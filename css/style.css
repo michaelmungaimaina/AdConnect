@@ -1417,7 +1417,7 @@ body section .contact-countainer .contact-footer div a:hover {
 
 /**********************************************************************************************************
 /*------------------------------------------- FAQ Section ------------------------------------------------*/
-.background-tint-black .appointment-layout .center{
+.black-background-tint-faq .appointment-layout .center{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1425,14 +1425,14 @@ body section .contact-countainer .contact-footer div a:hover {
     width: 100%;
 }
 
-.background-tint-black .faqSection {
+.black-background-tint-faq .faqSection {
     height: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.background-tint-black .button-close{
+.black-background-tint-faq .button-close{
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -1446,18 +1446,18 @@ body section .contact-countainer .contact-footer div a:hover {
     right: 0;
 }
 
-.background-tint-black .button-close:hover{
+.black-background-tint-faq .button-close:hover{
     background: inherit;
     .fa-xmark:hover{
         color:#F65730
     }
 }
 
-.background-tint-black .button-close .fa-xmark{
+.black-background-tint-faq.button-close .fa-xmark{
     color:white
 }
 
-.background-tint-black .appointment-layout .center h4{
+.black-background-tint-faq .appointment-layout .center h4{
     margin: 20px 0 0;
     font-size: 20px;
     color: white;
@@ -1467,12 +1467,12 @@ body section .contact-countainer .contact-footer div a:hover {
     text-align: center;
 }
 
-.background-tint-black .appointment-layout .center img{
+.black-background-tint-faq .appointment-layout .center img{
     width: 50px;
     color: white;
 }
 
-.background-tint-black .appointment-layout .sub-heading-faq{
+.black-background-tint-faq .appointment-layout .sub-heading-faq{
     font-size:17px;
     font-family: "IBM Plex Sans hebrew";
     font-weight: 500;
@@ -1480,7 +1480,7 @@ body section .contact-countainer .contact-footer div a:hover {
     margin: 4px 30px;
 }
 
-.background-tint-black .appointment-layout .quesion-faq{
+.black-background-tint-faq .appointment-layout .quesion-faq{
     font-size:13px;
     font-family: "IBM Plex Sans hebrew";
     font-weight: 500;
@@ -1488,7 +1488,7 @@ body section .contact-countainer .contact-footer div a:hover {
     margin: 4px 30px 4px 50px;
 }
 
-.background-tint-black .appointment-layout .anwer-faq{
+.black-background-tint-faq .appointment-layout .anwer-faq{
     font-size:13px;
     font-family: "IBM Plex Sans hebrew";
     font-weight: 500;
@@ -1496,7 +1496,7 @@ body section .contact-countainer .contact-footer div a:hover {
     margin: 4px 30px 4px 60px;
 }
 
-.background-tint-black .appointment-layout .button-submit{
+.black-background-tint-faq .appointment-layout .button-submit{
     display: flex;
     background: #F65730;
     width: 150px;
@@ -1506,14 +1506,14 @@ body section .contact-countainer .contact-footer div a:hover {
     transition: all 0.5s ease;
 }
 
-.background-tint-black .appointment-layout .button-submit p{
+.black-background-tint-faq .appointment-layout .button-submit p{
     font-size:13px;
     font-family: "IBM Plex Sans hebrew";
     font-weight: bold;
     color: #ffffff;
     margin: 4px 4px;
 }
-.background-tint-black .appointment-layout .button-submit:hover{
+.black-background-tint-faq .appointment-layout .button-submit:hover{
     border: 1.5px solid #F65730;
     background: inherit;
     transition: all 0.5s ease;
@@ -1522,7 +1522,7 @@ body section .contact-countainer .contact-footer div a:hover {
     }
 }
 
-.background-tint-black .appointment-layout .h-layout{
+.black-background-tint-faq .appointment-layout .h-layout{
     display: flex;
     flex-direction: row;
     justify-content: start;
@@ -1531,23 +1531,23 @@ body section .contact-countainer .contact-footer div a:hover {
     overflow: hidden;
 }
 
-.background-tint-black .appointment-layout .h-layout .left-col{
+.black-background-tint-faq .appointment-layout .h-layout .left-col{
     margin: 0 50px;
 }
 
-.background-tint-black .appointment-layout .h-layout .v-layout form{
+.black-background-tint-faq .appointment-layout .h-layout .v-layout form{
     width: 200px;
 }
 
-.background-tint-black .appointment-layout .h-layout .v-layout form input{
+.black-background-tint-faq .appointment-layout .h-layout .v-layout form input{
     width: 100%;
 }
 
-.background-tint-black .appointment-layout .h-layout .right-col{
+.black-background-tint-faq .appointment-layout .h-layout .right-col{
     margin: 0 0;
 }
 
-.background-tint-black .appointment-layout .h-layout .right-col textarea{
+.black-background-tint-faq .appointment-layout .h-layout .right-col textarea{
     width: 275px;
     min-width: 275px;
     max-width: 435px;
@@ -1557,7 +1557,7 @@ body section .contact-countainer .contact-footer div a:hover {
     padding: 10px;
 }
 
-.background-tint-black .appointment-layout .submit-button{
+.black-background-tint-faq .appointment-layout .submit-button{
     display: flex;
     background: #F65730;
     width: 150px;
@@ -1569,14 +1569,14 @@ body section .contact-countainer .contact-footer div a:hover {
     overflow: hidden;
 }
 
-.background-tint-black .appointment-layout .submit-button p{
+.black-background-tint-faq .appointment-layout .submit-button p{
     font-size:13px;
     font-family: "IBM Plex Sans hebrew";
     font-weight: bold;
     color: #ffffff;
     margin: 4px 4px;
 }
-.background-tint-black .appointment-layout .submit-button:hover{
+.black-background-tint-faq .appointment-layout .submit-button:hover{
     border: 1.5px solid #F65730;
     background: inherit;
     transition: all 0.5s ease;
@@ -1587,11 +1587,11 @@ body section .contact-countainer .contact-footer div a:hover {
 
 /* Responsiveness of the FAQ Section */
 @media screen and (max-width: 880px) {
-    .background-tint-black .appointment-layout .h-layout{
+    .black-background-tint-faq .appointment-layout .h-layout{
         flex-direction: column !important;
     }
 
-    .background-tint-black .appointment-layout .h-layout .right-col{
+    .black-background-tint-faq .appointment-layout .h-layout .right-col{
         margin: 0 50px !important;
     }
 }
