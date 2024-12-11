@@ -193,6 +193,33 @@ function navigateToNextPage() {
     document.getElementById('contactDiv').scrollIntoView();
   }
 
+  /* toggle dropdown in mobile view */
+  document.querySelectorAll('.collapse-btn').forEach(item => {
+    const trigger = item.querySelector('.dropdown-trigger');
+    const dropdown = item.querySelector('.collapse');
+
+    trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        dropdown.classList.toggle('show');
+    });
+});
+
+/* Control Navigation Bar Visibility */
+let lastScrollTop = 0;
+const navHeader = document.querySelector("..navbar"); // Replace with your nav header's class or ID
+
+window.addEventListener("scroll", () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrollTop > lastScrollTop) {
+        // Scroll Down
+        navHeader.style.transform = "translateY(-100%)";
+    } else {
+        // Scroll Up
+        navHeader.style.transform = "translateY(0)";
+    }
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For mobile or negative scrolling
+})
+
   $('.video').parent().click(function () {
     if($(this).children(".video").get(0).paused){        $(this).children(".video").get(0).play();   $(this).children(".playpause").fadeOut();
       }else{       $(this).children(".video").get(0).pause();
