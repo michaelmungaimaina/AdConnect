@@ -1,15 +1,3 @@
-/* Sidebar start */
-
-function openNav(){
-    'use strict';
-    const sidepanel = document.getElementById('mySidePanel');
-    
-    if (sidepanel){
-        sidepanel.style.left = '0';
-    } else{
-        console.error('Error: sidepanel not found');
-    }
-}
 
 'use strict';
 const showFAQsSection = document.getElementById('showFAQsSection');
@@ -34,6 +22,9 @@ const sectionThankYouVideo = document.getElementById('thankYouVideoSection');
 const btnCloseThanksPage = document.getElementById('btnCloseThanksPage');
 
 const btnSubmitLeadCapture  = document.getElementById('btnSubmitLeadCapture');
+
+const sidepanel = document.getElementById('mySidePanel');
+
 
 function openThankYouPage(){
     if (sectionThankYouVideo){
@@ -130,10 +121,25 @@ function closeFAQs(){
 
 function closeNav(){
     'use strict';
+    const navHeader = document.querySelector(".navbar");
     const sidepanel = document.getElementById('mySidePanel');
 
     if (sidepanel){
         sidepanel.style.left = '-320px';
+        navHeader.style.transform = "translateY(0)";
+    } else{
+        console.error('Error: sidepanel not found');
+    }
+}
+
+/* Sidebar start */
+
+function openNav(){
+    'use strict';
+    const navHeader = document.querySelector(".navbar");
+    if (sidepanel){
+        navHeader.style.transform = "translateY(-100%)";
+        sidepanel.style.left = '0';
     } else{
         console.error('Error: sidepanel not found');
     }

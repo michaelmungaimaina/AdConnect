@@ -385,7 +385,7 @@ header {
     width: 250px;
     position: fixed;
     top: 0;
-    left: 0;
+    left: -320px;
     background-color: #646262; /* Sidebar background */
     overflow-x: hidden;
     transition: 0.5s;
@@ -679,7 +679,7 @@ header {
 }
 
 .hero {
-    padding: 55px 20px;
+    padding: 58px 20px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.737) 100%, rgba(0, 0, 0, 0.567) 50%), url(/resources/background-image.jpeg);
     text-align: center;
     height: 100%;
@@ -695,7 +695,8 @@ header {
     line-height: 1.4;
     padding: 0 20px;
     margin: 0;
-    text-align: center;
+    text-align: left;
+    margin-bottom: 20px;
 }
 
 .hero h1 span {
@@ -704,8 +705,15 @@ header {
     box-shadow: 0 2px 7px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
+.hero h1 .one{
+    font-size: 3rem;
+    color: #4ABC4F;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
 .hero .elip-image {
-    display: none; /* Hidden for better responsiveness */
+    display: flex;
+    width: 500px; 
 }
 
 .hero p {
@@ -803,6 +811,7 @@ header {
         font-size: 2rem;
         text-align: justify;
         letter-spacing: 1pt;
+        line-height: 1.2;
     }
 
     .hero h1 span {
@@ -832,6 +841,10 @@ header {
     .exclusive-services h2 {
         margin: 0 10px;
     }
+
+    .hero .elip-image {
+        display: flex;
+    }
 }
 
 @media (max-width: 768px) {
@@ -839,6 +852,7 @@ header {
         font-size: 1.8rem;
         text-align: justify;
         letter-spacing: 1pt;
+        line-height: 1;
     }
 
     .hero h1 span {
@@ -882,11 +896,17 @@ header {
     .exclusive-services h2 {
         margin: 0 10px;
     }
+
+    .hero .elip-image {
+        display: none;/* Hidden for better responsiveness */
+    }
 }
 
 @media (max-width: 480px) {
     .hero h1 {
+        margin-top: 10px;
         font-size: 1.5rem;
+        line-height: 1;
     }
 
     .hero h1 span {
@@ -907,6 +927,10 @@ header {
 
     .cta .cta-btn {
         font-size: 0.8rem;
+    }
+
+    .hero .elip-image {
+        display: none;/* Hidden for better responsiveness */
     }
 }
 
@@ -1637,7 +1661,7 @@ body section .contact-countainer .contact-footer div a:hover {
 /**********************************************************************************************************
 /*-------------------------------------- Value Video Section ---------------------------------------------*/
 #valueVideoSection{
-    padding: 20px 10;
+    padding: 80px 10px 20px 10px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.7)100%, rgba(0, 0, 0, 0.5)50%), url(/resources/background-image.jpeg);
     background-position: center;
     display: none;
@@ -1691,6 +1715,7 @@ body section .contact-countainer .contact-footer div a:hover {
     padding-top: 20px;
     text-align: start;
     margin: 0px 30px;
+    text-align: justify;
 }
 
 #valueVideoSection .one{
@@ -1767,6 +1792,7 @@ body section .contact-countainer .contact-footer div a:hover {
 }
 
 #valueVideoSection .lable-bg p{
+    text-align: center;
     animation-name: pulsate;
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
