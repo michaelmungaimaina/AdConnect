@@ -206,7 +206,7 @@ function navigateToNextPage() {
 
 /* Control Navigation Bar Visibility */
 let lastScrollTop = 0;
-const navHeader = document.querySelector("..navbar"); // Replace with your nav header's class or ID
+const navHeader = document.querySelector(".navbar"); // Replace with your nav header's class or ID
 
 window.addEventListener("scroll", () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
