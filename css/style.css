@@ -1858,7 +1858,9 @@ body section .contact-countainer .contact-footer div a:hover {
 #thankYouVideoSection .outer-container {
     display: flex;
     flex-direction: column;
+    height: 100%;
     width: 90%;
+    margin: 50px 100px;
     max-width: 800px;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 10px;
@@ -1896,11 +1898,12 @@ body section .contact-countainer .contact-footer div a:hover {
     border-radius: 10px;
     overflow: hidden;
     width: fit-content;
+    height: max-content;
 }
 
 #thankYouVideoSection .wrapper video {
     width: 100%;
-    height: 200px;
+    height: max-content;
     border-radius: 10px;
 }
 
@@ -1953,6 +1956,59 @@ body section .contact-countainer .contact-footer div a:hover {
     font-size: 20px;
 }
 
+
+@media screen and (max-width: 880px) {
+    #thankYouVideoSection .outer-container {
+        padding: 10px 20px;
+        height: fit-content;
+        overflow-x: scroll;
+    }
+    #thankYouVideoSection {
+        padding: 5px 10px 20px 10px;
+        height: fit-content;
+        overflow-x: scroll;
+    }
+
+    #thankYouVideoSection .outer-container .top-bar {
+        margin-bottom: 5px;
+    }
+
+    #thankYouVideoSection h2 {
+        height: 35px;
+        font-size: 18px;
+        margin: 5px 0;
+    }
+
+    #thankYouVideoSection .wrapper {
+        margin: 10px auto;
+    }
+
+    #thankYouVideoSection .foot-text {
+        font-size: 12px;
+    }
+
+    #btnApplyFreeConsultation {
+        font-size: 12px;
+    }
+
+    #btnCloseThanksPage {
+        width: 40px;
+        height: 40px;
+        right: 27px;
+    }
+
+    #thankYouVideoSection .foot-text {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    #btnApplyFreeConsultation {
+        margin: 20px auto 10px auto;
+        padding: 5px 20px;
+    }
+
+}
+
 /**********************************************************************************************************
 /*--------------------------------- ----- Application Form Section ----------------------------------------------*/
 #applicationFormSection {
@@ -1962,7 +2018,7 @@ body section .contact-countainer .contact-footer div a:hover {
     z-index: 9999;
     width: 100%;
     height: 100%;
-    padding: 20px 10px;
+    padding: 70px 10px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(/resources/background-image.jpeg);
     background-position: center;
     background-size: cover;
@@ -1977,12 +2033,31 @@ body section .contact-countainer .contact-footer div a:hover {
 #applicationFormSection .outer-container {
     display: flex;
     flex-direction: column;
-    width: 90%;
+    width: 70%;
     max-width: 800px;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    align-items: center;
+    margin-top: 70px;
+}
+
+#applicationFormSection .outer-container .top-bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+#applicationFormSection .outer-container .top-bar .v-layout{
+    width: fit-content
+}
+
+#applicationFormSection .outer-container .top-bar .v-layout img {
+    width: 110px;
 }
 
 #btnCloseApplicationForm {
@@ -1994,26 +2069,36 @@ body section .contact-countainer .contact-footer div a:hover {
     align-items: center;
     cursor: pointer;
     border-radius: 10px;
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
+    color: white;
 }
 
 #btnCloseApplicationForm:hover {
     background: inherit;
     border: 1.5px solid #F65730;
-    color: #4ABC4F;
+    color: #F65730;
+}
+
+#applicationFormSection .v-layout{
+    width: 100%;
+    overflow: hidden;
 }
 
 #applicationFormSection form{
-    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: left;
+    width: 100%;
     margin: 30px 0 0;
 }
 
 #applicationFormSection form label{
     font-family: 'DM Sans Serif';
     font-weight: bolder;
-    font-size: 18px;
+    font-size: 16px;
     width: fit-content;
 }
 
@@ -2023,7 +2108,25 @@ body section .contact-countainer .contact-footer div a:hover {
     width: 300px;
 }
 
+#applicationFormSection h5{
+    margin-top: 20px;
+    font-size: 16px;
+    padding: 10px;
+    width: 600px;
+    border-radius: 10px;
+    background: #00000000;
+    background-color: #00000000;
+    box-shadow: 4px -4px 0px 4px #F65730;
+    border: 0.7px solid #F65730;
+}
+
+#applicationFormSection .base-line{
+    width: 400px;
+    top: -10px;
+}
+
 #applicationFormSection .v-layout{
+    width: 600px;
     align-items: center;
 }
 
@@ -2039,7 +2142,7 @@ body section .contact-countainer .contact-footer div a:hover {
 
 #applicationFormSection button{
     background-color: rgb(246, 87, 48);
-    height: 50px;
+    height: 40px;
     font-size: 16px;
     font-weight: bolder;
     color: white;
@@ -2049,6 +2152,65 @@ body section .contact-countainer .contact-footer div a:hover {
     border-radius: 10px;
 }
 
+#applicationFormSection button:hover{
+    background-color: inherit;
+    border: 1px solid #F65730;
+}
+/** Responsiveness of the Application form */
+@media screen and (max-width: 980px) {
+    #applicationFormSection .outer-container {
+        margin-top: 100px;
+    }
+    #btnCloseApplicationForm {
+        width: 40px;
+        height: 40px;
+        position: -webkit-sticky;
+    }
+    #applicationFormSection .header-text{
+        font-size: 15px;
+    }
+
+    #applicationFormSection h5{
+        width: 100%;
+        font-size: 12px;
+        align-items: stretch;
+    }
+
+    #applicationFormSection .v-layout{
+        width: 100%;
+    }
+
+    #applicationFormSection form{
+        width: 100%;
+    }
+
+    #applicationFormSection form label{
+        width: 100%;
+    }
+
+    #applicationFormSection form label{
+        font-size: 14px;
+    }
+
+    #applicationFormSection form input{
+        font-size: 11px;
+        width: 200px;
+    }
+
+    #applicationFormSection #h-buttons{
+        width: 100%;
+    }
+
+    
+
+    
+}
+
+@media screen and (max-width: 720px) {
+    #applicationFormSection .base-line{
+        width: 250px;
+    }
+}
 
 
 /**********************************************************************************************************
@@ -2232,6 +2394,7 @@ body section .contact-countainer .contact-footer div a:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    z-index: 999999;
     width: 100%;
 }
 
