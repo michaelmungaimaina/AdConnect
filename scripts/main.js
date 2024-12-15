@@ -341,7 +341,7 @@ function submitLeads() {
     const phone = document.getElementById('phone').value;
     const errorMessage = document.getElementById('errorMessage');
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^\d+$/;
+    const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
     let errorMessages = [];
     if (name.trim() === '') {
@@ -469,7 +469,7 @@ function goToNextStep() {
         const errorMessages = [];
         const errorMessageContainer = document.getElementById('formErrorMessage');
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phonePattern = /^\d+$/;
+        const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
         // Switch case for structured validation
         switch (input.id) {
