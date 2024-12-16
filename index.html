@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home - Landing</title>
+  <title>Home</title>
 
   <!-- Logo Icon-->
-  <link rel="shortcut icon" href="resources/logo.svg" type="image/x-icon" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
 
   <!-- link css -->
   <link rel="stylesheet" href="css/style.css" />
@@ -41,7 +41,7 @@
             <a href="/" class="navbar-logo">
               <img src="/resources/logo.png" alt="" />
             </a>
-            <button onclick="openNav()" class="navbar-toggler" type="button">
+            <button id="navbarTogler" onclick="openNav()" class="navbar-toggler" type="button">
               <span class="fa fa-bars" aria-hidden="true"></span>
             </button>
             <!-- Menu -->
@@ -64,22 +64,22 @@
                 </ul>
               </li>
             </ul>
-            <div onclick="openSearch()" class="search-bar">
-              <i onclick="openSearch()" class="fa-solid fa-magnifying-glass"></i>
+            <div id="searchBar" onclick="openSearch()" class="search-bar">
+              <i id="searchBarIcon" onclick="openSearch()" class="fa-solid fa-magnifying-glass"></i>
             </div>
           </div>
-          <div class="nav-right flex">
+          <!--div class="nav-right flex">
             <p>John Doe <span>E-mail</span></p>
-            <!-- header buttons -->
+             header buttons 
             <i class="fa-solid fa-magnifying-glass"></i>
             <i class="fa-solid fa-bars"></i>
-          </div>
+          </div> -->
         </nav>
         <!-- sidebar -->
         <aside id="mySidePanel" class="sidepanel">
           <div class="sidebar flex">
             <a href=""> <img src="resources/logo.png" alt="logo" /> </a>
-            <button onclick="closeNav()" type="button" class="closebtn btn-hover">
+            <button id="sidePanelCloseBtn" onclick="closeNav()" type="button" class="closebtn btn-hover">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -111,7 +111,7 @@
         <!-- Searchbar -->
         <div id="searchbar">
           <div class="btn_hover1">
-            <i onclick="closeSearch()" class="fa-solid fa-xmark"></i>
+            <i id="btnCloseSearch" onclick="closeSearch()" class="fa-solid fa-xmark"></i>
           </div>
           <form action="#" method="search">
             <input type="search" required placeholder="Search ..." />
@@ -213,7 +213,7 @@
     <div class="outer-container">
       <div class="h-layout">
         <div class="slash-rect"></div>
-        <p class="header-text">Lead Capture</p>
+        <p class="header-text">Your Details</p>
       </div>
       <img class="elipsis" src="/resources/elipsis-line.png" alt="elipsis-line" />
       <div class="bordered-container">
@@ -289,7 +289,7 @@
       </div>
       <p class="foot-text">Want to see how these strategies can generate more property leads for your business? Apply
         your free consultation below!</p>
-      <button onclick="openApplicationForm()" id="btnApplyFreeConsultation">APPLY FOR A FREE CONSULTATION</button>
+      <button id="btnOpenApplicationForm" onclick="openApplicationForm()" id="btnApplyFreeConsultation">APPLY FOR A FREE CONSULTATION</button>
     </div>
   </section>
 
@@ -313,15 +313,15 @@
         Please take a few moments to answer these questions so we can hit the ground
         running during our call. The more detailed your answers, the better we can serve you!</h5>
       <img class="base-line" src="/resources/elipsis-line.png" alt="" style="margin: 5px 100px;">
-      <div id="formErrorMessage" style="color: rgb(236, 2, 2); display: block; margin: 0px 0px 0px 0px; background-color: rgba(251, 128, 128, 0.533); align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;"></div>
+      <div id="formErrorMessage" style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;"></div>
       <div class="v-layout">
         <form id="fname" action="submit" class="form-section">
           <label for="fname" class="label">What's Your First Name?</label>
           <input id="firstNameInput" type="text" class="input-field" placeholder="Type Your Name Here ...">
         </form>
 
-        <form id="lname" action="submit" class="form-section" style="display: none;">
-          <label for="lname" class="label">What's Your Last Name,</label>
+        <form id="lastname" action="submit" class="form-section" style="display: none;">
+          <label for="lastname" class="label">What's Your Last Name,</label>
           <input id="lastNameInput" type="text" class="input-field" placeholder="Type Your Last Name Here ...">
         </form>
 
@@ -331,7 +331,7 @@
         </form>
 
         <form id="phoneNumber" action="submit" class="form-section" style="display: none;">
-          <label for="phone" class="label">What's Your Phone Number,</label>
+          <label for="phonelabel" class="label">What's Your Phone Number,</label>
           <input id="phoneInput" type="tel" class="input-field" placeholder="(0) 123 456 789">
         </form>
 
@@ -356,13 +356,18 @@
         <form id="investment" action="submit" class="form-section" style="display: none;">
           <label for="investment" class="label">If you were 100% certain you could achieve your goals, how much would
             you invest directly in making it happen?</label>
-          <input id="investmentInput" type="dropdown" class="input-field" placeholder="Select a Value">
-          <label for="investment" class="label">Congrats! You've completed this form, we’ll review your responses and
-            prepare for your personalized consultation. Click below to send and schedule your call!</label>
+            <select id="investmentInput" class="input-field">
+              <option value="" disabled selected>Select Your Capability</option>
+              <option value="35000_or_less">KES 35,000 or less</option>
+              <option value="36000_60000">KES 36,000 – 60,000</option>
+              <option value="61000_120000">KES 61,000 – 120,000</option>
+              <option value="more_than_120000">More than KES 120,000</option>
+          </select>
+          <label for="investment" class="label-last"><span>Congrats! </span><span class="two">You've completed this form.</span><br> Click below to send and schedule your call!</label>
         </form>
         <div id="h-buttons">
-          <button id="btnLeftApplication" class="btn-class" style="filter: blur(5px);">PREV</button>
-          <button id="btnRightApplication" class="btn-class">NEXT</button>
+          <button id="btnLeftApplication" class="btn-class" style="filter: blur(5px);" onclick="goToPreviousStep()">PREV</button>
+          <button id="btnRightApplication" class="btn-class" onclick="goToNextStep()">NEXT</button>
       </div>
 
     </div>
@@ -378,6 +383,7 @@
         <div class="slash-rect"></div>
         <p class="header-text">Book an Appointment</p>
       </div>
+      <div id="appointmentErrorMessage" style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;"></div>
       <div class="h-layout myhlayout"><!-- Start H-Layout-->
         <div class="v-layout left-column">
           <img id="appointeeIcon" src="/resources/misgina.png" alt="image"/>
@@ -477,7 +483,7 @@
         <div class="v-layout right-col-message">
           <label for="message" class="label">Additional Message</label>
           <textarea id="appointeeMessage" type="text" class="input-field" placeholder="Your Appointment Message..."></textarea>
-            <div id="btnSubmitAppointment" class="experience">
+            <div id="btnSubmitAppointment" class="experience" onclick="submitAppointment()">
               <p>Book Appointment</p>
             </div>
         </div>
@@ -542,11 +548,12 @@
   <!-------------------------------------- Footer Section ------------------------------------------>
   <footer class="footer">
     <div class="footer-container">
+      <div class="footer-logo"><img src="/resources/logo.png" alt=""></div>
       <div class="top-items-footer">
         <div class="consultation">
           <img src="/resources/help.svg.svg" alt="" class="client-icon" />
           <p class="par-consult">Need Help? Call Us!</p>
-          <button type="submit" class="btn_hover1 small-button">
+          <button id="footerConsultationBtn" type="submit" class="btn_hover1 small-button">
             CONSULTATION
           </button>
         </div>
@@ -593,7 +600,7 @@
             Need a clarification? Ask our Agents for a clarified solution.
             You'll get your clarification as soon as possible
           </p>
-          <button id="showFAQsSection" onclick="openFAQs()" type="submit" class="btn_hover1 small-button">
+          <button id="showFAQsSection" type="submit" class="btn_hover1 small-button">
             VIEW FAQs SECTION
           </button>
         </div>
@@ -647,7 +654,7 @@
     integrity="sha256-DHF4zGyjT760MP8wpeehwoey18z8uiz9864PRu2lVBA=" crossorigin="anonymous"></script>
 
   <!-- Custom JS-->
-  <script src="scripts/main.js"></script>
+  <script type="module" src="scripts/main.js"></script>
 </body>
 
 </html>

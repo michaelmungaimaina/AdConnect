@@ -1,3 +1,5 @@
+import { UserApplicationObject } from './objects.js';
+
 
 'use strict';
 const showFAQsSection = document.getElementById('showFAQsSection');
@@ -25,11 +27,70 @@ const btnSubmitLeadCapture = document.getElementById('btnSubmitLeadCapture');
 
 const sidepanel = document.getElementById('mySidePanel');
 
-const btnApplyFreeConsultation = document.getElementById('btnApplyFreeConsultation');
 const sectionApplyConsultation = document.getElementById('applicationFormSection');
 
 const sectionAppointmentApplication = document.getElementById('appointmentView');
 const btnCloseAppointmentApplication = document.getElementById('btnCloseApointment');
+const navbarTogler = document.getElementById('navbarTogler');
+const searchBarContainer = document.getElementById('searchBar');
+const searchBarIcon = document.getElementById('searchBarIcon');
+const sidePanelCloseBtn = document.getElementById('sidePanelCloseBtn');
+const btnCloseSearch = document.getElementById('btnCloseSearch');
+const btnOpenApplicationForm = document.getElementById('btnOpenApplicationForm');
+const btnCloseApplicationForm = document.getElementById('btnCloseApplicationForm');
+const btnLeftApplicationForm = document.getElementById('btnLeftApplication');
+const btnRightApplicationForm = document.getElementById('btnRightApplication');
+const btnSubmitAppointment = document.getElementById('btnSubmitAppointment');
+const btnFooterConsultation= document.getElementById('footerConsultationBtn');
+const btnFooterFAQs = document.getElementById('showFAQsSection');
+
+
+
+// Attach event listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+
+    btnNavToVideoSection.addEventListener('click', openValueVideo);
+    navbarTogler.addEventListener('click', openNav);
+    searchBarIcon.addEventListener('click', openNav);
+    searchBarContainer.addEventListener('click', openSearch);
+    sidePanelCloseBtn.addEventListener('click', closeNav);
+    btnCloseSearch.addEventListener('click', closeSearch);
+    txtOpenLeadCapture.addEventListener('click', openLeadCaptureSection);
+    iconPause.addEventListener('click', openLeadCaptureSection);
+    btnCloseLeadapture.addEventListener('click', closeLeadCapture);
+    btnSubmitLeadCapture.addEventListener('click', submitLeads);
+    btnCloseThanksPage.addEventListener('click', closeThankYouPage);
+    btnOpenApplicationForm.addEventListener('click', openApplicationForm);
+    btnCloseApplicationForm.addEventListener('click', closeApplicationForm);
+    btnLeftApplicationForm.addEventListener('click', goToPreviousStep);
+    btnRightApplicationForm.addEventListener('click', goToNextStep);
+    btnCloseAppointmentApplication.addEventListener('click', closeAppointmentView);
+    btnSubmitAppointment.addEventListener('click', submitAppointMent);
+    btnCloseFAQs.addEventListener('click', closeFAQs);
+    showFAQsForm.addEventListener('click', openFAQsForm);
+    submitFAQsFormButton.addEventListener('click', submitFAQsForm);
+    btnFooterConsultation.addEventListener('click', () => openUrl('?lead-capture-form=true'));
+    btnFooterFAQs.addEventListener('click', openFAQs);
+});
+
+function openUrl(param) {
+    if (!param) {
+        console.error('Parameter is required.');
+        return;
+    }
+    console.log(`Opening overlay with parameter: ${param}`);
+    // Use history API or URL query parsing logic
+    const overlayElement = document.getElementById('leadCaptureSection'); // Replace with your actual overlay element
+    if (overlayElement) {
+        sectionLeadCapture.style.height = '100%'; // Show the overlay
+    }
+    // Optional: Add the parameter to the URL without reloading
+    const url = new URL(window.location.href);
+    url.searchParams.set('lead-capture-form', 'true');
+    window.history.pushState({}, '', url);
+}
+
+//window.openValueVideo = openValueVideo;
 
 // Managing url
 const currentUrl = window.location.href;
@@ -85,6 +146,15 @@ function openThankYouPage() {
     }
 }
 
+function closeThankYouPage() {
+    if (sectionThankYouVideo) {
+        sectionThankYouVideo.style.display = 'none';
+        window.history.pushState({}, '', baseUrl);
+    } else {
+        console.error('Error: ThankY You Video Section Not Found');
+    }
+}
+
 // Open Application Filling Form
 function openApplicationForm() {
     if (sectionApplyConsultation) {
@@ -119,17 +189,10 @@ window.addEventListener('resize', () => {
     }
 });
 
-function closeThankYouPage() {
-    if (sectionThankYouVideo) {
-        sectionThankYouVideo.style.display = 'none';
-        window.history.pushState({}, '', baseUrl);
-    } else {
-        console.error('Error: ThankY You Video Section Not Found');
-    }
-}
 
 function openFAQs() {
     'use strict';
+    console.log('Faqs Open')
     if (showFAQsSection) {
         const newUrl = `${baseUrl.slice(0, -1)}?faqs=true`;
         window.history.pushState({}, '', newUrl);
@@ -157,7 +220,7 @@ function openFAQsForm() {
     }
 }
 
-function openValueVideo() {
+export function openValueVideo() {
     if (sectionValueVideo) {
         sectionValueVideo.style.display = 'flex'
         sectionValueVideo.scrollIntoView({ behavior: 'smooth' });
@@ -280,6 +343,8 @@ function openAppointmentBooking() {
         sectionAppointmentApplication.style.height = '100%';
         const newUrl = `${baseUrl.slice(0, -1)}?appointment-booking=true`;
         window.history.pushState({}, '', newUrl);
+
+        appointmentAction()
     }
 }
 
@@ -289,9 +354,9 @@ function navigateToNextPage() {
     window.location.href = '.html';
 }
 
-function scrollToAboutPage() {
+/*function scrollToAboutPage() {
     document.getElementById('contactDiv').scrollIntoView();
-}
+}*/
 
 /* toggle dropdown in mobile view */
 document.querySelectorAll('.collapse-btn').forEach(item => {
@@ -342,35 +407,43 @@ function submitLeads() {
     const errorMessage = document.getElementById('errorMessage');
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
+    const twoWordsPattern = /^\S+\s+\S+/;
 
-    let errorMessages = [];
+    let errorMessages = '';
     if (name.trim() === '') {
         document.getElementById('name').focus();
-        errorMessages.push('Full Name is required!');
-        handleErrorMessages(errorMessages, errorMessage);
+        errorMessages = 'Full Name is required!';
+        handleErrorMessage(errorMessages, errorMessage);
+        return true;
+    }
+    if (!twoWordsPattern.test(name.trim())) {
+        document.getElementById('name').focus();
+        errorMessages = 'A full Name has two or more words!';
+        handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
     if (email.trim() === '') {
         document.getElementById('email').focus();
-        errorMessages.push('Email is required!');
-        handleErrorMessages(errorMessages, errorMessage);
+        errorMessages = 'Email is required!';
+        handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
     if (!emailPattern.test(email)) {
         document.getElementById('email').focus();
-        errorMessages.push('Please enter a valid email address!');
-        handleErrorMessages(errorMessages, errorMessage);
+        errorMessages = 'Please enter a valid email address!';
+        handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
     if (phone.trim() === '') {
         document.getElementById('phone').focus();
-        errorMessages.push('Phone Number is required!');
-        handleErrorMessages(errorMessages, errorMessage);
+        errorMessages = 'Phone Number is required!';
+        handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
     if (!phonePattern.test(phone)) {
-        errorMessages.push('Please enter a valid phone number.');
-        handleErrorMessages(errorMessages, errorMessage);
+        document.getElementById('phone').focus();
+        errorMessages = 'Please enter a valid phone number.';
+        handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
     // Submit data to Database and send an Email to the client
@@ -379,32 +452,36 @@ function submitLeads() {
     errorMessage.style.color = 'white';
     errorMessage.style.backgroundColor = '#4abc5061';
     errorMessage.style.display = 'block';
-    errorMessages.push('Thank You. Data Successfully Submitted!');
-    handleErrorMessages(errorMessages, errorMessage);
+    errorMessages = 'Thank You. Data Successfully Submitted!';
+    handleErrorMessage(errorMessages, errorMessage);
     // Delay for openning of thank you page for 4 seconds to display success message
     setTimeout(() => {
         errorMessage.style.color = 'rgb(236, 2, 2)';
         errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
         openThankYouPage();
-    }, 3000);
+    }, 2000);
 
     return true;
 }
 
-function handleErrorMessages(errorMessages, errorMessage) {
-    //const errorMessage = document.getElementById('errorMessage'); // Assuming the error message element has this ID
-
-    if (errorMessages.length > 0) {
-        errorMessage.style.display = 'block';
-        errorMessage.innerHTML = errorMessages.join('<br>');
+/**
+ * Method for displaying error messages to the user
+ * @param {the error text to be displayed} errorMessage 
+ * @param {the container for displaying the error text} errorMessageElement 
+ * @returns a view if true
+ */
+function handleErrorMessage(errorMessage, errorMessageElement) {
+    if (errorMessage && errorMessage.trim() !== '') {
+        errorMessageElement.style.display = 'block';
+        errorMessageElement.innerHTML = errorMessage;
 
         setTimeout(() => {
-            errorMessage.style.display = 'none';
+            errorMessageElement.style.display = 'none';
         }, 4000);
 
         return false;
     } else {
-        errorMessage.style.display = 'none';
+        errorMessageElement.style.display = 'none';
         return true;
     }
 }
@@ -417,7 +494,7 @@ function handleErrorMessages(errorMessages, errorMessage) {
 // Select all form elements and buttons
 const forms = [
     document.getElementById("fname"),
-    document.getElementById("lname"),
+    document.getElementById("lastname"),
     document.getElementById("eaddresss"),
     document.getElementById("phoneNumber"),
     document.getElementById("occupation"),
@@ -429,25 +506,9 @@ const forms = [
 const btnLeftApplication = document.getElementById("btnLeftApplication");
 const btnRightApplication = document.getElementById("btnRightApplication");
 
-// Store responses in an object
 const surveyData = {};
 let currentStep = 0;
-
-// Dropdown options for investment
-const investmentDropdown = document.getElementById("investmentInput");
-const investmentOptions = [
-    "Select Your Capability",
-    "KES 35,000 or less",
-    "KES 36,000 – 60,000",
-    "KES 61,000 – 120,000",
-    "More than KES 120,000",
-];
-investmentOptions.forEach(option => {
-    const opt = document.createElement("option");
-    opt.value = option;
-    opt.textContent = option;
-    investmentDropdown.appendChild(opt);
-});
+let userFirstName = '';
 
 // Initialize the form
 function initializeForm() {
@@ -458,89 +519,171 @@ function initializeForm() {
     btnRightApplication.textContent = "NEXT";
 }
 
-const userFirstName = '';
-// Move to the next step
 function goToNextStep() {
     const currentForm = forms[currentStep];
-    const input = currentForm.querySelector("input");
+    const input = currentForm.querySelector("input, select");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
     // Validate input
-    if (!input || !input.value.trim()) {
-        const errorMessages = [];
+    if (!input || input.value.trim() === '') {
+        let errorMessages = '';
         const errorMessageContainer = document.getElementById('formErrorMessage');
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
-        // Switch case for structured validation
         switch (input.id) {
             case 'firstNameInput':
-                errorMessages.push('Your Full Name is required!');
+                errorMessages = 'Your Full Name is required!';
                 break;
-
             case 'lastNameInput':
-                errorMessages.push('Your Last Name is required!');
+                errorMessages = 'Your Last Name is required!';
                 break;
-
             case 'emailAddressInput':
-                if (!input.value.trim()) {
-                    errorMessages.push('Your Email is required!');
-                } else if (!emailPattern.test(input.value.trim())) {
-                    errorMessages.push('A valid Email is required!');
-                }
+                errorMessages = 'Your Email is required!';
                 break;
-
             case 'phoneInput':
-                if (!input.value.trim()) {
-                    errorMessages.push('Your Phone Number is required!');
-                } else if (!phonePattern.test(input.value.trim())) {
-                    errorMessages.push('A valid Phone Number is required!');
-                }
+                errorMessages = 'Your Phone Number is required!';
                 break;
-
             case 'occupationInput':
-                errorMessages.push('Your Occupation is required!');
+                errorMessages = 'Your Occupation is required!';
                 break;
-
             case 'reasonInput':
-                errorMessages.push('Your Company Status is required!');
+                errorMessages = 'Your Company Status is required!';
                 break;
-
             case 'goalInput':
-                errorMessages.push('Your Goal is required!');
+                errorMessages = 'Your Goal is required!';
                 break;
-
             case 'investmentInput':
-                errorMessages.push('Your Investment choice is required!');
+                errorMessages = 'Your Investment choice is required!';
                 break;
-
             default:
-                errorMessages.push('An unexpected input error occurred.');
+                errorMessages = 'An unexpected input error occurred.';
                 break;
         }
-        // Handle error messages display
-        handleErrorMessages(errorMessages, errorMessageContainer);
-        input.focus();
 
+        // Display error and focus input
+        handleErrorMessage(errorMessages, errorMessageContainer);
+        input.focus();
+        return;
     }
 
+    // Store the input value in the UserApplication object
+    const inputValue = input.value.trim();
 
-    // Store the input value
+    //Conforming to Standard Input
+    let errorMessages = '';
+    const errorMessageContainer = document.getElementById('formErrorMessage');
+    // Switch case for structured validation
+    switch (input.id) {
+        case 'firstNameInput':
+            if (input.value.trim().length <= 4) {
+                errorMessages = 'Your Name is too short! Enter a valid Name.';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            userFirstName = input.value.trim();
+            UserApplicationObject.firstName = inputValue;
+            break;
+
+        case 'lastNameInput':
+            if (input.value.trim().length < 4) {
+                errorMessages = 'Your Name is too short! Enter a valid Name.';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.lastName = inputValue;
+            break;
+
+        case 'emailAddressInput':
+            if (input.value.trim().length <= 4) {
+                errorMessages = 'Email is Too Short';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            if (!emailPattern.test(input.value.trim())) {
+                errorMessages = 'Enter A valid Email Address!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.emailAddress = inputValue;
+            break;
+
+        case 'phoneInput':
+            if (!phonePattern.test(input.value.trim())) {
+                errorMessages = 'Please Enter A valid Phone Number!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.phoneNumber = inputValue;
+            break;
+
+        case 'occupationInput':
+            if ((input.value.trim().length <= 4)) {
+                errorMessages = 'Your Occupation is required!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.occupation = inputValue;
+            break;
+
+        case 'reasonInput':
+            if ((input.value.trim().length <= 4)) {
+                errorMessages = 'Your Company Status is required!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.reason = inputValue;
+            break;
+
+        case 'goalInput':
+            if ((input.value.trim().length <= 4)) {
+                errorMessages = 'Your Goal is required!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.goal = inputValue;
+            break;
+
+        case 'investmentInput':
+            if ((input.value.trim().length <= 4)) {
+                errorMessages = 'Your Investment choice is required!';
+                handleErrorMessage(errorMessages, errorMessageContainer);
+                input.focus();
+                return;
+            }
+            UserApplicationObject.investment = inputValue;
+            break;
+
+        default:
+            errorMessages = 'An unexpected input error occurred.';
+            break;
+    }
+
+    // Store input value
     const key = input.id;
     surveyData[key] = input.value;
 
-    // Customize the next form label if applicable
+    // Customize the label for the next form
+    // Update labels dynamically
     if (currentStep === 0) {
-        //userFirstName = document.getElementById('firstNameInput');
-        const lnameLabel = document.querySelector("label[for='lname']");
+        userFirstName = input.value.trim(); // Capture the first name
+        const lnameLabel = document.querySelector("label[for='lastname']");
         lnameLabel.textContent = `What's Your Last Name, ${userFirstName}?`;
     }
     if (currentStep === 1) {
-        const eAdressLabel = document.querySelector("label[for='eaddress']");
-        eAdressLabel.textContent = `What's Your Email Address, ${userFirstName}?`;
+        const lnameLabel = document.querySelector("label[for='eaddress']");
+        lnameLabel.textContent = `What's Your Email Address, ${userFirstName}?`;
     }
     if (currentStep === 2) {
-        const phoneLabel = document.querySelector("label[for='phone']");
-        phoneLabel.textContent = `What's Your Phone Number, ${input.value}?`;
+        const eAdressLabel = document.querySelector("label[for='phonelabel']");
+        eAdressLabel.textContent = `What's Your Phone Number, ${userFirstName}?`;
     }
 
     // Hide current form and show the next
@@ -548,44 +691,126 @@ function goToNextStep() {
     currentStep++;
 
     if (currentStep < forms.length) {
-        forms[currentStep].style.display = "block";
+        forms[currentStep].style.display = "flex";
     }
 
-    // Update button states
-    if (currentStep > 0) {
-        btnLeftApplication.style.filter = "none";
-    }
+    // Update button text
+    if (currentStep > 0) btnLeftApplication.style.filter = "none";
     if (currentStep === forms.length - 1) {
         btnRightApplication.textContent = "Send and Book Now";
     }
 
-    // Submit data if it's the last step
+    // Submit data on the last step
     if (currentStep === forms.length) {
         console.log("Survey completed. Data submitted:", surveyData);
-        //alert("Thank you for completing the survey! Your responses have been submitted.");
+        //API call
+        /**
+         * submit Data to DB
+         *
+        fetch('/submitApplication', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(UserApplicationObject),
+        })
+            .then(response => response.json())
+            .then(data => console.log('Success:', data))
+            .catch(error => console.error('Error:', error));*/
+
+
+        // Close the application window
+        sectionApplyConsultation.style.transform = 'translateY(-100%)';
         openAppointmentBooking();
     }
+
 }
 
-// Move to the previous step
 function goToPreviousStep() {
     if (currentStep === 0) return;
 
-    // Hide current form and show the previous
     forms[currentStep].style.display = "none";
     currentStep--;
-    forms[currentStep].style.display = "block";
+    forms[currentStep].style.display = "flex";
 
-    // Update button states
-    if (currentStep === 0) {
-        btnLeftApplication.style.filter = "blur(5px)";
-    }
+    if (currentStep === 0) btnLeftApplication.style.filter = "blur(5px)";
     btnRightApplication.textContent = "NEXT";
 }
 
-// Event listeners
-btnRightApplication.addEventListener("click", goToNextStep);
-btnLeftApplication.addEventListener("click", goToPreviousStep);
-
 // Initialize the survey form
 initializeForm();
+
+/**
+ * Process all pre-actions in the booking of an Appointment
+ * Prepopulates the data
+ * Sets a default date and disables Sundays
+ * Calls the Action for booking
+ */
+function appointmentAction() {
+    const fullNameInput = document.getElementById('appointeeName');
+    const emailInput = document.getElementById('appointeeEmail');
+    const phoneInput = document.getElementById('appointeePhone');
+    const locationInput = document.getElementById('appointeeLocation');
+    const dateInput = document.getElementById('appointeeDate');
+    const errorMessageContainer = document.getElementById('appointmentErrorMessage');
+
+    // Combine first name and last name for the full name
+    const fullName = `${UserApplicationObject.firstName} ${UserApplicationObject.lastName}`;
+
+    // Prepopulate the inputs
+    if (fullNameInput) fullNameInput.value = fullName;
+    if (emailInput) emailInput.value = `${UserApplicationObject.emailAddress}`;
+    if (phoneInput) phoneInput.value = `${UserApplicationObject.phoneNumber}`;
+
+    // Set default date to today
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayDate = `${yyyy}-${mm}-${dd}`;
+
+    // Set the input's default and minimum value
+    dateInput.value = todayDate;
+    dateInput.min = todayDate;
+
+    // Kenyan holidays (Add more as needed)
+    const kenyanHolidays = [
+        `${yyyy}-01-01`, // New Year's Day
+        `${yyyy}-03-08`, // International Women's Day
+        `${yyyy}-05-01`, // Labor Day
+        `${yyyy}-06-01`, // Madaraka Day
+        `${yyyy}-10-20`, // Mashujaa Day
+        `${yyyy}-12-12`, // Jamhuri Day
+        `${yyyy}-12-25`, // Christmas Day
+        `${yyyy}-12-26`, // Boxing Day
+    ];
+
+    let errorMessage = '';
+
+    // Disable Sundays and Kenyan holidays
+    dateInput.addEventListener('change', function () {
+        const selectedDate = new Date(this.value);
+        const day = selectedDate.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
+        const formattedDate = this.value;
+
+        // Check for Sundays
+        if (day === 0) {
+            errorMessage = 'Sundays are not available for appointments. Please select another date.';
+            handleErrorMessage(errorMessage, errorMessageContainer);
+            this.value = ''; // Clear the invalid date
+            return;
+        }
+
+        // Check for Kenyan holidays
+        if (kenyanHolidays.includes(formattedDate)) {
+            errorMessage = 'The selected date falls on a holiday. Please choose another date.';
+            handleErrorMessage(errorMessage, errorMessageContainer)
+            this.value = ''; // Clear the invalid date
+            return;
+        }
+    });
+}
+
+function submitAppointMent(){
+    // Perform Checks and Open a Thank you page
+}

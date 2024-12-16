@@ -179,10 +179,23 @@ header {
 
 .container-nav {
     gap: 50px;
+    align-items: start;
 }
 
 .navbar-logo {
     margin-right: 25px;
+    height: 40px;
+    width: 180px;
+    top: 5px;
+    overflow: hidden;
+    border-radius: 10px 5px 10px 1px;
+    background-color: #431005;
+    padding: 3px;
+}
+
+.navbar-logo img{
+    height: 100%;
+    width: 100%;
 }
 
 .fa {
@@ -223,6 +236,7 @@ header {
     font-weight: bolder;
     color: white;
     font-style: bold;
+    max-lines: 1;
 }
 
 .active,
@@ -1166,8 +1180,112 @@ body {
     color: #F65730;
 }
 
+.footer-container .footer-logo{
+    height: 60px;
+    display: none;
+}
+
+.footer-container .footer-logo img{
+    height: 100%;
+}
+
 /*-----------------------------FOOTER RESPONSIVENESS-----------------------------------*/
 @media screen and (max-width: 880px) {
+    .footer-container .top-items-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two columns of equal width */
+        grid-template-rows: auto auto; /* Auto height for rows */
+        gap: 0px; /* Space between grid items */
+      }
+
+      .footer-container .footer-logo{
+        display: flex;
+        margin-bottom: -100px;
+        padding-top: 20px;
+      }
+      
+      /* Position each section within the grid */
+      .footer-container .footer-logo {
+        grid-column: 1;
+      }
+      .footer-container .consultation {
+        grid-column: 2; /* Right column */
+      }
+      
+      .footer-container .company-info {
+        grid-column: 1; /* Left column */
+      }
+      
+      .footer-container .services {
+        grid-column: 2; /* Right column */
+      }
+      
+      .footer-container .newsletter {
+        grid-column: 1; /* Left column */
+      }
+      
+      .footer-container .footer-faq-section {
+        grid-column: 1 2; /* Span both columns */
+      }
+
+      .footer-container .consultation{
+        width: fit-content;
+    }
+
+    .footer {
+        width: 100%;
+    }
+
+    .footer-bottom p {
+        font-size: 13px;
+        margin-bottom: 7px;
+    }
+
+    .footer-bottom .social-icons a {
+        font-size: 16px;
+        margin: 7px;
+    }
+
+    .footer-bottom .footer-text-copyright {
+        font-size: 11px;
+    }
+
+    .footer-bottom .footer-text-copyright a {
+        font-size: 16px;
+    }
+
+    .footer-bottom {
+        margin-top: 12px;
+    }
+
+    .footer-container .footer-faq-section,
+    .footer-container .newsletter,
+    .footer-container .services,
+    .footer-container .company-info,
+    .footer-container .consultation{
+        padding: 10px 20px 5px 20px;
+    }
+
+    .footer-container a {
+        font-size: 12px;
+    }
+
+    .footer-container h5 {
+        margin-bottom:2px;
+        font-size: 15px;
+    }
+
+    .footer-container .services:hover,
+    .footer-container .newsletter:hover,
+    .footer-faq-section:hover,
+    .footer-container .company-info:hover{
+        h5 {
+           border-bottom: 2px solid #F65730;
+        }
+    }
+}
+
+@media screen and (max-width: 360px) {
     .footer-container .top-items-footer {
         flex-direction: column;
     }
@@ -2098,14 +2216,40 @@ body section .contact-countainer .contact-footer div a:hover {
 #applicationFormSection form label{
     font-family: 'DM Sans Serif';
     font-weight: bolder;
-    font-size: 16px;
+    font-size: 14px;
     width: fit-content;
 }
 
 #applicationFormSection form input{
     margin: 10px 0 0 20px;
-    font-size: 13px;
+    font-size: 12px;
     width: 300px;
+}
+
+#applicationFormSection form select{
+    margin: 10px 0 0 20px;
+    font-size: 12px;
+    width: 300px;
+}
+
+#applicationFormSection form .label-last{
+    margin-top: 30px;
+    align-items: center;
+    text-align: center;
+    font-family: 'DM Sans Serif';
+    font-weight: bolder;
+    font-size: 14px;
+    width: fit-content;
+    color: white;
+}
+
+#applicationFormSection form .label-last span{
+    color: #4ABC4F;
+    font-size: 16px;
+}
+#applicationFormSection form .label-last .two{
+    color: #ff9378;
+    font-size: 16px;
 }
 
 #applicationFormSection h5{
