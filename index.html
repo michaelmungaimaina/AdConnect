@@ -219,7 +219,8 @@
       <div class="bordered-container">
         <p>Enter Your Details to Get Our free Strategy</p>
         <img src="/resources/base-line.png" alt="">
-        <div id="errorMessage" style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: rgba(251, 128, 128, 0.533); align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;">
+        <div id="errorMessage"
+          style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: rgba(251, 128, 128, 0.533); align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;">
         </div> <!-- Error Message container -->
         <form class="form-section">
           <div class="h-layout">
@@ -277,7 +278,7 @@
           </div>
           <img src="/resources/elipsis-line.png" alt="">
         </div>
-        <div id="btnCloseThanksPage" onclick="closeThankYouPage()">
+        <div id="btnCloseThanksPage" onclick="closeThankYouPage()" style="position: fixed;">
           <i class="fa-solid fa-xmark"></i>
         </div>
       </div>
@@ -289,7 +290,8 @@
       </div>
       <p class="foot-text">Want to see how these strategies can generate more property leads for your business? Apply
         your free consultation below!</p>
-      <button id="btnOpenApplicationForm" onclick="openApplicationForm()" id="btnApplyFreeConsultation">APPLY FOR A FREE CONSULTATION</button>
+      <button id="btnOpenApplicationForm" onclick="openApplicationForm()">APPLY FOR A FREE
+        CONSULTATION</button>
     </div>
   </section>
 
@@ -313,7 +315,9 @@
         Please take a few moments to answer these questions so we can hit the ground
         running during our call. The more detailed your answers, the better we can serve you!</h5>
       <img class="base-line" src="/resources/elipsis-line.png" alt="" style="margin: 5px 100px;">
-      <div id="formErrorMessage" style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;"></div>
+      <div id="formErrorMessage"
+        style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;">
+      </div>
       <div class="v-layout">
         <form id="fname" action="submit" class="form-section">
           <label for="fname" class="label">What's Your First Name?</label>
@@ -356,37 +360,41 @@
         <form id="investment" action="submit" class="form-section" style="display: none;">
           <label for="investment" class="label">If you were 100% certain you could achieve your goals, how much would
             you invest directly in making it happen?</label>
-            <select id="investmentInput" class="input-field">
-              <option value="" disabled selected>Select Your Capability</option>
-              <option value="35000_or_less">KES 35,000 or less</option>
-              <option value="36000_60000">KES 36,000 – 60,000</option>
-              <option value="61000_120000">KES 61,000 – 120,000</option>
-              <option value="more_than_120000">More than KES 120,000</option>
+          <select id="investmentInput" class="input-field">
+            <option value="" disabled selected>Select Your Capability</option>
+            <option value="35000_or_less">KES 35,000 or less</option>
+            <option value="36000_60000">KES 36,000 – 60,000</option>
+            <option value="61000_120000">KES 61,000 – 120,000</option>
+            <option value="more_than_120000">More than KES 120,000</option>
           </select>
-          <label for="investment" class="label-last"><span>Congrats! </span><span class="two">You've completed this form.</span><br> Click below to send and schedule your call!</label>
+          <label for="investment" class="label-last"><span>Congrats! </span><span class="two">You've completed this
+              form.</span><br> Click below to send and schedule your call!</label>
         </form>
         <div id="h-buttons">
-          <button id="btnLeftApplication" class="btn-class" style="filter: blur(5px);" onclick="goToPreviousStep()">PREV</button>
+          <button id="btnLeftApplication" class="btn-class" style="filter: blur(5px);"
+            onclick="goToPreviousStep()">PREV</button>
           <button id="btnRightApplication" class="btn-class" onclick="goToNextStep()">NEXT</button>
-      </div>
+        </div>
 
-    </div>
+      </div>
   </section>
 
   <!---------------------------------------- Appointment Section -------------------------------------------->
   <section id="appointmentView" class="background-tint-black">
     <div id="btnCloseApointment" onclick="closeAppointmentView()" class="btn_hover1" style="position: fixed;">
-      <i class="fa-solid fa-xmark" ></i>
+      <i class="fa-solid fa-xmark"></i>
     </div>
+    <div id="appointmentErrorMessage"
+        style="color: rgb(236, 2, 2); display: none; margin: 2px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 20px;">
+      </div>
     <div class="appointment-layout outer-container">
       <div class="h-layout">
         <div class="slash-rect"></div>
         <p class="header-text">Book an Appointment</p>
       </div>
-      <div id="appointmentErrorMessage" style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;"></div>
       <div class="h-layout myhlayout"><!-- Start H-Layout-->
         <div class="v-layout left-column">
-          <img id="appointeeIcon" src="/resources/misgina.png" alt="image"/>
+          <img id="appointeeIcon" src="/resources/misgina.png" alt="image" />
           <p id="appointee-name">Mr. Misgina Fitwi</p>
           <p id="appointee-designation">Digital Marketing Specialist</p>
           <p id="appointee-school">
@@ -482,13 +490,46 @@
         </div>
         <div class="v-layout right-col-message">
           <label for="message" class="label">Additional Message</label>
-          <textarea id="appointeeMessage" type="text" class="input-field" placeholder="Your Appointment Message..."></textarea>
-            <div id="btnSubmitAppointment" class="experience" onclick="submitAppointment()">
-              <p>Book Appointment</p>
-            </div>
+          <textarea id="appointeeMessage" type="text" class="input-field"
+            placeholder="Your Appointment Message..."></textarea>
+          <div id="btnSubmitAppointment" class="experience" onclick="submitAppointment()">
+            <p>Book Appointment</p>
+          </div>
         </div>
       </div>
       <!-- End H-Layout-->
+    </div>
+  </section>
+
+  <!---------------------------------------- Appointment Thanks Section -------------------------------------------->
+  <section id="appointmentThanksView" class="background-tint-black-appt">
+    <div id="btnCloseApointmentThanks" onclick="closeAppointmentThanksView()" class="btn_hover1" style="position: fixed;">
+      <i class="fa-solid fa-xmark"></i>
+    </div>
+    <div class="appointment-layout outer-container">
+      <div class="h-layout">
+        <div class="slash-rect"></div><div class="slash-rect"></div>
+      </div>
+      <div class="v-layout">
+        <img src="/resources/check-icon.png" alt="">
+        <h5>Thanks, Your Booking has Been successfully scheduled!</h5>
+        <p>We’ve received your details and will be ready to discuss how our strategies can help you achieve your goals. Please check your E-mail for receipt and Booking Details</p>
+        <div class="inner-container">
+          <div class="h-layout">
+            <img src="/resources/video-icon.png" alt="">
+            <p id="meetingType">Online Consultation</p>
+          </div>
+          <div class="h-layout">
+            <img src="/resources/calendar-icon.png" alt="">
+            <p id="meetingDate">Wednesday, December 2, 2024<br>06.30PM - 07.30PM</p>
+          </div>
+        </div>
+        <div class="preparation"><p>What to Expect.</p></div>
+        <p class="expectation">During the consultation, we’ll review your current challenges, share proven strategies, and outline how our system works.</p>
+        <div class="preparation"><p>How to Prepare!</p></div>
+        <p class="expectation">Feel free to bring any questions or examples of your current marketing efforts.</p>
+        <p class="reschedule">If you need to reschedule, please contact us on: <span>+254-790 064 130</span></p>
+    </div>
     </div>
   </section>
 

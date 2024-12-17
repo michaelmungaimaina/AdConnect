@@ -41,8 +41,15 @@ const btnCloseApplicationForm = document.getElementById('btnCloseApplicationForm
 const btnLeftApplicationForm = document.getElementById('btnLeftApplication');
 const btnRightApplicationForm = document.getElementById('btnRightApplication');
 const btnSubmitAppointment = document.getElementById('btnSubmitAppointment');
-const btnFooterConsultation= document.getElementById('footerConsultationBtn');
+const btnFooterConsultation = document.getElementById('footerConsultationBtn');
 const btnFooterFAQs = document.getElementById('showFAQsSection');
+const sectionApptThanks = document.getElementById('appointmentThanksView');
+const btnCloseApointmentThanksView = document.getElementById('btnCloseApointmentThanks');
+const txtMeetingDate = document.getElementById('meetingDate');
+const txtMeetingType = document.getElementById('meetingType');
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
 
 
@@ -71,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitFAQsFormButton.addEventListener('click', submitFAQsForm);
     btnFooterConsultation.addEventListener('click', () => openUrl('?lead-capture-form=true'));
     btnFooterFAQs.addEventListener('click', openFAQs);
+    btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
 });
 
 function openUrl(param) {
@@ -123,6 +131,7 @@ window.onload = function () {
     const leadCapture = getUrlParameter('lead-capture-form');
     const thankYou = getUrlParameter('thank-you-page');
     const bookingForm = getUrlParameter('appointment-booking');
+    const appointmentThankyouView = getUrlParameter('thank-you-for-booking');
 
     if (faqs === 'true') openFAQs();
     if (faqsForm === 'true') openFAQsForm();
@@ -131,6 +140,7 @@ window.onload = function () {
     if (leadCapture === 'true') openLeadCaptureSection();
     if (thankYou === 'true') openThankYouPage();
     if (bookingForm === 'true') openAppointmentBooking();
+    if (appointmentThankyouView === 'true') openAppointmentBookingThankYouPage();
 };
 
 function openThankYouPage() {
@@ -405,8 +415,6 @@ function submitLeads() {
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
     const errorMessage = document.getElementById('errorMessage');
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
     const twoWordsPattern = /^\S+\s+\S+/;
 
     let errorMessages = '';
@@ -522,8 +530,6 @@ function initializeForm() {
 function goToNextStep() {
     const currentForm = forms[currentStep];
     const input = currentForm.querySelector("input, select");
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 
     // Validate input
     if (!input || input.value.trim() === '') {
@@ -798,6 +804,7 @@ function appointmentAction() {
             errorMessage = 'Sundays are not available for appointments. Please select another date.';
             handleErrorMessage(errorMessage, errorMessageContainer);
             this.value = ''; // Clear the invalid date
+            checkAvailableDates();
             return;
         }
 
@@ -806,11 +813,144 @@ function appointmentAction() {
             errorMessage = 'The selected date falls on a holiday. Please choose another date.';
             handleErrorMessage(errorMessage, errorMessageContainer)
             this.value = ''; // Clear the invalid date
+            checkAvailableDates();
             return;
+        }
+
+    });
+    checkAvailableDates();
+
+}
+
+function checkAvailableDates() {
+    const timeSlots = [
+        { id: 'eit', time: '08.30 AM - 09.00 AM' },
+        { id: 'nine', time: '09.15 AM - 09.45 AM' },
+        { id: 'ten', time: '10.15 AM - 10.45 AM' },
+        { id: 'eleven', time: '11.00 AM - 11.30 AM' },
+        { id: 'telve', time: '11.45 AM - 12.15 PM' },
+        { id: 'noon', time: '12.30 PM - 01.00 PM' },
+        { id: 'one', time: '01.30 PM - 02.00 PM' },
+        { id: 'two', time: '02.15 PM - 02.45 PM' },
+        { id: 'three', time: '03.00 PM - 03.30 PM' },
+        { id: 'four', time: '03.45 PM - 04.15 PM' },
+        { id: 'four30', time: '04.30 PM - 05.00 PM' },
+        { id: 'five', time: '05.15 PM - 05.45 PM' },
+        { id: 'six', time: '06.00 PM - 06.30 PM' },
+        { id: 'six45', time: '06.45 PM - 07.15 PM' },
+        { id: 'seven', time: '07.30 PM - 08.00 PM' },
+        { id: 'eightPm', time: '08.15 PM - 08.45 PM' },
+        { id: 'ninePm', time: '09.00 PM - 09.30 PM' },
+        { id: 'tenPm', time: '09.45 PM - 10.15 PM' },
+        { id: 'ten30Pm', time: '10.30 PM - 11.00 PM' },
+        { id: 'elevenPm', time: '11.15 PM - 11.45 PM' }
+    ];
+
+    // Example of booked time slots, fetched from database
+    const bookedTimes = ['eit', 'two', 'six'];
+
+    timeSlots.forEach(slot => {
+        const element = document.getElementById(slot.id);
+        if (bookedTimes.includes(slot.id)) {
+            element.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0.9)';
+            element.style.borderColor = 'rgb(251, 150, 125)';
+            //element.childNodes. = 'rgb(251, 150, 125)';
+        } else {
+            //element.classList.add('available'); 
+            element.addEventListener('click', () => selectTime(slot.time));
         }
     });
 }
 
-function submitAppointMent(){
-    // Perform Checks and Open a Thank you page
+function selectTime(time) {
+    alert(`You selected: ${time}`);
+    // Send email or make an API call to confirm the booking 
+}
+
+/**
+ * Method for submitting appointment data and launch the thank you page
+ */
+function submitAppointMent() {
+    // Perform Checks(Validation) and Open a Thank you page
+
+    const fullNameInput = document.getElementById('appointeeName');
+    const emailInput = document.getElementById('appointeeEmail');
+    const phoneInput = document.getElementById('appointeePhone');
+    const locationInput = document.getElementById('appointeeLocation');
+    const dateInput = document.getElementById('appointeeDate');
+    const messageInput = document.getElementById('appointeeMessage');
+    const errorMessageContainer = document.getElementById('appointmentErrorMessage');
+
+    //Input Validation
+    if (fullNameInput.value.trim() === '') {
+        handleErrorMessage('Full Name is Required!', errorMessageContainer);
+        fullNameInput.focus();
+        return;
+    }
+    if (emailInput.value.trim() === '') {
+        handleErrorMessage('Email is Required', errorMessageContainer);
+        emailInput.focus();
+        return;
+    }
+    if (!emailPattern.test(emailInput.value)) {
+        handleErrorMessage('Enter valid Email!!', errorMessageContainer);
+        emailInput.focus();
+        return;
+    }
+    if (phoneInput.value.trim() === '') {
+        handleErrorMessage('Phone Number is Required', errorMessageContainer);
+        phoneInput.focus();
+        return;
+    }
+    if (!phonePattern.test(phoneInput.value.trim())) {
+        handleErrorMessage('Enter valid Phone Number!!', errorMessageContainer);
+        phoneInput.focus();
+        return;
+    }
+    if (dateInput.value.trim() === '') {
+        handleErrorMessage('Date is Required', errorMessageContainer);
+        dateInput.focus();
+        return;
+    }
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; 
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(dateInput.value);
+    //if (dateInput.value === Date.now().formattedDate.){}
+
+    if (txtMeetingDate) txtMeetingDate.value = formattedDate;
+    if (txtMeetingType) txtMeetingType.value = 'Online Consltation'
+    openAppointmentBookingThankYouPage();
+}
+
+
+/**
+ * Method for Opening the appointment booking page
+ */
+function openAppointmentBookingThankYouPage() {
+    if (sectionApptThanks) {
+        sectionAppointmentApplication.style.transform = 'translateY(-100%)';
+        sectionApptThanks.style.height = '100%';
+
+        const newUrl = `${baseUrl.slice(0, -1)}?thank-you-for-booking=true`;
+        window.history.pushState({}, '', newUrl);
+    } else {
+        console.log('Error: Thanks Section Not Available');
+    }
+}
+
+/**
+ * Method for closing the thank you page after a successfull appointment booking
+ * It launches the booking form after closure.
+ */
+function closeAppointmentThanksView() {
+    if (sectionAppointmentApplication) {
+        sectionApptThanks.style.height = '0%';
+        sectionAppointmentApplication.style.height = '100%';
+
+        const newUrl = `${baseUrl.slice(0, -1)}?appointment-booking=true`;
+        window.history.pushState({}, '', newUrl);
+        console.log('Execution Success!');
+    } else {
+        console.log('Error: Thanks Section Not Available');
+    }
 }

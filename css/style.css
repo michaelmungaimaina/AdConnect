@@ -1575,7 +1575,6 @@ body section .contact-countainer .contact-footer div a:hover {
 .background-tint-black .appointment-layout .myhlayout {
     width: fit-content;
     margin: 10px;
-    background-color: #646262;
 }
 
 .background-tint-black .appointment-layout .myhlayout .left-column {
@@ -1758,23 +1757,160 @@ body section .contact-countainer .contact-footer div a:hover {
         flex-direction: column !important;
     }
     body section .contact-countainer .contact-inner-container {
-        margin: 30px 10px 10px 10px;
+        margin: 30px 10px 10px 10px !important;
     }
-    .navbar-toggler {
-        display: block !important;
-    }
-
-    .navbar-nav,
-    .search-bar,
-    .nav-right {
-        display: none !important;
-    }
-
-    .container-nav {
-        width: 100%;
-        justify-content: space-between;
+    .background-tint-black .appointment-layout {
+        width: fit-content;
+        height: fit-content;
+        margin: 50px 50px;
     }
 }
+
+/**********************************************************************************************************
+/*-------------------------------------- Appt Thanks Section ---------------------------------------------*/
+.background-tint-black-appt .appointment-layout {
+    width: fit-content;
+    height: fit-content;
+    margin: 100px 150px;
+    padding: 20px;
+}
+
+#btnCloseApointmentThanks {
+    width: 44px;
+    height: 44px;
+    position: absolute;
+    right: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.25em;
+    border: 1.5px solid #F65730;
+    color: white;
+    margin: 30px;
+    cursor: pointer;
+}
+
+#btnCloseApointmentThanks:hover{
+    border: 1.5px solid #F65730;
+    background: inherit;
+    color: #F65730;
+}
+
+.background-tint-black-appt .appointment-layout .h-layout{
+    width: 100%;
+    justify-content: space-between;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout{
+    width: 100%;
+    align-items: center;
+    border-radius: 15px;
+    /*box-shadow: 0 2px 7px rgba(255, 62, 3, 0.5), 0 1px 2px rgba(255, 62, 3, 0.5);*/
+}
+
+.background-tint-black-appt .appointment-layout .v-layout h5{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: white;
+}
+.background-tint-black-appt .appointment-layout .v-layout p{
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    width: 500px;
+}
+.background-tint-black-appt .appointment-layout .v-layout .inner-container{
+    width: fit-content;
+    height: fit-content;
+    background-color: #73737386;
+    border: 1.5px solid #7D8489;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .inner-container .h-layout{
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .inner-container .h-layout p{
+    width: fit-content;
+    font-size: 12px;
+    margin: 0 5px 0 5px;
+    text-align: start;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .inner-container .h-layout img{
+    width: 30px;
+    height: 30px;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .preparation{
+    margin: 10px 5px 5px;
+    background-color: #d84520;
+    width: fit-content;
+    border-radius: 5px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.50), 0 1px 2px rgba(0, 0, 0, 0.24);
+    padding: 1px 50px 1px 5px;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .preparation p{
+    width: fit-content;
+    font-size: 8px;
+    font-weight: bolder;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .expectation{
+    margin: 10px 40px ;
+    width: fit-content;
+    text-align: center;
+    font-size: 12px;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .reschedule{
+    margin: 10px 40px ;
+    width: fit-content;
+    text-align: center;
+    font-size: 10px;
+}
+
+.background-tint-black-appt .appointment-layout .v-layout .reschedule span{
+    color: #4ABC4F;
+    font-weight: bolder;
+}
+
+/* Responsiveness of the Appointment Thanks Section */
+@media screen and (max-width: 880px) {
+    .background-tint-black-appt .appointment-layout {
+        margin: 80px 20px !important;
+    }
+    #btnCloseApointmentThanks {
+        margin-top: 10px;
+    }
+
+    .background-tint-black-appt .appointment-layout .v-layout h5{
+        font-size: 15px !important;
+        text-align: center;
+    }
+    .background-tint-black-appt .appointment-layout .v-layout p{
+        width: 300px;
+        font-size: 11.5px;
+        text-align: justify;
+    }
+    .background-tint-black-appt .appointment-layout .v-layout .inner-container{
+        margin-top: 15px;
+        width: fit-content;
+    }
+    .background-tint-black-appt .appointment-layout .v-layout .inner-container .h-layout p{
+        font-size: 10px;
+        width: fit-content;
+    }
+}
+
+
 
 /**********************************************************************************************************
 /*-------------------------------------- Value Video Section ---------------------------------------------*/
@@ -1991,7 +2127,7 @@ body section .contact-countainer .contact-footer div a:hover {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #thankYouVideoSection .outer-container .top-bar .v-layout img {
@@ -2002,7 +2138,7 @@ body section .contact-countainer .contact-footer div a:hover {
     text-align: center;
     color: white;
     font-size: 28px;
-    margin: 10px 0;
+    margin: 0 0 10px;
 }
 
 #thankYouVideoSection h2 span {
@@ -2011,17 +2147,17 @@ body section .contact-countainer .contact-footer div a:hover {
 
 #thankYouVideoSection .wrapper {
     position: relative;
-    margin: 20px auto;
+    margin: 10px auto;
     border: 1.5px solid #F65730;
     border-radius: 10px;
     overflow: hidden;
     width: fit-content;
-    height: max-content;
+    height: fit-content;
 }
 
 #thankYouVideoSection .wrapper video {
     width: 100%;
-    height: max-content;
+    height: 100%;
     border-radius: 10px;
 }
 
@@ -2032,7 +2168,7 @@ body section .contact-countainer .contact-footer div a:hover {
     margin: 20px auto;
 }
 
-#btnApplyFreeConsultation {
+#btnOpenApplicationForm {
     display: block;
     margin: 20px auto;
     background-color: #F65730;
@@ -2046,8 +2182,8 @@ body section .contact-countainer .contact-footer div a:hover {
     transition: background-color 0.3s ease;
 }
 
-#btnApplyFreeConsultation:hover {
-    background-color: #d84520;
+#btnOpenApplicationForm:hover {
+    background-color: #bb3817;
 }
 
 #btnCloseThanksPage {
@@ -2105,7 +2241,7 @@ body section .contact-countainer .contact-footer div a:hover {
         font-size: 12px;
     }
 
-    #btnApplyFreeConsultation {
+    #btnOpenApplicationForm {
         font-size: 12px;
     }
 
@@ -2120,7 +2256,7 @@ body section .contact-countainer .contact-footer div a:hover {
         margin-top: 5px;
     }
 
-    #btnApplyFreeConsultation {
+    #btnOpenApplicationForm {
         margin: 20px auto 10px auto;
         padding: 5px 20px;
     }
