@@ -1,4 +1,5 @@
 import { UserApplicationObject } from './objects.js';
+import { AppointmentBooking } from './objects.js';
 
 
 'use strict';
@@ -851,10 +852,11 @@ function checkAvailableDates() {
 
     timeSlots.forEach(slot => {
         const element = document.getElementById(slot.id);
+        const child = element.querySelector('p');
         if (bookedTimes.includes(slot.id)) {
             element.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0.9)';
             element.style.borderColor = 'rgb(251, 150, 125)';
-            //element.childNodes. = 'rgb(251, 150, 125)';
+            child.style.color = 'rgb(251, 150, 125)';
         } else {
             //element.classList.add('available'); 
             element.addEventListener('click', () => selectTime(slot.time));
@@ -864,6 +866,7 @@ function checkAvailableDates() {
 
 function selectTime(time) {
     alert(`You selected: ${time}`);
+    AppointmentBooking.time = time;
     // Send email or make an API call to confirm the booking 
 }
 
@@ -913,12 +916,17 @@ function submitAppointMent() {
         return;
     }
 
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; 
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(dateInput.value);
-    //if (dateInput.value === Date.now().formattedDate.){}
+    const date = new Date(dateInput.value); // Ensure the date is valid 
+    if (!isNaN(date.getTime())) { 
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; 
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date); 
+        //Store Values
+        AppointmentBooking.date = formattedDate;
+        console.log(`Formatted Date: ${formattedDate}`);
+    } else {
+         handleErrorMessage('Invalid date value',errorMessageContainer);
+    }
 
-    if (txtMeetingDate) txtMeetingDate.value = formattedDate;
-    if (txtMeetingType) txtMeetingType.value = 'Online Consltation'
     openAppointmentBookingThankYouPage();
 }
 
@@ -936,6 +944,17 @@ function openAppointmentBookingThankYouPage() {
     } else {
         console.log('Error: Thanks Section Not Available');
     }
+
+    actionOnApptThankYouPage();
+}
+
+function actionOnApptThankYouPage(){
+    const br = document.createElement('br');
+    if (txtMeetingDate) txtMeetingDate.textContent = `${AppointmentBooking.date}`;
+    txtMeetingDate.appendChild(br);
+    const timeText = document.createTextNode(`${AppointmentBooking.time}`);
+    txtMeetingDate.appendChild(timeText);
+    console.log(`Success ${AppointmentBooking.date} \n${AppointmentBooking.time}`);
 }
 
 /**

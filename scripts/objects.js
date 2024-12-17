@@ -8,3 +8,8 @@ export const UserApplicationObject = {
     goal: "",
     investment: ""
 };
+
+export const AppointmentBooking = {
+    date: "",
+    time: ""
+};
