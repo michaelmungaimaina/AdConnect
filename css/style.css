@@ -174,7 +174,7 @@ header {
     animation-duration: 0.75s;
     position: fixed;
     transition: transform 0.3s ease;
-    z-index: 1200;
+    z-index: 999999999;
 }
 
 .container-nav {
@@ -969,7 +969,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: normal;
-    gap: 20px;
+    gap: 10px;
 }
 
 .footer-container .top-items-footer {
@@ -977,7 +977,7 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: normal;
-    gap: 20px;
+    gap: 10px;
 }
 
 .footer-container h5 {
@@ -990,7 +990,6 @@ body {
 
 .footer-container a {
     color: rgb(212, 212, 212);
-    text-decoration: none;
     font-size: 14px;
 }
 
@@ -1005,12 +1004,18 @@ body {
     justify-content: center;
     align-items: center;
     /*background-color: #4a4a4a;*/
-    width: auto;
+    width: fit-content;
     height: fit-content;
     top: 0;
-    overflow-x: visible;
     transition: 0.5s;
     padding: 10px 20px 20px 20px;
+}
+
+.footer-container .consultation a{
+    font-weight: bolder;
+    font-size: 11px;
+    padding: 0px 9px;
+    margin-top: 20px;
 }
 
 .footer-container .consultation p {
@@ -1034,8 +1039,6 @@ body {
     /*background-color: #4a4a4a;*/
     width: 160px;
     height: fit-content;
-    top: 0;
-    overflow-x: visible;
     transition: 0.5s;
     padding: 10px 20px 20px 20px;
 }
@@ -1057,8 +1060,6 @@ body {
     /*background-color: #4a4a4a;*/
     width: max-content;
     height: fit-content;
-    top: 0;
-    overflow-x: visible;
     transition: 0.5s all ease-in-out;
     padding: 10px 20px 20px 20px;
     /*cursor: pointer;*/
@@ -1072,6 +1073,13 @@ body {
 
 
 
+.footer-container .newsletter a{
+    font-weight: bolder;
+    font-size: 11px;
+    padding: 0px 9px;
+    margin-top: 20px;
+}
+
 .footer-container .newsletter {
     position: relative;
     display: flex;
@@ -1081,8 +1089,6 @@ body {
     /*background-color: #4a4a4a;*/
     width: 200px;
     height: fit-content;
-    top: 0;
-    overflow-x: visible;
     transition: 0.5s;
     padding: 10px 20px 20px 20px;
 }
@@ -1120,10 +1126,15 @@ body {
     /*background-color: #4a4a4a;*/
     width: 200px;
     height: fit-content;
-    top: 0;
-    overflow-x: visible;
     transition: 0.5s;
     padding: 10px 20px 20px 20px;
+}
+
+.footer-container .footer-faq-section a{
+    font-weight: bolder;
+    font-size: 11px;
+    padding: 0px 9px;
+    margin-top: 10px;
 }
 
 .footer-container .footer-faq-section h5 {
@@ -1372,25 +1383,35 @@ body .contact-main {
  **************************      Contact Page Syles     ****************************
  ***********************************************************************************
  ***********************************************************************************/
-body section .contact-countainer {
+#contactSection {
+    height: 100%;
+}
+#contactSection .outer-container{
+    height: fit-content;
+    margin-top: 60px;
+}
+body section .contact-container {
+    width: 100%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: start;
-    padding: 20px 30px;
+    padding: 5px 20px;
 }
 
-body section .contact-countainer .header-text-layout {
+body section .contact-container .header-text-layout {
     display: flex;
     flex-direction: row;
     justify-content: start;
+    padding: 20px 0 0 20px;
 }
 
-body section .contact-countainer img {
+body section .contact-container img {
     width: 300px;
     margin-left: 30px;
 }
 
-body section .contact-countainer p {
+body section .contact-container p {
     font-size: medium;
     font-family: "DM Sans";
     font-weight: 500;
@@ -1401,18 +1422,24 @@ body section .contact-countainer p {
     text-align: left;
 }
 
-body section .contact-countainer .contact-inner-container {
+body section .contact-container .contact-inner-container {
+    width: fit-content;
     margin: 30px 100px 10px 100px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 0.2fr 1fr; /* Two columns of equal width */
+    grid-template-rows: auto auto; /* Auto height for rows */
+    gap: 0px; /* Space between grid items */
     flex-direction: row;
     background: linear-gradient(to left, #646464, #4D4C4B);
     height: max-content;
     border: 1.5px solid #7D8489;
     border-radius: 10px;
     justify-content: left;
+    padding-right: 20px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column {
+body section .contact-container .contact-inner-container .left-column {
+    grid-column: 0;
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -1420,7 +1447,7 @@ body section .contact-countainer .contact-inner-container .left-column {
     width: 250px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column p {
+body section .contact-container .contact-inner-container .left-column p {
     font-size: 20px;
     color: white;
     font-family: 'Oregano', cursive;
@@ -1430,30 +1457,31 @@ body section .contact-countainer .contact-inner-container .left-column p {
     margin-left: 50px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column img {
+body section .contact-container .contact-inner-container .left-column img {
     width: 80px;
     margin-left: 50px;
     margin-top: -5px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column form {
+body section .contact-container .contact-inner-container .left-column form {
     margin: 5px 20px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column form label {
+body section .contact-container .contact-inner-container .left-column form label {
     margin: 5px;
 }
 
-body section .contact-countainer .contact-inner-container .left-column form button {
+body section .contact-container .contact-inner-container button {
     font-size: 13px;
     font-weight: bold;
     width: 150px;
-    margin: 40px 0 10px 0;
+    margin: 35px 0 10px 30px;
     height: 30px;
     color: white;
+    grid-column: 1;
 }
 
-body section .contact-countainer .contact-inner-container .left-column form button:hover {
+body section .contact-container .contact-inner-container button:hover {
     color: #F65730;
     background: inherit;
     border: 1.5px solid #F65730;
@@ -1461,7 +1489,8 @@ body section .contact-countainer .contact-inner-container .left-column form butt
 
 
 
-body section .contact-countainer .contact-inner-container .right-column {
+body section .contact-container .contact-inner-container .right-column {
+    grid-column: 2;
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -1469,19 +1498,19 @@ body section .contact-countainer .contact-inner-container .right-column {
     width: fit-content;
 }
 
-body section .contact-countainer .contact-inner-container .right-column textarea {
-    margin: 83px 0 0 0;
+body section .contact-container .contact-inner-container .right-column textarea {
+    margin: 75px 0 0 0;
     width: max-content;
     min-width: 300px;
-    max-width: 402px;
-    max-height: 172px;
+    max-width: 700px;
+    max-height: 150px;
     min-height: 150px;
     height: 100px;
     color: white;
     padding: 5px;
 }
 
-body section .contact-countainer .contact-footer {
+body section .contact-container .contact-footer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -1489,35 +1518,35 @@ body section .contact-countainer .contact-footer {
     width: 800px;
 }
 
-body section .contact-countainer .contact-footer p {
+body section .contact-container .contact-footer p {
     font-size: 12px;
     font-weight: bold;
     margin: 7px 5px;
 }
 
-body section .contact-countainer .contact-footer span {
+body section .contact-container .contact-footer span {
     font-size: 10px;
     font-weight: lighter;
     margin-left: 10px;
 }
 
-body section .contact-countainer .contact-footer div {
+body section .contact-container .contact-footer div {
     display: flex;
     flex-direction: row;
     justify-content: start;
     width: 265px;
 }
 
-body section .contact-countainer .contact-footer div p {
+body section .contact-container .contact-footer div p {
     margin: 7px 5px;
 }
 
-body section .contact-countainer .contact-footer div a {
+body section .contact-container .contact-footer div a {
     color: #F65730;
     margin: 5px 5px;
 }
 
-body section .contact-countainer .contact-footer div a:hover {
+body section .contact-container .contact-footer div a:hover {
     color: #4ABC4F;
     margin: 5px 5px;
 }
@@ -1533,6 +1562,63 @@ body section .contact-countainer .contact-footer div a:hover {
     position: relative;
     width: 50%;
 }
+
+
+/*-----------------------------CONTACT RESPONSIVENESS-----------------------------------*/
+@media screen and (max-width: 880px) {
+    #contactSection .outer-container{
+        height: fit-content;
+        width: 100%;
+        margin-left: 5px;
+        margin-right: 15px;
+    }
+    body section .contact-container .header-text-layout {
+        padding: 15px 0 0 0px;
+    }
+    body section .contact-container img {
+        width: 200px;
+    }
+    body section .contact-container p {
+        width: 100%;
+        margin: 6px 15px 0 15px;
+        font-size: 12px;
+    }
+    body section .contact-container .contact-inner-container {
+        display: flex;
+        flex-direction: column;
+        margin: 17px 20px 10px;
+        padding: 0 40px 0 0;
+    }
+    body section .contact-container .contact-inner-container .left-column form input{
+        width: 100%;
+    }
+    body section .contact-container .contact-inner-container .left-column form {
+        width: 100%;
+    }
+    body section .contact-container .contact-inner-container .right-column {
+        width: 250px;
+        padding: 0 20px;
+    }
+    body section .contact-container .contact-inner-container .right-column textarea {
+        margin: 7px 0 0 8px;
+        width: 200px;
+        min-width: 230px;
+        max-width: 230px;
+        max-height: 200px;
+        min-height: 150px;
+        height: 100px;
+        color: white;
+        padding: 5px;
+    }
+    body section .contact-container .contact-inner-container button {
+        margin: 20px 0 10px 50px;
+    }
+    body section .contact-container .contact-footer {
+        flex-direction: column;
+        width: fit-content;
+    }
+}
+
 
 /**************************      Appointment Page Syles     ****************************/
 #btnCloseApointment {

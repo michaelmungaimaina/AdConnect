@@ -144,7 +144,6 @@ html {
 }
 
 /* -- button CSS --*/
-
 .btn_hover1 {
     display: inline-block;
     position: relative;
@@ -173,7 +172,6 @@ html {
 }
 
 .small-button {
-    position: relative;
     width: max-content;
     height: 25px;
     font-weight: bold;
