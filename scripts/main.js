@@ -48,39 +48,58 @@ const sectionApptThanks = document.getElementById('appointmentThanksView');
 const btnCloseApointmentThanksView = document.getElementById('btnCloseApointmentThanks');
 const txtMeetingDate = document.getElementById('meetingDate');
 const txtMeetingType = document.getElementById('meetingType');
+const inputNameContactUs = document.getElementById('inputNameContactUs');
+const inputEmailContactUs = document.getElementById('inputEmailContactUs');
+const inputPhoneContactUs = document.getElementById('inputPhoneContactUs');
+const textAreaMessageContactUs = document.getElementById('textAreaMessageContactUs');
+const btnSubmitContactUsData = document.getElementById('textAreaMessageContactUs');
+const errorMessageContainer = document.getElementById('contactUsErrorMessageContainer');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
-
-
+const twoWordsPattern = /^\S+\s+\S+/;
 
 // Attach event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-
-    btnNavToVideoSection.addEventListener('click', openValueVideo);
-    navbarTogler.addEventListener('click', openNav);
-    searchBarIcon.addEventListener('click', openNav);
-    searchBarContainer.addEventListener('click', openSearch);
-    sidePanelCloseBtn.addEventListener('click', closeNav);
-    btnCloseSearch.addEventListener('click', closeSearch);
-    txtOpenLeadCapture.addEventListener('click', openLeadCaptureSection);
-    iconPause.addEventListener('click', openLeadCaptureSection);
-    btnCloseLeadapture.addEventListener('click', closeLeadCapture);
-    btnSubmitLeadCapture.addEventListener('click', submitLeads);
-    btnCloseThanksPage.addEventListener('click', closeThankYouPage);
-    btnOpenApplicationForm.addEventListener('click', openApplicationForm);
-    btnCloseApplicationForm.addEventListener('click', closeApplicationForm);
-    btnLeftApplicationForm.addEventListener('click', goToPreviousStep);
-    btnRightApplicationForm.addEventListener('click', goToNextStep);
-    btnCloseAppointmentApplication.addEventListener('click', closeAppointmentView);
-    btnSubmitAppointment.addEventListener('click', submitAppointMent);
-    btnCloseFAQs.addEventListener('click', closeFAQs);
-    showFAQsForm.addEventListener('click', openFAQsForm);
-    submitFAQsFormButton.addEventListener('click', submitFAQsForm);
-    btnFooterConsultation.addEventListener('click', () => openUrl('?lead-capture-form=true'));
-    btnFooterFAQs.addEventListener('click', openFAQs);
-    btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
+    const pageId = document.body.id;
+    if (pageId === 'indexPage') {
+        btnNavToVideoSection.addEventListener('click', openValueVideo);
+        navbarTogler.addEventListener('click', openNav);
+        searchBarIcon.addEventListener('click', openSearch);
+        searchBarContainer.addEventListener('click', openSearch);
+        sidePanelCloseBtn.addEventListener('click', closeNav);
+        btnCloseSearch.addEventListener('click', closeSearch);
+        txtOpenLeadCapture.addEventListener('click', openLeadCaptureSection);
+        iconPause.addEventListener('click', openLeadCaptureSection);
+        btnCloseLeadapture.addEventListener('click', closeLeadCapture);
+        btnSubmitLeadCapture.addEventListener('click', submitLeads);
+        btnCloseThanksPage.addEventListener('click', closeThankYouPage);
+        btnOpenApplicationForm.addEventListener('click', openApplicationForm);
+        btnCloseApplicationForm.addEventListener('click', closeApplicationForm);
+        btnLeftApplicationForm.addEventListener('click', goToPreviousStep);
+        btnRightApplicationForm.addEventListener('click', goToNextStep);
+        btnCloseAppointmentApplication.addEventListener('click', closeAppointmentView);
+        btnSubmitAppointment.addEventListener('click', submitAppointMent);
+        btnCloseFAQs.addEventListener('click', closeFAQs);
+        showFAQsForm.addEventListener('click', openFAQsForm);
+        submitFAQsFormButton.addEventListener('click', submitFAQsForm);
+        btnFooterConsultation.addEventListener('click', () => openUrl('?lead-capture-form=true'));
+        btnFooterFAQs.addEventListener('click', openFAQs);
+        btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
+    }
+    if (pageId === 'contactUsPage') {
+        navbarTogler.addEventListener('click', openNav);
+        searchBarContainer.addEventListener('click', openSearch);
+        sidePanelCloseBtn.addEventListener('click', closeNav);
+        btnCloseSearch.addEventListener('click', closeSearch);
+        btnSubmitContactUsData.addEventListener('click', () => actionSubmitContactUsData);
+    }
 });
+
+// Attach to the global scope
+window.openNav = openNav;
+window.closeNav = closeNav;
+window.actionSubmitContactUsData = actionSubmitContactUsData;
 
 function openUrl(param) {
     if (!param) {
@@ -143,6 +162,61 @@ window.onload = function () {
     if (bookingForm === 'true') openAppointmentBooking();
     if (appointmentThankyouView === 'true') openAppointmentBookingThankYouPage();
 };
+/**
+ * Handle the form for Contact in Contact Page
+ * @returns  input focus / Succes message
+ */
+function actionSubmitContactUsData(){
+    if (inputNameContactUs.value.trim() === ''){
+        handleErrorMessage('Name Field is Required!',errorMessageContainer);
+        inputNameContactUs.focus();
+        return;
+    }
+    if (inputNameContactUs.value.trim().length < 6){
+        handleErrorMessage('Name is Too Short!',errorMessageContainer);
+        inputNameContactUs.focus();
+        return;
+    }
+    if (!twoWordsPattern.test(inputNameContactUs.value.trim())){
+        handleErrorMessage('Name is NOT Full!',errorMessageContainer);
+        inputNameContactUs.focus();
+        return;
+    }
+    if (inputEmailContactUs.value.trim() === ''){
+        handleErrorMessage('Email Field is Required!',errorMessageContainer);
+        inputEmailContactUs.focus();
+        return;
+    }
+    if (!emailPattern.test(inputEmailContactUs.value.trim())){
+        handleErrorMessage('Email is NOT Valid!',errorMessageContainer);
+        inputEmailContactUs.focus();
+        return;
+    }
+    if (inputPhoneContactUs.value.trim() === ''){
+        handleErrorMessage('Phone Number Field is Required!',errorMessageContainer);
+        inputPhoneContactUs.focus();
+        return;
+    }
+    if (!phonePattern.test(inputPhoneContactUs.value.trim())){
+        handleErrorMessage('Phone Number is NOT Valid!',errorMessageContainer);
+        inputPhoneContactUs.focus();
+        return;
+    }
+    if (textAreaMessageContactUs.value.trim() === ''){
+        handleErrorMessage('Tell Us Something!',errorMessageContainer);
+        textAreaMessageContactUs.focus();
+        return;
+    }
+
+
+    // SUbmit data and show success notification
+
+    // Display success Message
+    errorMessageContainer.style.color = 'white';
+    errorMessageContainer.style.backgroundColor = '#4abc5061';
+    errorMessageContainer.style.display = 'block';
+    handleErrorMessage('Thank You. Data Successfully Submitted!', errorMessageContainer);
+}
 
 function openThankYouPage() {
     if (sectionThankYouVideo) {
@@ -416,7 +490,6 @@ function submitLeads() {
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
     const errorMessage = document.getElementById('errorMessage');
-    const twoWordsPattern = /^\S+\s+\S+/;
 
     let errorMessages = '';
     if (name.trim() === '') {
@@ -917,14 +990,14 @@ function submitAppointMent() {
     }
 
     const date = new Date(dateInput.value); // Ensure the date is valid 
-    if (!isNaN(date.getTime())) { 
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; 
-        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date); 
+    if (!isNaN(date.getTime())) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
         //Store Values
         AppointmentBooking.date = formattedDate;
         console.log(`Formatted Date: ${formattedDate}`);
     } else {
-         handleErrorMessage('Invalid date value',errorMessageContainer);
+        handleErrorMessage('Invalid date value', errorMessageContainer);
     }
 
     openAppointmentBookingThankYouPage();
@@ -948,7 +1021,7 @@ function openAppointmentBookingThankYouPage() {
     actionOnApptThankYouPage();
 }
 
-function actionOnApptThankYouPage(){
+function actionOnApptThankYouPage() {
     const br = document.createElement('br');
     if (txtMeetingDate) txtMeetingDate.textContent = `${AppointmentBooking.date}`;
     txtMeetingDate.appendChild(br);

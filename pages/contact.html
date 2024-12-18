@@ -7,7 +7,7 @@
   <title>Contact Us</title>
 
   <!-- Logo Icon-->
-  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
 
   <!-- link css -->
   <link rel="stylesheet" href="../css/style.css" />
@@ -30,7 +30,7 @@
     rel="stylesheet" />
 </head>
 
-<body>
+<body id="contactUsPage">
   <div class="site-wrapper">
     <div class="headerindex">
       <!-- Header Section -->
@@ -41,7 +41,7 @@
             <a href="/" class="navbar-logo">
               <img src="/resources/logo.png" alt="" />
             </a>
-            <button id="navbarTogler" onclick="openNav()" class="navbar-toggler" type="button">
+            <button id="navbarTogler"  class="navbar-toggler" type="button">
               <span class="fa fa-bars" aria-hidden="true"></span>
             </button>
             <!-- Menu -->
@@ -73,7 +73,7 @@
         <aside id="mySidePanel" class="sidepanel">
           <div class="sidebar flex">
             <a href=""> <img src="/resources/logo.png" alt="logo" /> </a>
-            <button id="sidePanelCloseBtn" onclick="closeNav()" type="button" class="closebtn btn-hover">
+            <button id="sidePanelCloseBtn" type="button" class="closebtn btn-hover">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -134,24 +134,27 @@
         advertising? We’d love to hear from you!
       </p>
       <div class="contact-inner-container">
+        <div id="contactUsErrorMessageContainer"
+        style="color: rgb(236, 2, 2); display: none; margin: 2px 10px 2px 30px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: -170px;">
+      </div>
         <div class="left-column">
           <p>Fill the Form</p>
           <img src="/resources/base-line.png" alt="image" />
           <form class="form-section" action="input">
             <label for="name" class="label">Enter Name</label>
-            <input type="text" name="name" class="input-field" placeholder="Enter Your Name Here!" />
+            <input id="inputNameContactUs" type="text" name="name" class="input-field" placeholder="Enter Your Name Here!" />
             <label for="email" class="label">Enter Email</label>
-            <input type="email" name="email" class="input-field" placeholder="example@example.com" />
+            <input id="inputEmailContactUs" type="email" name="email" class="input-field" placeholder="example@example.com" />
             <label for="phone" class="label">Enter Phone Number</label>
-            <input type="phone" name="phone" class="input-field" placeholder="OXXX XXX XXX" />
+            <input id="inputPhoneContactUs" type="phone" name="phone" class="input-field" placeholder="OXXX XXX XXX" />
           </form>
         </div>
         <div class="right-column">
           <form class="form-section" action="input">
-            <textarea name="message" class="input-field message" placeholder="Your Message"></textarea>
+            <textarea id="textAreaMessageContactUs" name="message" class="input-field message" placeholder="Your Message"></textarea>
           </form>
         </div>
-        <button type="submit" class="btn_hover1 contact-submit-button">
+        <button id="btnSubmitContactUsData" type="submit" onclick="actionSubmitContactUsData()" class="btn_hover1 contact-submit-button">
           SUBMIT
         </button>
       </div>
