@@ -1619,6 +1619,393 @@ body section .contact-container .contact-footer div a:hover {
     }
 }
 
+/***********************************************************************************
+************************************************************************************
+ **************************      About Page Syles     ****************************
+ ***********************************************************************************
+ ***********************************************************************************/
+ #aboutSection{
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.6)70%, rgba(0, 0, 0, 0.6)70%), url(/resources/background-image.jpeg);
+    padding: 80px 100px;
+ }
+ #aboutSection .about-container{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding: 15px 20px;
+ }
+ #aboutSection .header-text-layout{
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+ }
+ #aboutSection img{
+    width: 400px;
+ }
+
+ #aboutSection .about-inner-container{
+    display: grid;
+    grid-template-columns: 0.2fr 1fr; /* Two columns of equal width */
+    grid-template-rows: auto auto; /* Auto height for rows */
+    gap: 0px; /* Space between grid items */
+    margin: 20px 0;
+ }
+#aboutSection .about-inner-container img{
+    width: 300px;
+    border-radius: 50%;
+    grid-column: 0;
+ }
+ #aboutSection .about-inner-container .grid-element{
+    grid-column: 0 1;
+ }
+ #aboutSection .about-inner-container .grid-element-bottom{
+    grid-column: 2;
+ }
+
+ #aboutSection .about-inner-container .styled-text{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    margin-top: 60px;
+    margin-left: 40px;
+ }
+ #aboutSection .about-inner-container .about-content{
+    margin: 10px;
+    padding: 0 0 3px;
+    height: fit-content;
+    width: 100%;
+ }
+
+ #aboutSection .about-inner-container .styled-text p{
+    font-size: 20px;
+    color: white;
+    font-family: 'Oregano', cursive;
+    font-weight: lighter;
+    font-style: italic;
+    text-align: start;
+    width:fit-content;
+    
+ }
+ #aboutSection .about-inner-container .styled-text img{
+    width: fit-content;
+ }
+#aboutSection .about-inner-container .about-content p{
+    background-image: url('/resources/msg.png');
+    background-size: cover;
+    padding: 30px 30px 30px 70px;
+    color: white;
+    text-align: justify;
+    width: fit-content;
+    height: fit-content;
+    margin: 0 3px 0 0;
+    font-size: 15px;
+ }
+ #aboutSection .v-layout{
+    width: fit-content;
+    height: fit-content;
+ }
+
+ /*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
+@media screen and (max-width: 880px) {
+    #aboutSection{
+        padding: 67px 10px;
+    }
+    #aboutSection img{
+        width: 200px;
+    }
+    #aboutSection h4{
+        font-size: 15px;
+    }
+    #aboutSection .about-inner-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #aboutSection .about-inner-container img{
+        width: 150px;
+    }
+    #aboutSection .about-inner-container .h-layout{
+        flex-direction: column;
+    }
+    #aboutSection .about-inner-container .styled-text{
+        margin: 10px 0 -20px 0;
+    }
+    #aboutSection .about-inner-container .styled-text p{
+        font-size: 15px;
+    }
+    #aboutSection .about-inner-container .styled-text img{
+        width: 100px;
+    }
+    #aboutSection .about-inner-container .about-content p{
+        font-size: 11px;
+        padding: 20px 20px 15px 50px;
+    }
+}
+
+/***********************************************************************************
+************************************************************************************
+ **************************      OUR SERVICES Page Syles     ****************************
+ ***********************************************************************************
+ ***********************************************************************************/
+ #ourServiceSection{
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.6)70%, rgba(0, 0, 0, 0.6)70%), url(/resources/background-image.jpeg);
+    padding: 80px 100px;
+ }
+#ourServiceSection .our-service-container{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+#ourServiceSection .our-service-container #elipsis{
+    width: 400px;
+    margin: 0 30px 0;
+}
+#ourServiceSection .our-service-container #headerText{
+    margin: 10px 10px 0;
+}
+#ourServiceSection .our-service-container #service{
+    margin: 20px 0 0 30px;
+}
+#ourServiceSection .our-service-container .header-text-layout{
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+}
+#ourServiceSection .our-service-container .header-text-layout img{
+    height: 33px;
+}
+#ourServiceSection .our-service-container .header-text-layout h5{
+    font-size: 18px;
+    color: white;
+    font-family: 'Oregano', cursive;
+    font-weight: lighter;
+    font-style: italic;
+    text-align: start;
+    width:fit-content;
+}
+#ourServiceSection .our-service-container .v-layout #base-line{
+    width: 150px;
+    margin: -7px 0 0 80px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container{
+    display: flex;
+    flex-direction: column;
+    background-color: #737373;
+    border: 1.5px solid #7D8489;
+    border-radius: 10px;
+    width: fit-content;
+    height: fit-content;
+    margin: 10px 20px 0 60px;
+    padding: 7px 15px;
+    align-items: start;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container p{
+    color: white;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout{
+    margin: 10px 10px 0px 40px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout .header-text-layout{
+    width: 250px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout img{
+    height: 20px;
+    margin-top: 7px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout h5{
+    font-size: 15px;
+    margin-right: 20px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout p{
+    font-size: 14px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout .v-layout{
+    border: 1.3px solid #7D8489;
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+#ourServiceSection .our-service-container .v-layout .inner-container .h-layout .v-layout .header-text-layout{
+    width: 190px;
+    align-items: start;
+    justify-items: left;
+}
+/**  Courses Section   **/
+#ourServiceSection #courses #elipsis{
+    width: 200px;
+    margin: 0 20px 0;
+}
+
+#ourServiceSection #courses .v-layout{
+    width: fit-content;
+    height: fit-content;
+    border-radius: 10px;
+    border: 1.5px solid #9d9c9c;
+    margin: 20px 10px 0;
+    align-items: center;
+}
+#ourServiceSection #courses .v-layout .top-item{
+    background-color: #f658309d;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+#ourServiceSection #courses .v-layout .top-item img{
+    margin: 15px;
+    width: 70px;
+}
+#ourServiceSection #courses .v-layout #p{
+    font-size: 11px;
+}
+#ourServiceSection #courses .v-layout p{
+    color: white;
+    font-size: 15px;
+    font-weight: bolder;
+    text-align: center;
+    margin: 20px;
+}
+#ourServiceSection #courses .v-layout img{
+    width: 70px;
+}
+#ourServiceSection #courses .v-layout .bottom-item{
+    background-color: #f65830;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+#ourServiceSection #courses .v-layout .bottom-item p{
+    font-size: large;
+}
+/**  Development Section   **/
+#ourServiceSection #development #elipsis{
+    width: 200px;
+    margin: 0 20px 0;
+}
+
+#ourServiceSection #development .v-layout{
+    width: fit-content;
+    height: fit-content;
+    border-radius: 10px;
+    border: 1.5px solid #9d9c9c;
+    margin: 20px 2px 0;
+    align-items: center;
+}
+#ourServiceSection #development .v-layout .top-item{
+    background-color: #ffffff9d;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+#ourServiceSection #development .v-layout .top-item h4{
+    margin: 10px 0 0 0;
+    text-align: center;
+}
+#ourServiceSection #development .v-layout .top-item p{
+    font-size: 12px;
+    color: #f65830;
+    height: 5px;
+    line-height: 3px;
+}
+#ourServiceSection #development .v-layout #p{
+    font-size: 11px;
+}
+#ourServiceSection #development .v-layout p{
+    color: #ffffff9d;
+    font-size: 15px;
+    font-weight: bolder;
+    text-align: center;
+    margin: 20px;
+    width: 210px;
+}
+#ourServiceSection #development .v-layout img{
+    width: 20px;
+    margin: 5px;
+}
+#ourServiceSection #development .v-layout .bottom-item{
+    background-color: #f65830;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+#ourServiceSection #development .v-layout .bottom-item p{
+    font-size: large;
+}
+
+ /*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
+ @media screen and (max-width: 880px) {
+    #ourServiceSection{
+        padding: 67px 10px;
+    }
+    #ourServiceSection .our-service-container #elipsis{
+        width: 200px;
+        margin: 0 10px 0;
+    }
+    #ourServiceSection .our-service-container #headerText{
+        margin: 10px 5px 0;
+    }
+    #ourServiceSection .our-service-container #headerText h4{
+        font-size: 16px;
+    }
+    #ourServiceSection .our-service-container #service{
+        margin: 20px 0 0 10px;
+    }
+    #ourServiceSection .our-service-container .header-text-layout img{
+        height: 25px;
+    }
+    #ourServiceSection .our-service-container .header-text-layout h5{
+        font-size: 14px;
+    }
+    #ourServiceSection .our-service-container .v-layout #base-line{
+        width: 150px;
+        margin: -1px 0 0 20px;
+    }
+    #ourServiceSection .our-service-container .v-layout .inner-container{
+        margin: 10px 10px 0 10px;
+    }
+    #ourServiceSection .our-service-container .v-layout .inner-container p{
+        font-size: 13.5px;
+    }
+    #ourServiceSection .our-service-container .v-layout .inner-container .h-layout{
+        margin: 10px 10px 0px 10px;
+        flex-direction: column;
+    }
+    #ourServiceSection .our-service-container .v-layout .inner-container .h-layout h5{
+        font-size: 12px;
+    }
+    #ourServiceSection .our-service-container .v-layout .inner-container .h-layout p{
+        font-size: 11.5px;
+    }
+    #ourServiceSection #courses .h-layout{
+        flex-direction: column;
+    }
+    #ourServiceSection #development .h-layout{
+        flex-direction: column;
+        align-items: center;
+    }
+    #ourServiceSection #development .v-layout .top-item{
+        padding: 10px;
+    }
+ }
+
 
 /**************************      Appointment Page Syles     ****************************/
 #btnCloseApointment {

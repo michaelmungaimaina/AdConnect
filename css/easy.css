@@ -285,7 +285,7 @@ body main .page-sec {
     justify-content: center;
     background-color: #000000a6;
     width: 100%;
-    height: 0%;
+    height: 100%;
     position: fixed;
     z-index: 9999;
     border-radius: 0px;

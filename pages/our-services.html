@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Services</title>
+
+    <!-- Logo Icon-->
+    <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
+
+    <!-- link css -->
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/easy.css" />
+
+    <!-- Scroll cdn -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <!-- Font awesome cdn -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+        integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Font Oregano -->
+    <link href="https://fonts.googleapis.com/css2?family=Oregano&display=swap" rel="stylesheet" />
+    <!-- Font DM Sans  sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Font IBM Plex Sans Hebrew sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body id="ourServicePage">
+    <div class="site-wrapper">
+        <div class="headerindex">
+            <!-- Header Section -->
+            <header>
+                <nav class="container navbar">
+                    <div class="container-nav flex">
+                        <!-- Site Logo-->
+                        <a href="/" class="navbar-logo">
+                            <img src="/resources/logo.png" alt="" />
+                        </a>
+                        <button id="navbarTogler" class="navbar-toggler" type="button">
+                            <span class="fa fa-bars" aria-hidden="true"></span>
+                        </button>
+                        <!-- Menu -->
+                        <ul class="navbar-nav flex">
+                            <li><a href="/index.html" class="nav-link">Home</a></li>
+                            <li><a href="../pages/aboutus.html" class="nav-link">About Us</a></li>
+                            <li><a href="/" class="nav-link">Blog</a></li>
+                            <li>
+                                <a href="../pages/contact.html" class="nav-link">Contact Us</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="../pages/our-services.html" class="nav-link dropdown-toggle active">Our
+                                    Services
+                                    <i class="fa fa-caret-down"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item active">Social Media
+                                            Advertising</a></li>
+                                    <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics &
+                                            Reporting</a></li>
+                                    <li><a href="../pages/our-services.html?development-service=true" class="dropdown-item">Web Design &
+                                            Development</a></li>
+                                    <li><a href="../pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <!--div id="searchBar" onclick="openSearch()" class="search-bar">
+              <i id="searchBarIcon" onclick="openSearch()" class="fa-solid fa-magnifying-glass"></i>
+            </div-->
+                    </div>
+                </nav>
+                <!-- sidebar -->
+                <aside id="mySidePanel" class="sidepanel">
+                    <div class="sidebar flex">
+                        <a href=""> <img src="/resources/logo.png" alt="logo" /> </a>
+                        <button id="sidePanelCloseBtn" type="button" class="closebtn btn-hover">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <!-- Side Menus -->
+                    <div>
+                        <ul>
+                            <li><a href="/index.html" class="nav-link">Home</a></li>
+                            <li><a href="../pages/aboutus.html" class="nav-link">About Us</a></li>
+                            <li><a href="../pages/contact.html" class="nav-link">Contact Us</a></li>
+                            <li class="collapse-btn">
+                                <a href="javascript:void(0);" class="nav-link dropdown-trigger active">
+                                    Our Services
+                                    <i class="fa-solid fa-caret-down"></i>
+                                </a>
+                                <div class="collapse" id="services">
+                                    <ul>
+                                        <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item active">Social
+                                                Media Advertising</a></li>
+                                        <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics &
+                                                Reporting</a></li>
+                                        <li><a href="../pages/our-services.html?development-service=true" class="dropdown-item">Web Design &
+                                                Development</a></li>
+                                        <li><a href="../pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li><a href="/" class="nav-link">Blog</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Searchbar -->
+                <div id="searchbar">
+                    <div class="btn_hover1">
+                        <i id="btnCloseSearch" onclick="closeSearch()" class="fa-solid fa-xmark"></i>
+                    </div>
+                    <form action="#" method="search">
+                        <input type="search" required placeholder="Search ..." />
+                        <button type="submit" class="btn_hover1 search_button">
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </header>
+        </div>
+    </div>
+
+    <!-------------------------------- Hero Section --------------------------------------->
+
+    <section id="ourServiceSection">
+        <div id="mediaService" class="outer-container our-service-container">
+            <div id="headerText" class="header-text-layout">
+                <div class="slash-rect"></div>
+                <h4 id="socialMediatHeader" class="header-text">
+                    Comprehensive Social Media Advertising Solutions for Real Estate
+                </h4>
+            </div>
+            <img id="elipsis" src="/resources/elipsis-line.png" alt="elipsis-line" />
+            <div class="v-layout">
+                <div id="service" class="header-text-layout">
+                    <img src="/resources/checked.png" alt="">
+                    <h5 class='styled-text'>Social Media Advertising</h5>
+                </div>
+                <img id="base-line" src="/resources/base-line.png" alt="">
+                <div class="inner-container">
+                    <p>We create customized advertising campaigns across
+                        multiple social media platforms, including Facebook,
+                        Instagram, TikTok, YouTube, and more. Our strategies
+                        include:
+                    </p>
+                    <div class="h-layout">
+                        <div class="header-text-layout">
+                            <img src="/resources/checked.png" alt="">
+                            <h5 class='styled-text'>Ad Creative Design</h5>
+                        </div>
+                        <p>Eye-catching graphics and compelling copy tailored
+                            for each platform.
+                        </p>
+                    </div>
+                    <div class="h-layout">
+                        <div class="header-text-layout">
+                            <img src="/resources/checked.png" alt="">
+                            <h5 class='styled-text'>Audience Targeting</h5>
+                        </div>
+                        <p>Precise targeting based on demographics, interests,
+                            and behaviors on each platform.
+                        </p>
+                    </div>
+                    <div class="h-layout">
+                        <div class="header-text-layout">
+                            <img src="/resources/checked.png" alt="">
+                            <h5 class='styled-text'>Budget Management</h5>
+                        </div>
+                        <p>Efficient use of your advertising budget to
+                            maximize reach and conversions across all platforms.
+                        </p>
+                    </div>
+                    <div class="h-layout">
+                        <div class="header-text-layout">
+                            <img src="/resources/checked.png" alt="">
+                            <h5 class='styled-text'>Lead Generation Strategies</h5>
+                        </div>
+                        <div class="v-layout">
+                            <p>Our proven techniques will help you capture high-quality
+                                leads through:
+                            </p>
+                            <div class="h-layout">
+                                <div class="header-text-layout">
+                                    <img src="/resources/checked.png" alt="">
+                                    <h5 class='styled-text'>Landing Pages</h5>
+                                </div>
+                                <p>Optimized pages designed for conversion.</p>
+                            </div>
+                            <div class="h-layout">
+                                <div class="header-text-layout">
+                                    <img src="/resources/checked.png" alt="">
+                                    <h5 class='styled-text'>Lead Magnets</h5>
+                                </div>
+                                <p>Free resources to entice potential clients.</p>
+                            </div>
+                            <div class="h-layout">
+                                <div class="header-text-layout">
+                                    <img src="/resources/checked.png" alt="">
+                                    <h5 class='styled-text'>Follow-Up Campaigns</h5>
+                                </div>
+                                <p>Automated email sequences to nurture leads.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="service" class="header-text-layout">
+                    <img src="/resources/checked.png" alt="">
+                    <h5 class='styled-text'>Analytics & Reporting</h5>
+                </div>
+                <img id="base-line" src="/resources/base-line.png" alt="">
+                <div class="inner-container">
+                    <p>We provide in-depth analytics and reports to track your
+                        campaign's performance, ensuring you understand your
+                        ROI and the effectiveness of your ads.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="courses" class="outer-container our-service-container">
+            <div class="header-text-layout">
+                <div class="slash-rect"></div>
+                <h4 id="socialMediatHeader" class="header-text">
+                    Your Coaching Programs
+                </h4>
+            </div>
+            <img id="elipsis" src="/resources/elipsis-line.png" alt="elipsis-line" />
+            <div class="h-layout">
+                <div class="v-layout">
+                    <div class="top-item">
+                        <img src="/resources/gear-one.png" alt="">
+                    </div>
+                    <p>Choose - learn - start - grow</p>
+                    <img src="/resources/lock-one.png" alt="">
+                    <p id="p">Everything you need to know to get started with your online business!</p>
+                    <div class="bottom-item">
+                        <p>Coming Soon!</p>
+                    </div>
+                </div>
+                <div class="v-layout">
+                    <div class="top-item">
+                        <img src="/resources/gear-one.png" alt="">
+                    </div>
+                    <p>Choose - learn - start - grow</p>
+                    <img src="/resources/lock-one.png" alt="">
+                    <p id="p">Everything you need to know to get started with your online business!</p>
+                    <div class="bottom-item">
+                        <p>Coming Soon!</p>
+                    </div>
+                </div>
+                <div class="v-layout">
+                    <div class="top-item">
+                        <img src="/resources/gear-one.png" alt="">
+                    </div>
+                    <p>Choose - learn - start - grow</p>
+                    <img src="/resources/lock-one.png" alt="">
+                    <p id="p">Everything you need to know to get started with your online business!</p>
+                    <div class="bottom-item">
+                        <p>Coming Soon!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="development" class="outer-container our-service-container">
+            <div class="header-text-layout">
+                <div class="slash-rect"></div>
+                <h4 id="socialMediatHeader" class="header-text">
+                    Programming & Development
+                </h4>
+            </div>
+            <img id="elipsis" src="/resources/elipsis-line.png" alt="elipsis-line" />
+            <div class="h-layout">
+                <div class="v-layout">
+                    <div class="top-item">
+                        <h4>Mobile & Web Design (UI/UX)</h4>
+                        <p>with Figma</p>
+                    </div>
+                    <p>Build intuitive Designs that are human centered, designed with user and for people.</p>
+                    <div>
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <p id="p">Simple-Flexible-Agile</p>
+                    <div class="bottom-item">
+                        <p>Apply for Service!</p>
+                    </div>
+                </div>
+                <div class="v-layout">
+                    <div class="top-item">
+                        <h4>Web Development</h4>
+                        <p>Vue-Node-Express-JS-HTML-CSS</p>
+                        <p>Mongo-SQL-Maria-Firebase-Oracle</p>
+                    </div>
+                    <p>Build interactive website that suits your development need..</p>
+                    <div>
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <p id="p">Simple-Robust-Scalable-Agile</p>
+                    <div class="bottom-item">
+                        <p>Apply for Service!</p>
+                    </div>
+                </div>
+                <div class="v-layout">
+                    <div class="top-item">
+                        <h4>Android Development</h4>
+                        <p>Java-Kotlin-Compose-XML</p>
+                        <p>SQlite-Firebase</p>
+                    </div>
+                    <p>Build interactive Android Apps for Company or Personal use.</p>
+                    <div>
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <p id="p">Simple-Robust-Scalable-Agile</p>
+                    <div class="bottom-item">
+                        <p>Apply for Service!</p>
+                    </div>
+                </div>
+                <div class="v-layout">
+                    <div class="top-item">
+                        <h4>Software Development</h4>
+                        <p>JavaFX-Jarkata-Java-Spring</p>
+                        <p>MySQl-Oracle</p>
+                    </div>
+                    <p>Build interactive Web or Desktop Applications for Company.</p>
+                    <div>
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <p id="p">Simple-Robust-Scalable-Agile</p>
+                    <div class="bottom-item">
+                        <p>Apply for Service!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-------------------------------------- Footer Section ------------------------------------------>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo"><img src="/resources/logo.png" alt=""></div>
+            <div class="top-items-footer">
+                <div class="consultation">
+                    <img src="/resources/help.svg.svg" alt="" class="client-icon" />
+                    <p class="par-consult">Need Help? Call Us!</p>
+                    <a href="/?lead-capture-form=true" class="btn_hover1 small-button">CONSULTATION</a>
+                </div>
+                <!-- End of consultation Section-->
+                <div class="company-info">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="../pages/aboutus.html">About Us</a></li>
+                        <li><a href="../pages/contact.html">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Blog Posts</a></li>
+                    </ul>
+                </div>
+                <!-- End of Company Section-->
+                <div class="services">
+                    <h5>Our Services</h5>
+                    <ul>
+                        <li><a href="../pages/our-services.html?adverts-service=true">Social Media Management</a></li>
+                        <li><a href="../pages/our-services.html?adverts-service=true">Ad Creative Design</a></li>
+                        <li><a href="../pages/our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
+                        <li><a href="../pages/our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
+                        <li><a href="../pages/our-services.html?development-service=true">Software Slolution & Web Design</a></li>
+                        <li><a href="../pages/our-services.html?development-service=true">Mobile Development (Android)</a></li>
+                    </ul>
+                </div>
+                <!-- End of Service Section-->
+                <div class="newsletter">
+                    <h5>Newsletter</h5>
+                    <form action="#" method="newsletter">
+                        <input type="email" required placeholder="Email ... (example@example.com)" />
+                        <!--button type="submit" class="btn_hover1 search_button">
+                Search
+              </button-->
+                    </form>
+                    <a href="#" class="btn_hover1 small-button">Watch the Free Video</a>
+                </div>
+                <!-- End of Newsletter Section-->
+                <div class="footer-faq-section">
+                    <img src="/resources/msg.svg.svg" alt="" class="conversation-icon" />
+                    <h5>FAQs</h5>
+                    <p>
+                        Need a clarification? Ask our Agents for a clarified solution.
+                        You'll get your clarification as soon as possible
+                    </p>
+                    <a href="/?faqs=true" class="btn_hover1 small-button">VIEW FAQs SECTION</a>
+                </div>
+                <!-- End of faq Section-->
+            </div>
+            <!-- End of footer top items -->
+            <div class="footer-bottom">
+                <div class="social-icons">
+                    <p class="footer-text-follow-us">Follow Us:</p>
+                    <a href="https://www.facebook.com/profile.php?id=61567259036362"><i
+                            class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+                <!-- End of footer social media -->
+                <p class="footer-text-copyright">
+                    Copyright © 2024 <span><a href="/index.html">AdConnect</a></span>. All rights reserved.
+                </p>
+            </div>
+        </div>
+        <!-- End of footer container -->
+    </footer>
+
+    <!-- Scroll animation Lib -->
+    <script src="https://unpkg.com/aos@next/dist/aos.css"></script>
+    <script>
+        AOS.init({
+            offset: 150,
+            duration: 1250,
+            once: true,
+        });
+    </script>
+
+    <!-- jquery js cdn -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+        integrity="sha512-+k1pnlgt4F1H8L7t329503/KO+078INEcXTbno3Q/F2VqDVhwoaiVml/0EHv9HsVgxUaVW+IbiZPUJQFF/YxZw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- jquery min js cdn-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVTBEE2iyI610V8e6M8PP2/4hpQINQ/g="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- slick carousel min js cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
+        integrity="sha256-DHF4zGyjT760MP8wpeehwoey18z8uiz9864PRu2lVBA=" crossorigin="anonymous"></script>
+
+    <!-- Custom JS-->
+    <script type="module" src="../scripts/main.js"></script>
+</body>
+
+</html>

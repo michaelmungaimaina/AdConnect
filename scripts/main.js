@@ -54,6 +54,10 @@ const inputPhoneContactUs = document.getElementById('inputPhoneContactUs');
 const textAreaMessageContactUs = document.getElementById('textAreaMessageContactUs');
 const btnSubmitContactUsData = document.getElementById('textAreaMessageContactUs');
 const errorMessageContainer = document.getElementById('contactUsErrorMessageContainer');
+const ourServiceSection = document.getElementById('ourServiceSection');
+const socialMediaService = document.getElementById('mediaService');
+const courseService = document.getElementById('courses');
+const developmentService = document.getElementById('development');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
@@ -93,6 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sidePanelCloseBtn.addEventListener('click', closeNav);
         btnCloseSearch.addEventListener('click', closeSearch);
         btnSubmitContactUsData.addEventListener('click', () => actionSubmitContactUsData);
+    }
+    if (pageId === 'aboutUsPage') {
+        navbarTogler.addEventListener('click', openNav);
+        sidePanelCloseBtn.addEventListener('click', closeNav);
+    }
+    if (pageId === 'ourServicePage') {
+        navbarTogler.addEventListener('click', openNav);
+        sidePanelCloseBtn.addEventListener('click', closeNav);
     }
 });
 
@@ -152,6 +164,9 @@ window.onload = function () {
     const thankYou = getUrlParameter('thank-you-page');
     const bookingForm = getUrlParameter('appointment-booking');
     const appointmentThankyouView = getUrlParameter('thank-you-for-booking');
+    const coursesService = getUrlParameter('courses-service');
+    const developmentService = getUrlParameter('development-service');
+    const advertService = getUrlParameter('adverts-service');
 
     if (faqs === 'true') openFAQs();
     if (faqsForm === 'true') openFAQsForm();
@@ -161,7 +176,38 @@ window.onload = function () {
     if (thankYou === 'true') openThankYouPage();
     if (bookingForm === 'true') openAppointmentBooking();
     if (appointmentThankyouView === 'true') openAppointmentBookingThankYouPage();
+    if (coursesService === 'true') openCoursesService();
+    if (developmentService === 'true') openDevelopmentService();
+    if (advertService === 'true') openSocialMediaService();
 };
+
+function openCoursesService(){
+    if (courseService) {
+        courseService.scrollIntoView({ behavior: 'smooth' });
+        const newUrl = `${baseUrl.slice(0, 0)}?courses-service=true`;
+        window.history.pushState({}, '', newUrl);
+    } else {
+        console.error('Error: Service Section Not Found');
+    }
+}
+function openDevelopmentService(){
+    if (developmentService) {
+        developmentService.scrollIntoView({ behavior: 'smooth' });
+        const newUrl = `${baseUrl.slice(0, 0)}?development-service=true`;
+        window.history.pushState({}, '', newUrl);
+    } else {
+        console.error('Error: Service Section Not Found');
+    }
+}
+function openSocialMediaService(){
+    if (socialMediaService) {
+        socialMediaService.scrollIntoView({ behavior: 'smooth' });
+        const newUrl = `${baseUrl.slice(0, 0)}?adverts-service=true`;
+        window.history.pushState({}, '', newUrl);
+    } else {
+        console.error('Error: Service Section Not Found');
+    }
+}
 /**
  * Handle the form for Contact in Contact Page
  * @returns  input focus / Succes message
@@ -209,7 +255,7 @@ function actionSubmitContactUsData(){
     }
 
 
-    // SUbmit data and show success notification
+    // SUbmit data, clear inputs and show success notification
 
     // Display success Message
     errorMessageContainer.style.color = 'white';
@@ -456,7 +502,7 @@ document.querySelectorAll('.collapse-btn').forEach(item => {
 
 /* Control Navigation Bar Visibility */
 let lastScrollTop = 0;
-const navHeader = document.querySelector(".navbar"); // Replace with your nav header's class or ID
+const navHeader = document.querySelector(".navbar"); 
 
 window.addEventListener("scroll", () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -472,7 +518,8 @@ window.addEventListener("scroll", () => {
 
 $('.video').parent().click(function () {
     if ($(this).children(".video").get(0).paused) {
-        $(this).children(".video").get(0).play(); $(this).children(".playpause").fadeOut();
+        $(this).children(".video").get(0).play(); 
+        $(this).children(".playpause").fadeOut();
     } else {
         $(this).children(".video").get(0).pause();
         $(this).children(".playpause").fadeIn();
