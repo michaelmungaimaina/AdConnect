@@ -226,9 +226,9 @@ window.onload = function () {
     const faqs = getUrlParameter('faqs');
     const faqsForm = getUrlParameter('faqs-form');
     const applicationForm = getUrlParameter('application-form');
-    const valueVideo = getUrlParameter('value-video');
+    const valueVideo = getUrlParameter('value-video-request');
     const leadCapture = getUrlParameter('lead-capture-form');
-    const thankYou = getUrlParameter('thank-you-page');
+    const thankYou = getUrlParameter('value-video-opt-in');
     const bookingForm = getUrlParameter('appointment-booking');
     const appointmentThankyouView = getUrlParameter('thank-you-for-booking');
     const coursesService = getUrlParameter('courses-service');
@@ -353,7 +353,7 @@ function openThankYouPage() {
 
         sectionThankYouVideo.style.display = 'flex';
         sectionThankYouVideo.style.transform = "translateY(0%)";
-        const newUrl = `${baseUrl.slice(0, 0)}?thank-you-page=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?value-video-opt-in=true`;
         window.history.pushState({}, '', newUrl);
     } else {
         console.error('Error: Thank You Video Section Not Found');
@@ -439,7 +439,7 @@ export function openValueVideo() {
         sectionValueVideo.style.display = 'flex'
         sectionValueVideo.scrollIntoView({ behavior: 'smooth' });
 
-        const newUrl = `${baseUrl.slice(0, 0)}?value-video=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?value-video-request=true`;
         window.history.pushState({}, '', newUrl);
 
         sectionMainhero.style.display = "none"
