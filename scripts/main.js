@@ -600,13 +600,22 @@ window.addEventListener("scroll", () => {
 
 
 $('.video').parent().click(function () {
-    if ($(this).children(".video").get(0).paused) {
-        $(this).children(".video").get(0).play(); 
-        $(this).children(".playpause").fadeOut();
+    const video = $(this).children(".video").get(0);
+    const playPauseIcon = $(this).children(".playpause");
+
+    if (video.paused) {
+        video.play();
+        playPauseIcon.fadeOut();
     } else {
-        $(this).children(".video").get(0).pause();
-        $(this).children(".playpause").fadeIn();
+        video.pause();
+        playPauseIcon.fadeIn();
     }
+});
+
+// Disable video download option
+$('.video').each(function() {
+    this.removeAttribute('controlsList'); // Ensure there's no pre-existing attribute
+    this.setAttribute('controlsList', 'nodownload'); // Disable download option
 });
 
 

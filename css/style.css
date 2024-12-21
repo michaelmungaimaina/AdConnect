@@ -2707,6 +2707,14 @@ body section .contact-container .contact-footer div a:hover {
     border-radius: 10px;
 }
 
+/* Style for the progress bar */
+#thankYouVideoSection video::-webkit-media-controls-timeline {
+    background-color: #F65730; /* Change color for WebKit-based browsers */
+}
+#thankYouVideoSection video::-moz-range-track {
+    background-color: #F65730; /* Change color for Firefox */
+}
+
 #thankYouVideoSection .foot-text {
     text-align: center;
     color: white;
