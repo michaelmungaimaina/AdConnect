@@ -116,34 +116,63 @@ document.addEventListener('DOMContentLoaded', () => {
  * This is for google tag manager
  */
 (function() {
-    const sendPageView = () => {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            event: 'pageview',
-            pagePath: window.location.pathname,
-            pageTitle: document.title,
-        });
+    // Function to determine the category based on the URL
+    const getCategoryFromURL = () => {
+        const urlPath = window.location.pathname;
+
+        // Define categories based on URL patterns
+        if (urlPath === '/index.html') {
+            return 'Home';
+        } else if (urlPath === '/index.html/?value-video=true') {
+            return 'Value Video (Closed)';
+        } else if (urlPath === '/index.html/?lead-capture-form=true') {
+            return 'Lead Capture';
+        } else if (urlPath === '/index.html/?thank-you-page=true') {
+            return 'Thank You Page';
+        } else {
+            return 'Other'; // Default category
+        }
     };
 
-    // Track initial page load
+    // Function to send pageview with category to GTM
+    const sendPageView = () => {
+        const category = getCategoryFromURL();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: 'pageview',              // Event name for GTM
+            pagePath: window.location.pathname + window.location.search,
+            pageTitle: document.title,
+            category: category              // Include the category
+        });
+        console.log('Pageview event sent:', { 
+            pagePath: window.location.pathname, 
+            category 
+        }); // Debugging
+    };
+
+    // Track the initial page load
     sendPageView();
 
-    // Track changes for SPAs using history API
+    // Hook into the History API to track pushState and replaceState
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
+    // Override pushState
     history.pushState = function(...args) {
         originalPushState.apply(this, args);
         sendPageView();
     };
 
+    // Override replaceState
     history.replaceState = function(...args) {
         originalReplaceState.apply(this, args);
         sendPageView();
     };
 
     // Fallback for hash-based navigation
-    window.addEventListener('hashchange', sendPageView);
+    window.addEventListener('hashchange', () => {
+        sendPageView();
+    });
 })();
 
 // Attach to the global scope
