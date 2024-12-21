@@ -58,6 +58,8 @@ const ourServiceSection = document.getElementById('ourServiceSection');
 const socialMediaService = document.getElementById('mediaService');
 const courseService = document.getElementById('courses');
 const developmentService = document.getElementById('development');
+const sectionPrivacyPolicy = document.getElementById('privacyPolicy');
+const btnClosePrivacyPolicy = document.getElementById('btnClosePrivacyPolicy');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
@@ -90,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFooterConsultation.addEventListener('click', () => openUrl('?lead-capture-form=true'));
         btnFooterFAQs.addEventListener('click', openFAQs);
         btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
+        btnClosePrivacyPolicy.addEventListener('click', closePrivacyPolicy);
     }
     if (pageId === 'contactUsPage') {
         navbarTogler.addEventListener('click', openNav);
@@ -167,6 +170,7 @@ window.onload = function () {
     const coursesService = getUrlParameter('courses-service');
     const developmentService = getUrlParameter('development-service');
     const advertService = getUrlParameter('adverts-service');
+    const privacyPolicy = getUrlParameter('privacy-policy');
 
     if (faqs === 'true') openFAQs();
     if (faqsForm === 'true') openFAQsForm();
@@ -179,6 +183,7 @@ window.onload = function () {
     if (coursesService === 'true') openCoursesService();
     if (developmentService === 'true') openDevelopmentService();
     if (advertService === 'true') openSocialMediaService();
+    if (privacyPolicy === 'true') openPrivacyPolicy();
 };
 
 function openCoursesService(){
@@ -206,6 +211,20 @@ function openSocialMediaService(){
         window.history.pushState({}, '', newUrl);
     } else {
         console.error('Error: Service Section Not Found');
+    }
+}
+
+function openPrivacyPolicy() {
+    if (sectionPrivacyPolicy) {
+        sectionPrivacyPolicy.style.height = '100%';
+        const newUrl = `${baseUrl.slice(0, 0)}?privacy-policy=true`;
+        window.history.pushState({}, '', newUrl);
+    }
+}
+function closePrivacyPolicy(){
+    if (sectionPrivacyPolicy) {
+        sectionPrivacyPolicy.style.height = '0%';
+        window.history.pushState({}, '', baseUrl);
     }
 }
 /**
@@ -450,7 +469,6 @@ function closeSearch() {
 
 function closeAppointmentView() {
     'use strict'
-    const btnCloseAppointmentView = document.getElementById('btnCloseApointment');
     const appointmentView = document.getElementById('appointmentView');
     window.history.pushState({}, '', baseUrl);
     if (appointmentView) {
@@ -500,7 +518,7 @@ document.querySelectorAll('.collapse-btn').forEach(item => {
     });
 });
 
-/* Control Navigation Bar Visibility */
+/* Control Navigation Bar Visibility *
 let lastScrollTop = 0;
 const navHeader = document.querySelector(".navbar"); 
 
@@ -514,7 +532,8 @@ window.addEventListener("scroll", () => {
         navHeader.style.transform = "translateY(0)";
     }
     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For mobile or negative scrolling
-})
+});*/
+
 
 $('.video').parent().click(function () {
     if ($(this).children(".video").get(0).paused) {

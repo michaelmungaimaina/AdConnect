@@ -144,6 +144,7 @@ h5 {
     background-position: center;
     block-size: cover;
     position: fixed;
+    z-index: 100000;
 }
 
 header {
@@ -161,7 +162,6 @@ header {
 }
 
 .navbar {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -174,7 +174,7 @@ header {
     animation-duration: 0.75s;
     position: fixed;
     transition: transform 0.3s ease;
-    z-index: 999999999;
+    z-index: 100000;
 }
 
 .container-nav {
@@ -2236,6 +2236,79 @@ body section .contact-container .contact-footer div a:hover {
         width: fit-content;
         height: fit-content;
         margin: 50px 50px;
+    }
+}
+
+/**************************      Privacy Policy Page Syles     ****************************/
+#btnClosePrivacyPolicy {
+    width: 44px;
+    height: 44px;
+    position: absolute;
+    right: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.25em;
+    border: 1.5px solid #F65730;
+    color: white;
+    margin: 30px;
+    cursor: pointer;
+}
+
+#btnClosePrivacyPolicy:hover{
+    border: 1.5px solid #F65730;
+    background: inherit;
+    color: #F65730;
+}
+
+.background-tint-black .appointment-layout {
+    width: fit-content;
+    height: fit-content;
+    margin: 100px 150px;
+    padding: 20px;
+}
+
+.background-tint-black .appointment-layout .h-layout {
+    width: fit-content;
+    margin: 20px 0 10px 20px;
+}
+
+#privacyPolicy .h-layout{
+    margin-top: -10px;
+    margin-left: -10px;
+}
+#privacyPolicy #date{
+    color: #d75c3d;
+    font-weight: bold;
+    font-size: 15px;
+}
+#privacyPolicy p{
+    text-align: justify;
+    font-size: 14px;
+    color: white;
+    margin: 5px 20px 5px 60px;
+}
+#privacyPolicy p a{
+    color: #4ABC4F;
+    font-size: 15px;
+    font-weight: bold;
+}
+#privacyPolicy #header{
+    font-size: 19px;
+    color: white;
+    margin: 0 0 0 5px;
+}
+#privacyPolicy h6{
+    color: #fc5931;
+    margin: 0px 20px 0px 30px;
+}
+/* Responsiveness of the Privacy Policy Section */
+@media screen and (max-width: 880px) {
+    .background-tint-black .appointment-layout {
+        margin: 80px 10px;
+    }
+    #privacyPolicy p{
+        margin: 5px 20px 5px 20px;
     }
 }
 

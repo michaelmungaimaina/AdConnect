@@ -506,15 +506,15 @@
 
   <!---------------------------------------- Privacy Policy Section -------------------------------------------->
   <section id="privacyPolicy" class="background-tint-black">
-    <div id="btnClosePrivacyPolicy" onclick="closeAppointmentView()" class="btn_hover1" style="position: fixed;">
+    <div id="btnClosePrivacyPolicy" onclick="closePrivacyPolicy()" class="btn_hover1" style="position: fixed;">
       <i class="fa-solid fa-xmark"></i>
     </div>
     <div class="appointment-layout outer-container">
       <div class="h-layout">
         <div class="slash-rect"></div>
-        <p class="header-text">Our Privacy Policy</p>
+        <p id="header" class="header-text">Our Privacy Policy</p>
       </div>
-      <p>Effective: December 20th, 2024</p>
+      <p id="date">Effective: December 20th, 2024</p>
       <p>At <a href="/index.html">AdConnect</a>, your privacy is a priority. 
         This Privacy Policy explains how we collect, use, and protect your personal 
         data when you engage with our services, visit our website, or interact with 
@@ -574,7 +574,8 @@
           </p>
           <h6>10. Contact Us</h6>
           <p>If you have questions about this Privacy Policy or wish to exercise your rights, 
-            please contact us at:
+            please contact us at: <br>
+            <a href="/pages/contact.html">AdConnect</a>
           </p>
     </div>
   </section>
@@ -672,7 +673,7 @@
   </section>
 
   <!-------------------------------------- Footer Section ------------------------------------------>
-  <footer class="footer">
+  <footer id="footerSection" class="footer">
     <div class="footer-container">
       <div class="footer-logo"><img src="/resources/logo.png" alt=""></div>
       <div class="top-items-footer">
@@ -689,7 +690,7 @@
           <ul>
             <li><a href="/pages/aboutus.html">About Us</a></li>
             <li><a href="/pages/contact.html">Contact Us</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="?privacy-policy=true">Privacy Policy</a></li>
             <li><a href="#">Blog Posts</a></li>
           </ul>
         </div>
