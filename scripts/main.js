@@ -111,6 +111,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/**
+ * Listen for history changes
+ * This is for google tag manager
+ */
+(function() {
+    const sendPageView = () => {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: 'pageview',
+            pagePath: window.location.pathname,
+            pageTitle: document.title,
+        });
+    };
+
+    // Track initial page load
+    sendPageView();
+
+    // Track changes for SPAs using history API
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function(...args) {
+        originalPushState.apply(this, args);
+        sendPageView();
+    };
+
+    history.replaceState = function(...args) {
+        originalReplaceState.apply(this, args);
+        sendPageView();
+    };
+
+    // Fallback for hash-based navigation
+    window.addEventListener('hashchange', sendPageView);
+})();
+
 // Attach to the global scope
 window.openNav = openNav;
 window.closeNav = closeNav;
@@ -289,7 +324,7 @@ function openThankYouPage() {
 
         sectionThankYouVideo.style.display = 'flex';
         sectionThankYouVideo.style.transform = "translateY(0%)";
-        const newUrl = `${baseUrl.slice(0, -1)}?thank-you-page=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?thank-you-page=true`;
         window.history.pushState({}, '', newUrl);
     } else {
         console.error('Error: Thank You Video Section Not Found');
@@ -312,7 +347,7 @@ function openApplicationForm() {
 
         sectionApplyConsultation.style.display = 'flex';
         sectionApplyConsultation.style.transform = 'translateY(0%)';
-        const newUrl = `${baseUrl.slice(0, -1)}?application-form=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?application-form=true`;
         window.history.pushState({}, '', newUrl);
     } else {
         console.error('Error: Thank Application Section Not Found');
@@ -344,7 +379,7 @@ function openFAQs() {
     'use strict';
     console.log('Faqs Open')
     if (showFAQsSection) {
-        const newUrl = `${baseUrl.slice(0, -1)}?faqs=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?faqs=true`;
         window.history.pushState({}, '', newUrl);
         faqsSection.style.height = '100%';
     } else {
@@ -362,7 +397,7 @@ function openFAQsForm() {
         showFAQsForm.style.overflow = 'hidden'
         submitFAQsFormButton.style.height = 'fit-content'
 
-        const newUrl = `${baseUrl.slice(0, -1)}?faqs-form=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?faqs-form=true`;
         window.history.pushState({}, '', newUrl);
 
     } else {
@@ -375,7 +410,7 @@ export function openValueVideo() {
         sectionValueVideo.style.display = 'flex'
         sectionValueVideo.scrollIntoView({ behavior: 'smooth' });
 
-        const newUrl = `${baseUrl.slice(0, -1)}?value-video=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?value-video=true`;
         window.history.pushState({}, '', newUrl);
 
         sectionMainhero.style.display = "none"
@@ -388,7 +423,7 @@ function openLeadCaptureSection() {
     if (sectionLeadCapture) {
         sectionLeadCapture.style.height = '100%';
 
-        const newUrl = `${baseUrl.slice(0, -1)}?lead-capture-form=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?lead-capture-form=true`;
         window.history.pushState({}, '', newUrl);
     } else {
         console.error('Error: Lead Section Not Found!');
@@ -490,7 +525,7 @@ function closeLeadCapture() {
 function openAppointmentBooking() {
     if (sectionAppointmentApplication) {
         sectionAppointmentApplication.style.height = '100%';
-        const newUrl = `${baseUrl.slice(0, -1)}?appointment-booking=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?appointment-booking=true`;
         window.history.pushState({}, '', newUrl);
 
         appointmentAction()
