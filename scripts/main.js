@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Listen for history changes
  * This is for google tag manager
- */
+ *
 (function() {
     // Function to determine the category based on the URL
     const getCategoryFromURL = () => {
@@ -164,6 +164,75 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Override replaceState
+    history.replaceState = function(...args) { 102.212.247.82
+        originalReplaceState.apply(this, args);
+        sendPageView();
+    };
+
+    // Fallback for hash-based navigation
+    window.addEventListener('hashchange', () => {
+        sendPageView();
+    });
+})();*/
+
+(function() {
+    // Function to determine the category based on the URL
+    const getCategoryFromURL = () => {
+        const urlPath = window.location.pathname;
+
+        // Define categories based on URL patterns
+        if (urlPath === '/index.html') {
+            return 'Home';
+        } else if (urlPath === '/index.html/?value-video-request=true') {
+            return 'Value Video (Closed)';
+        } else if (urlPath === '/index.html/lead-capture-form=true') {
+            return 'Lead Capture';
+        } else if (urlPath === 'value-video-opt-in=true') {
+            return 'Value Video (Open)';
+        } else if (urlPath === 'application-form=true') {
+            return 'Application Form';
+        } else if (urlPath === 'appointment-booking=true') {
+            return 'Appointment Booking';
+        } else if (urlPath === 'thank-you-for-booking=true') {
+            return 'Thank You Page';
+        } else {
+            return 'Other'; // Default category
+        }
+    };
+
+    // Function to send pageview with category to Facebook Pixel
+    const sendPageView = () => {
+        const category = getCategoryFromURL();
+        const pagePath = window.location.pathname + window.location.search;
+        const pageTitle = document.title;
+
+        // Ensure the fbq function is available
+        if (typeof fbq === 'function') {
+            fbq('trackCustom', 'PageView', {
+                pagePath: pagePath,   // Full URL path
+                pageTitle: pageTitle, // Title of the page
+                category: category    // Custom category
+            });
+            console.log('Facebook Pixel event sent:', { pagePath, category }); // Debugging
+        } else {
+            console.error('Facebook Pixel (fbq) not initialized.');
+        }
+    };
+
+    // Track the initial page load
+    sendPageView();
+
+    // Hook into the History API to track pushState and replaceState
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    // Override pushState
+    history.pushState = function(...args) {
+        originalPushState.apply(this, args);
+        sendPageView();
+    };
+
+    // Override replaceState
     history.replaceState = function(...args) {
         originalReplaceState.apply(this, args);
         sendPageView();
@@ -174,6 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sendPageView();
     });
 })();
+
+
 
 // Attach to the global scope
 window.openNav = openNav;
@@ -959,6 +1030,9 @@ function goToPreviousStep() {
 // Initialize the survey form
 initializeForm();
 
+const dateSelected = false;
+const dateChanged = false;
+
 /**
  * Process all pre-actions in the booking of an Appointment
  * Prepopulates the data
@@ -1017,7 +1091,7 @@ function appointmentAction() {
             errorMessage = 'Sundays are not available for appointments. Please select another date.';
             handleErrorMessage(errorMessage, errorMessageContainer);
             this.value = ''; // Clear the invalid date
-            checkAvailableDates();
+            dateChanged = false;
             return;
         }
 
@@ -1026,13 +1100,21 @@ function appointmentAction() {
             errorMessage = 'The selected date falls on a holiday. Please choose another date.';
             handleErrorMessage(errorMessage, errorMessageContainer)
             this.value = ''; // Clear the invalid date
-            checkAvailableDates();
+            dateChanged = false;
             return;
         }
-
+        // Date changed to an acceptable value
+        dateChanged = true;
     });
-    checkAvailableDates();
-
+    
+    switch (dateChanged){
+        case true:
+            checkAvailableDates();
+            break;
+        default:
+            handleErrorMessage('Select an Active Date', errorMessageContainer)
+    }
+    
 }
 
 function checkAvailableDates() {
@@ -1077,7 +1159,13 @@ function checkAvailableDates() {
 }
 
 function selectTime(time) {
-    alert(`You selected: ${time}`);
+    dateSelected = true;
+    // Display Date Selected
+    errorMessage.style.color = 'white';
+    errorMessage.style.backgroundColor = '#4abc5061';
+    errorMessage.style.display = 'block';
+    errorMessages = `You selected: ${time}`;
+    handleErrorMessage(errorMessages, errorMessage);
     AppointmentBooking.time = time;
     // Send email or make an API call to confirm the booking 
 }
@@ -1127,7 +1215,15 @@ function submitAppointMent() {
         dateInput.focus();
         return;
     }
-
+    if (!dateSelected){
+        handleErrorMessage('Select your appointment time!', errorMessageContainer);
+        return;
+    }
+    if (messageInput.value.trim() === '') {
+        handleErrorMessage('Please Tell Us Something', errorMessageContainer);
+        messageInput.focus();
+        return;
+    }
     const date = new Date(dateInput.value); // Ensure the date is valid 
     if (!isNaN(date.getTime())) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -1151,7 +1247,7 @@ function openAppointmentBookingThankYouPage() {
         sectionAppointmentApplication.style.transform = 'translateY(-100%)';
         sectionApptThanks.style.height = '100%';
 
-        const newUrl = `${baseUrl.slice(0, -1)}?thank-you-for-booking=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?thank-you-for-booking=true`;
         window.history.pushState({}, '', newUrl);
     } else {
         console.log('Error: Thanks Section Not Available');
@@ -1178,7 +1274,7 @@ function closeAppointmentThanksView() {
         sectionApptThanks.style.height = '0%';
         sectionAppointmentApplication.style.height = '100%';
 
-        const newUrl = `${baseUrl.slice(0, -1)}?appointment-booking=true`;
+        const newUrl = `${baseUrl.slice(0, 0)}?appointment-booking=true`;
         window.history.pushState({}, '', newUrl);
         console.log('Execution Success!');
     } else {

@@ -694,7 +694,7 @@ header {
 
 .hero {
     padding: 58px 20px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.737) 100%, rgba(0, 0, 0, 0.567) 50%), url(/resources/background-image.jpeg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50) 100%, rgba(0, 0, 0, 0.567) 50%), url(/resources/background-image.jpeg);
     text-align: center;
     height: 100%;
     background-position: center;
