@@ -1,5 +1,7 @@
 import { UserApplicationObject } from './objects.js';
 import { AppointmentBooking } from './objects.js';
+import { Client } from './models/client.js';
+const nodemailer = require('nodemailer');
 
 
 'use strict';
@@ -164,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Override replaceState
-    history.replaceState = function(...args) { 102.212.247.82
+    history.replaceState = function(...args) {
         originalReplaceState.apply(this, args);
         sendPageView();
     };
@@ -175,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 })();*/
 
-(function() {
+(function () {
     // Function to determine the category based on the URL
     const getCategoryFromURL = () => {
         const urlPath = window.location.pathname;
@@ -227,13 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalReplaceState = history.replaceState;
 
     // Override pushState
-    history.pushState = function(...args) {
+    history.pushState = function (...args) {
         originalPushState.apply(this, args);
         sendPageView();
     };
 
     // Override replaceState
-    history.replaceState = function(...args) {
+    history.replaceState = function (...args) {
         originalReplaceState.apply(this, args);
         sendPageView();
     };
@@ -321,7 +323,7 @@ window.onload = function () {
     if (privacyPolicy === 'true') openPrivacyPolicy();
 };
 
-function openCoursesService(){
+function openCoursesService() {
     if (courseService) {
         courseService.scrollIntoView({ behavior: 'smooth' });
         const newUrl = `${baseUrl.slice(0, 0)}?courses-service=true`;
@@ -330,7 +332,7 @@ function openCoursesService(){
         console.error('Error: Service Section Not Found');
     }
 }
-function openDevelopmentService(){
+function openDevelopmentService() {
     if (developmentService) {
         developmentService.scrollIntoView({ behavior: 'smooth' });
         const newUrl = `${baseUrl.slice(0, 0)}?development-service=true`;
@@ -339,7 +341,7 @@ function openDevelopmentService(){
         console.error('Error: Service Section Not Found');
     }
 }
-function openSocialMediaService(){
+function openSocialMediaService() {
     if (socialMediaService) {
         socialMediaService.scrollIntoView({ behavior: 'smooth' });
         const newUrl = `${baseUrl.slice(0, 0)}?adverts-service=true`;
@@ -356,7 +358,7 @@ function openPrivacyPolicy() {
         window.history.pushState({}, '', newUrl);
     }
 }
-function closePrivacyPolicy(){
+function closePrivacyPolicy() {
     if (sectionPrivacyPolicy) {
         sectionPrivacyPolicy.style.height = '0%';
         window.history.pushState({}, '', baseUrl);
@@ -366,44 +368,44 @@ function closePrivacyPolicy(){
  * Handle the form for Contact in Contact Page
  * @returns  input focus / Succes message
  */
-function actionSubmitContactUsData(){
-    if (inputNameContactUs.value.trim() === ''){
-        handleErrorMessage('Name Field is Required!',errorMessageContainer);
+function actionSubmitContactUsData() {
+    if (inputNameContactUs.value.trim() === '') {
+        handleErrorMessage('Name Field is Required!', errorMessageContainer);
         inputNameContactUs.focus();
         return;
     }
-    if (inputNameContactUs.value.trim().length < 6){
-        handleErrorMessage('Name is Too Short!',errorMessageContainer);
+    if (inputNameContactUs.value.trim().length < 6) {
+        handleErrorMessage('Name is Too Short!', errorMessageContainer);
         inputNameContactUs.focus();
         return;
     }
-    if (!twoWordsPattern.test(inputNameContactUs.value.trim())){
-        handleErrorMessage('Name is NOT Full!',errorMessageContainer);
+    if (!twoWordsPattern.test(inputNameContactUs.value.trim())) {
+        handleErrorMessage('Name is NOT Full!', errorMessageContainer);
         inputNameContactUs.focus();
         return;
     }
-    if (inputEmailContactUs.value.trim() === ''){
-        handleErrorMessage('Email Field is Required!',errorMessageContainer);
+    if (inputEmailContactUs.value.trim() === '') {
+        handleErrorMessage('Email Field is Required!', errorMessageContainer);
         inputEmailContactUs.focus();
         return;
     }
-    if (!emailPattern.test(inputEmailContactUs.value.trim())){
-        handleErrorMessage('Email is NOT Valid!',errorMessageContainer);
+    if (!emailPattern.test(inputEmailContactUs.value.trim())) {
+        handleErrorMessage('Email is NOT Valid!', errorMessageContainer);
         inputEmailContactUs.focus();
         return;
     }
-    if (inputPhoneContactUs.value.trim() === ''){
-        handleErrorMessage('Phone Number Field is Required!',errorMessageContainer);
+    if (inputPhoneContactUs.value.trim() === '') {
+        handleErrorMessage('Phone Number Field is Required!', errorMessageContainer);
         inputPhoneContactUs.focus();
         return;
     }
-    if (!phonePattern.test(inputPhoneContactUs.value.trim())){
-        handleErrorMessage('Phone Number is NOT Valid!',errorMessageContainer);
+    if (!phonePattern.test(inputPhoneContactUs.value.trim())) {
+        handleErrorMessage('Phone Number is NOT Valid!', errorMessageContainer);
         inputPhoneContactUs.focus();
         return;
     }
-    if (textAreaMessageContactUs.value.trim() === ''){
-        handleErrorMessage('Tell Us Something!',errorMessageContainer);
+    if (textAreaMessageContactUs.value.trim() === '') {
+        handleErrorMessage('Tell Us Something!', errorMessageContainer);
         textAreaMessageContactUs.focus();
         return;
     }
@@ -684,7 +686,7 @@ $('.video').parent().click(function () {
 });
 
 // Disable video download option
-$('.video').each(function() {
+$('.video').each(function () {
     this.removeAttribute('controlsList'); // Ensure there's no pre-existing attribute
     this.setAttribute('controlsList', 'nodownload'); // Disable download option
 });
@@ -695,10 +697,15 @@ $('.video').each(function() {
  * Outputs the error message for each input for 4 seconds only
  * @returns focus for the input field, end of function
  */
-function submitLeads() {
+async function submitLeads() {
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
+    const company = document.getElementById('company').value;
+    const street = document.getElementById('address').value;
+    const city = document.getElementById('city').value;
+    const province = document.getElementById('state').value;
+    const zip = document.getElementById('zipCode').value;
     const errorMessage = document.getElementById('errorMessage');
 
     let errorMessages = '';
@@ -738,22 +745,131 @@ function submitLeads() {
         handleErrorMessage(errorMessages, errorMessage);
         return true;
     }
+
     // Submit data to Database and send an Email to the client
-
-    // Display success Message
-    errorMessage.style.color = 'white';
-    errorMessage.style.backgroundColor = '#4abc5061';
-    errorMessage.style.display = 'block';
-    errorMessages = 'Thank You. Data Successfully Submitted!';
-    handleErrorMessage(errorMessages, errorMessage);
-    // Delay for openning of thank you page for 4 seconds to display success message
-    setTimeout(() => {
-        errorMessage.style.color = 'rgb(236, 2, 2)';
-        errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-        openThankYouPage();
-    }, 2000);
-
+    try {
+        const response = await fetch('http://localhost:3000/api/clients', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            //body: JSON.stringify(new Client(getCurrentDatetime(), name, email, phone, company || 'N/A', city || 'N/A', street || 'N/A', province || 'N/A', zip || 'N/A')),
+            body: JSON.stringify({
+                clientID: getCurrentDatetime(),
+                clientName: name,
+                clientEmail: email,
+                clientPhone: phone,
+                clientCompany: company || 'N/A',
+                clientStreet: street || 'N/A',
+                clientCity: city || 'N/A',
+                clientProvince: province || 'N/A',
+                clientZip: zip || 'N/A',
+            }),
+        });
+    
+        if (response.ok) {
+            let result;
+            try {
+                result = await response.json(); // Try parsing JSON
+            } catch (error) {
+                console.warn('Empty or non-JSON response, using fallback');
+                result = { message: 'Client created successfully' }; // Default fallback message
+            }
+    
+            console.log('Response:', result);
+            errorMessage.style.color = 'white';
+            errorMessage.style.backgroundColor = '#4abc5061';
+            errorMessage.style.display = 'block';
+            handleErrorMessage(result.message, errorMessage);
+    
+            setTimeout(() => {
+                errorMessage.style.color = 'rgb(236, 2, 2)';
+                errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+                sendWelcomeEmail(name, email);
+                openThankYouPage();
+            }, 2000);
+        } else {
+            const errorText = await response.text(); // Capture text response if any
+            console.error('Error Response:', errorText || 'Unknown error occurred');
+            handleErrorMessage(`Error: ${errorText || 'An error occurred'}`,errorMessage);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        handleErrorMessage('Failed to create Lead', errorMessage);
+    }
     return true;
+}
+
+/**
+ * Function for getting the current date & time
+ * @returns dat-time (yyyyMMddHHmmss)
+ * 
+ */
+const getCurrentDatetime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+};
+
+// Configure the transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Use your email provider
+    auth: {
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS, 
+    },
+});
+
+/**
+ * Send a welcome email to the client
+ * @param   {*} clientName 
+ * @param {*} clientEmail 
+ */
+async function sendWelcomeEmail(clientName, clientEmail) {
+    const mailOptions = {
+        from: '"Adconnect.co.ke Team" <your-email@example.com>', // Replace with your sender email
+        to: clientEmail, // Recipient email
+        subject: 'Welcome to Adconnect.co.ke – Your Partner in Real Estate Marketing Success 🎉',
+        html: `
+            <p>Hello ${clientName}, Misgina Fitwi Here</p>
+            <p>Welcome to Adconnect.co.ke! We’re thrilled to have you on board 🎉.</p>
+            <p>
+                Our mission is simple: to help real estate companies like yours succeed through 
+                powerful, targeted ads, professional social media management, and more. 
+                At Adconnect.co.ke, we know that your success is our success 💪.
+            </p>
+            <p>Here's what you can expect:</p>
+            <ul>
+                <li>✨ Proven strategies to attract and convert leads through Facebook and social media advertising.</li>
+                <li>🔧 Expert support from our experienced developers, content editors, and marketing professionals.</li>
+                <li>📈 Ongoing guidance to keep your digital marketing at the cutting edge.</li>
+            </ul>
+            <p>We’re here to take the complexity out of digital marketing for you.</p>
+            <p>
+                <a href="https://adconnect.co.ke/consultation" 
+                   style="display: inline-block; padding: 10px 20px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
+                   Book a Free Consultation Today
+                </a>
+            </p>
+            <p>Looking forward to helping you grow!</p>
+            <p>Warm regards,</p>
+            <p>Your Name<br> <a href="https://adconnect.co.ke" style="color: #F65730; font-weight:bold;">Adconnect Team</a><br>📞 Phone: 0790064130</p>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Welcome email sent successfully!');
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+        throw error;
+    }
 }
 
 /**
@@ -1106,15 +1222,15 @@ function appointmentAction() {
         // Date changed to an acceptable value
         dateChanged = true;
     });
-    
-    switch (dateChanged){
+
+    switch (dateChanged) {
         case true:
             checkAvailableDates();
             break;
         default:
             handleErrorMessage('Select an Active Date', errorMessageContainer)
     }
-    
+
 }
 
 function checkAvailableDates() {
@@ -1215,7 +1331,7 @@ function submitAppointMent() {
         dateInput.focus();
         return;
     }
-    if (!dateSelected){
+    if (!dateSelected) {
         handleErrorMessage('Select your appointment time!', errorMessageContainer);
         return;
     }
@@ -1281,3 +1397,11 @@ function closeAppointmentThanksView() {
         console.log('Error: Thanks Section Not Available');
     }
 }
+
+document.querySelectorAll('.time-layout .grey-bordered').forEach((slot) => {
+    slot.addEventListener('click', function () {
+        if (!this.classList.contains('booked')) {
+            alert(`You selected: ${this.querySelector('p').innerText}`);
+        }
+    });
+});
