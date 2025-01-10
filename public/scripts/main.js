@@ -259,7 +259,7 @@ function openUrl(param) {
     }
     console.log(`Opening overlay with parameter: ${param}`);
     // Use history API or URL query parsing logic
-    const overlayElement = document.getElementById('leadCaptureSection'); // Replace with your actual overlay element
+    const overlayElement = document.getElementById('leadCaptureSection'); 
     if (overlayElement) {
         sectionLeadCapture.style.height = '100%'; // Show the overlay
     }
