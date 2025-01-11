@@ -35,7 +35,7 @@ AdConnect leverages modern technologies to build a scalable, user-friendly platf
   - React (for dynamic UI components)
 - **Backend:**
   - Node.js with Express.js (for API and server-side logic)
-  - MongoDB (for storing data such as client info, bookings, and campaigns)
+  - MySQL (for storing data such as client info, bookings, and campaigns)
   - Nodemailer (for email automation)
 - **Third-Party Integrations:**
   - Social Media API Integrations (for ad management) Google & Facebook
