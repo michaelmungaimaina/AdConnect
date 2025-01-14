@@ -775,9 +775,9 @@ async function submitLeads() {
                 clientPhone: phone,
                 clientCompany: company || 'N/A',
                 clientStreet: street || 'N/A',
-                clientCity: city || 'N/A',
+                clientLocation: city || 'N/A',
                 clientProvince: province || 'N/A',
-                clientZip: zip || 'N/A',
+                clientZipCode: zip || 'N/A',
             }),
         });
     
