@@ -2,6 +2,10 @@ console.log("main.js is loaded");
 
 const APP_API_URL= 'https://adconnect.co.ke/';
 
+let DOMAIN_NAME = 'http://127.0.0.1:3000/';
+let API_PATH = 'api/';
+const DOMAIN = `${DOMAIN_NAME}${API_PATH}`;
+
 
 'use strict';
 const showFAQsSection = document.getElementById('showFAQsSection');
@@ -61,6 +65,8 @@ const courseService = document.getElementById('courses');
 const developmentService = document.getElementById('development');
 const sectionPrivacyPolicy = document.getElementById('privacyPolicy');
 const btnClosePrivacyPolicy = document.getElementById('btnClosePrivacyPolicy');
+// Select the loader element
+const loader = document.getElementById('loader');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
@@ -259,7 +265,7 @@ function openUrl(param) {
     }
     console.log(`Opening overlay with parameter: ${param}`);
     // Use history API or URL query parsing logic
-    const overlayElement = document.getElementById('leadCaptureSection'); 
+    const overlayElement = document.getElementById('leadCaptureSection'); // Replace with your actual overlay element
     if (overlayElement) {
         sectionLeadCapture.style.height = '100%'; // Show the overlay
     }
@@ -689,6 +695,15 @@ $('.video').each(function () {
     this.setAttribute('controlsList', 'nodownload'); // Disable download option
 });
 
+// Function to show the loader
+function showLoader() {
+  loader.classList.remove('hidden');
+}
+
+// Function to hide the loader
+function hideLoader() {
+  loader.classList.add('hidden');
+}
 
 /**
  * Input validation for Lead Capture
@@ -746,6 +761,7 @@ async function submitLeads() {
 
     // Submit data to Database and send an Email to the client
     try {
+        showLoader();
         const response = await fetch(`${APP_API_URL}api/clients`, {
             method: 'POST',
             headers: {
@@ -802,6 +818,7 @@ async function submitLeads() {
         console.error('Error:', error);
         handleErrorMessage('Failed to create Lead', errorMessage);
     }
+    hideLoader();
     return true;
 }
 

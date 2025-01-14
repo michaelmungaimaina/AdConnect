@@ -3076,7 +3076,7 @@ body section .contact-container .contact-footer div a:hover {
     border-radius: 0.25em;
     border: 1.5px solid #F65730;
     color: white;
-    margin: 50px;
+    margin: 60px;
     cursor: pointer;
 }
 
@@ -3087,7 +3087,7 @@ body section .contact-container .contact-footer div a:hover {
 }
 
 .black-background-tint-lead-capture .outer-container{
-    margin: 50px 100px 10px 100px;
+    margin: 60px 100px 10px 100px;
     display: flex;
     top: 100px;
     padding:10px 20px;
@@ -3419,3 +3419,32 @@ body section .contact-container .contact-footer div a:hover {
         height: fit-content;
     }
 }
+
+/* Loader styles */
+.loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #F65730;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Animation for spinning */
+  @keyframes spin {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+  
+  /* Hidden state for the loader */
+  .hidden {
+    display: none;
+  }
