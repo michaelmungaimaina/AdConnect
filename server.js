@@ -1,27 +1,15 @@
 require('dotenv').config();
 const express = require('express');
-const mysql2 = require('mysql2');
 const mysql = require('mysql2/promise');
-const mongoose = require('mongoose');
+const moment = require("moment-timezone");
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const User = require('./models/User');
-const Client = require('./models/Client');
-const AppointmentBooking = require('./models/AppointmentBooking');
-const MarketingStrategyApplication = require('./models/MarketingStrategyApplication');
 const path = require('path');
+const { google } = require('googleapis');
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 
 const app = express();
-
-function CurrentTime() {
-    const currentDate = new Date();
-    const hours = String(currentDate.getHours()).padStart(2, '0');
-    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-}
-
 
 // Middleware
 app.use(bodyParser.json());
@@ -30,21 +18,27 @@ app.use(express.json());
 app.use(cors());
 
 app.use(cors({
-    origin: ['127.0.0.1'], // Replace with your frontend domains
+    origin: ['127.0.0.1'], // frontend domains
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+// 
+app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
+});
+
 // Serve API routes under `/api`
-app.use('/', express.json()); // Ensure requests to `/api` parse JSON bodies
+app.use('/api', express.json()); // Ensure requests to `/api` parse JSON bodies
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('public'));
 
-// Handle frontend routing by redirecting all non-API requests to index.html
+/*/ Handle frontend routing by redirecting all non-API requests to index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+});*/
 
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded({ extended: false }));
@@ -85,8 +79,8 @@ connectAndStartServer();
 app.post('/api/users', async (req, res) => {
     try {
         const { id, name, email, role, access_level } = req.body;
-        const newUser = new User({ id, name, email, role, access_level });
-        await newUser.save();
+        //const newUser = new User({ id, name, email, role, access_level });
+        //await newUser.save();
         res.status(200).json({ message: 'User created successfully', user: newUser });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -230,29 +224,14 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 });
 
-/**
- * Function for getting the current date & time
- * @returns dat-time (yyyyMMddHHmmss)
- * 
- */
-const getCurrentDatetime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-
-    return `${year}${month}${day}${hours}${minutes}${seconds}`;
-};
-
+// Format timestamp for EAT
+const clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS");
+const createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SSS");
 // Create a new client (lead)
 app.post('/api/clients', async (req, res) => {
     try {
         console.log(req.body); // Log the request body for debugging
-    
-        const { clientId, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode} = req.body;
+        const { clientId, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode,clientSource, clientStatus, clientSubScription} = req.body;
 
         // Check if the client already exists based on email or phone
         const checkQuery = `
@@ -265,22 +244,21 @@ app.post('/api/clients', async (req, res) => {
             const errorMessage = existingClient[0].clientEmail === clientEmail
                 ? 'Email already exists'
                 : 'Phone number already exists';
-                currentDateTime = new Date();
-            return res.status(400).json({ error: `${getCurrentDatetime()} ${errorMessage}` });
+            return res.status(400).json({error:`${errorMessage}` });
         }
 
         // Insert the new client into the database
         const insertQuery = `
-            INSERT INTO clients (clientID, clientName, clientEmail, clientPhone, clientCity, clientCompany, clientStreet, clientProvince, clientZip)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO clients (clientID, clientName, clientEmail, clientPhone, clientCity, clientCompany, clientStreet, clientProvince, clientZip, clientSource, clientStatus, clientSubScription,created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await db.execute(insertQuery, [`${getCurrentDatetime()}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode]);
+        await db.execute(insertQuery, [`${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, `${createdAt}`]);
 
         // Respond with success
-        res.status(201).json({ message: 'Lead created successfully', lead: { clientId: `${getCurrentDatetime()}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode} });
+        res.status(201).json({ message: 'Lead created successfully', lead: { clientId: `${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription,} });
     } catch (error) {
-        console.error(`Backend Error: ${getCurrentDatetime()}`, error); // Log the error for debugging
-        res.status(500).json({ error: `${getCurrentDatetime()} ${error.message}` }); // Send the error message in the response
+        console.error(`Backend Error: `, error); // Log the error for debugging
+        res.status(500).json({ error: `${error.message}` }); // Send the error message in the response
     }
 });
 
@@ -405,7 +383,6 @@ app.post('/api/appointments', async (req, res) => {
         console.log(req.body);
 
         const { 
-            clientId,
             clientName, 
             clientEmail, 
             clientPhone, 
@@ -419,8 +396,8 @@ app.post('/api/appointments', async (req, res) => {
         } = req.body;
 
         // Check if all required fields are provided
-        if (!clientId || !appointmentDate || !clientPhone) {
-            return res.status(400).json({ error: 'Missing required fields: clientId, appointmentDate, or service' });
+        if (!appointmentDate || !clientPhone) {
+            return res.status(400).json({ error: 'Missing required fields: appointmentDate, or service' });
         }
 
         // SQL query to insert a new appointment
@@ -430,7 +407,7 @@ app.post('/api/appointments', async (req, res) => {
         `;
 
         // Execute the insert query
-        const [result] = await db.execute(insertQuery, [clientId, clientName, clientEmail, clientPhone, clientLocation, 
+        const [result] = await db.execute(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation, 
             appointmentDate, appointmentTime, appointmentType, appointmentStatus, 
             appointmentNotes, meetingLink]);
 
@@ -439,7 +416,7 @@ app.post('/api/appointments', async (req, res) => {
             message: 'Appointment Booked successfully',
             appointment: {
                 //id: result.insertId, // Auto-generated ID after insertion
-                clientId, clientName, clientEmail, clientPhone, clientLocation, 
+                clientID, clientName, clientEmail, clientPhone, clientLocation, 
         appointmentDate, appointmentTime, appointmentType, appointmentStatus, 
         appointmentNotes, meetingLink
             }
@@ -499,6 +476,35 @@ app.get('/api/appointments/:id', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while retrieving the appointment' });
     }
 });
+
+app.get('/api/appointments-by-date/:appointmentDate', async (req, res) => {
+    try {
+        const appointmentDate = req.params.appointmentDate;
+
+        // Log the input date for debugging
+        console.log('Received appointmentDate:', appointmentDate);
+
+        // Fetch appointments from the database
+        const query = 'SELECT appointmentTime FROM appointments WHERE appointmentDate = ?';
+        const [appointments] = await db.execute(query, [appointmentDate]);
+
+        // Log the database result
+        console.log('Database response:', appointments);
+
+        if (appointments.length === 0) {
+            return res.status(404).json({ error: 'No appointments found for the given date' });
+        }
+
+        res.status(200).json({
+            message: 'Appointment time(s) retrieved successfully',
+            appointmentTime: appointments,
+        });
+    } catch (error) {
+        console.error('Backend Error:', error);
+        res.status(500).json({ error: 'An error occurred while retrieving appointment times' });
+    }
+});
+
 
 
 // Update an appointment by ID
@@ -578,22 +584,22 @@ app.post('/api/marketing-strategy-applications', async (req, res) => {
         console.log(req.body);
 
         // Extract the necessary fields from the request body
-        const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status} = req.body;
+        const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status} = req.body;
 
         // SQL query to insert a new application
         const insertQuery = `
-            INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status)
-            VALUES (?, ?, ,?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         // Execute the query to insert the new application into the database
-        const [result] = await db.execute(insertQuery, [applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status]);
+        const [result] = await db.execute(insertQuery, [`${clientID}`, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, `${createdAt}`]);
 
         // Respond with a success message and the inserted application data
         res.status(201).json({
             message: 'Application submitted successfully',
             application: {
-                id: result.applicationId, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status
+                id: result.applicationId, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status
             }
         });
     } catch (error) {
@@ -706,7 +712,7 @@ async function sendWelcomeEmail(clientName, clientEmail) {
     const mailOptions = {
         from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
         to: clientEmail, // Recipient email
-        subject: 'Welcome to Adconnect – Your Partner in Real Estate Marketing Success 🎉',
+        subject: 'Welcome to Adconnect â€“ Your Partner in Real Estate Marketing Success ðŸŽ‰',
         html: `
            <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
     <div style="
@@ -724,8 +730,8 @@ async function sendWelcomeEmail(clientName, clientEmail) {
             font-weight: bold;
             font-size: large;
             transition: color 0.3s ease;
-            text-decoration: none;">Adconnect!</a> We’re
-            thrilled to have you on board 🎉.
+            text-decoration: none;">Adconnect!</a> Weâ€™re
+            thrilled to have you on board ðŸŽ‰.
         </p>
         <p style="line-height: 1.5;">
             Our mission is simple: to help real estate companies like yours succeed
@@ -735,23 +741,23 @@ async function sendWelcomeEmail(clientName, clientEmail) {
             font-size: large;
             transition: color 0.3s ease;
             text-decoration: none;">AdConnect</a>, we
-            know that your success is our success 💪.
+            know that your success is our success ðŸ’ª.
         </p>
         <p style="line-height: 1.5;">Here's what you can expect:</p>
         <ul>
             <li>
-                ✨ Proven strategies to attract and convert leads through Facebook and
+                âœ¨ Proven strategies to attract and convert leads through Facebook and
                 social media advertising.
             </li>
             <li>
-                🔧 Expert support from our experienced developers, content editors, and
+                ðŸ”§ Expert support from our experienced developers, content editors, and
                 marketing professionals.
             </li>
             <li>
-                📈 Ongoing guidance to keep your digital marketing at the cutting edge.
+                ðŸ“ˆ Ongoing guidance to keep your digital marketing at the cutting edge.
             </li>
         </ul>
-        <p style="line-height: 1.5;">We’re here to take the complexity out of digital marketing for you.</p>
+        <p style="line-height: 1.5;">Weâ€™re here to take the complexity out of digital marketing for you.</p>
         <p style="line-height: 1.5;">
             <a href="https://adconnect.co.ke/index.html?value-video-opt-in=true" style="display: inline-block;
             padding: 5px 30px;
@@ -802,7 +808,206 @@ async function sendWelcomeEmail(clientName, clientEmail) {
         console.error('Error sending welcome email:', error);
         throw error;
     }
+} 
+/**
+ * Send a welcome email to the client
+ * @param {string} clientName - Name of the client
+ * @param {string} clientEmail - Email of the client
+ */
+async function sendBookingEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    const mailOptions = {
+        from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
+        to: clientEmail, // Recipient email
+        subject: 'Meeting Confirmation: Consultation with Adconnect Team',
+        html: `
+           <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
+    <div style="
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(to right, #4d4c4b, #646464);
+      border-radius: 10px;
+    ">
+        <p style="line-height: 1.5;">
+            Dear <span style="font-weight: bold;">${clientName},</span>
+        </p>
+        <p style="line-height: 1.5;">
+            We are writing to confirm that you have scheduled a consultation meeting with us as follows:.
+        </p>
+        <p style="line-height: 1.5;"> <br>
+            <b>Date: </b> ${meetingDate}. <br>
+            <b>Time: </b> ${meetingTime} EAT. <br>
+            <b>Location: </b> ${meetingLocation}. <br>
+            <b>Agenda: </b> ${meetingAgenda}. <br>
+            <br>
+        </p>
+        <p style="line-height: 1.5;">
+            <a href='${meetingLink}' style="display: inline-block;
+            padding: 5px 30px;
+            background-color: #f65730;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;">
+                Proceed to Meeting
+            </a>
+            </p>
+        <p style="line-height: 1.5;">If you have any questions or need to reschedule, don't hesitate to contact the undersigned.</p>
+       
+        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
+
+        <p style="line-height: 1.5;">Warm regards,<br /></p>
+        <p style="line-height: 1.5;">
+            Misgina Fitwi<br />
+            <a href="https://adconnect.co.ke" style="color: #4abc4f;
+        text-decoration: none;">Adconnect Team</a><br />
+            Phone: 0790064130
+        </p>
+        <footer style="text-align: center;
+        margin-top: 30px;
+        color: #fff;
+        font-size: 14px;">
+            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
+                Powered By <br /><span style="color: #4abc4f;
+                font-weight: bold;
+                font-size: large;
+                transition: color 0.3s ease;
+                text-decoration: none;">AdConnect</span>
+            </p>
+            <p style="line-height: 1.5;">
+                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
+                text-decoration: none;
+                margin-top: -10px;"></a>
+            </p>
+        </footer>
+    </div>
+</body>
+      `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Booking email sent successfully!');
+    } catch (error) {
+        console.error('Error sending booking email:', error);
+        throw error;
+    }
 }
+
+/**
+ * Send a email to admin
+ * @param {string} clientName - Name of the client
+ * @param {string} clientEmail - Email of the client
+ */
+async function sendBookingReactionEmail(clientName, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    const mailOptions = {
+        from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
+        to: 'info@adconnect.co.ke', // Recipient email
+        subject: 'New Appointment',
+        html: `
+           <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
+    <div style="
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(to right, #4d4c4b, #646464);
+      border-radius: 10px;
+    ">
+        <p style="line-height: 1.5;">
+            A new appointment has been scheduled:
+        </p>
+        <p style="line-height: 1.5;"> <br>
+            <b>Client Name: </b> ${clientName}. <br>
+            <b>Date: </b> ${meetingDate}. <br>
+            <b>Time: </b> ${meetingTime} EAT. <br>
+            <b>Location: </b> ${meetingLocation}. <br>
+            <b>Agenda: </b> ${meetingAgenda}. <br>
+            <br>
+        </p>
+        <p style="line-height: 1.5;">
+            <a href='${meetingLink}' style="display: inline-block;
+            padding: 5px 30px;
+            background-color: #f65730;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;">
+                Proceed to Meeting
+            </a>
+            </p>
+            
+        <footer style="text-align: center;
+        margin-top: 30px;
+        color: #fff;
+        font-size: 14px;">
+            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
+                Powered By <br /><span style="color: #4abc4f;
+                font-weight: bold;
+                font-size: large;
+                transition: color 0.3s ease;
+                text-decoration: none;">AdConnect</span>
+            </p>
+            <p style="line-height: 1.5;">
+                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
+                text-decoration: none;
+                margin-top: -10px;"></a>
+            </p>
+        </footer>
+    </div>
+</body>
+      `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Booking email sent successfully!');
+    } catch (error) {
+        console.error('Error sending booking email:', error);
+        throw error;
+    }
+}
+
+app.post('/api/send-booking-reaction-email', async (req, res) => {
+    const { clientName,  meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink } = req.body;
+
+    if (!clientName || !meetingDate || !meetingTime || !meetingLocation || !meetingAgenda || !meetingLink) {
+        console.log('All fields are required');
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        console.log(req.body);
+        await sendBookingReactionEmail(clientName, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink);
+        console.log('Booking email sent successfully');
+        res.status(200).json({ message: 'Reaction email sent successfully' });
+    } catch (error) {
+        console.error('Failed to send email:', error);
+        res.status(500).json({ error: 'Failed to send email' });
+    }
+});
+
+app.post('/api/send-booking-email', async (req, res) => {
+    const { clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink } = req.body;
+
+    if (!clientName || !clientEmail || !meetingDate || !meetingTime || !meetingLocation || !meetingAgenda || !meetingLink) {
+        console.log('All fields are required');
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        console.log(req.body);
+        await sendBookingEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink);
+        console.log('Booking email sent successfully');
+        res.status(200).json({ message: 'Booking email sent successfully' });
+    } catch (error) {
+        console.error('Failed to send email:', error);
+        res.status(500).json({ error: 'Failed to send email' });
+    }
+});
 
 // Send a welcome email to the client
 app.post('/api/send-welcome-email', async (req, res) => {
@@ -834,6 +1039,144 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS, // email password or app password
     },
 });
+
+// Load your OAuth2 credentials
+const credentialsPath = path.join(__dirname, 'credentials.json');
+const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+
+// Initialize OAuth2 client
+const { client_id, client_secret, redirect_uris } = credentials.web;
+const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+// Token file path (to store access and refresh tokens)
+const tokenPath = path.join(__dirname, 'token.json');
+
+// Get and store the token (for one-time authorization)
+async function getAndStoreToken() {
+    const authUrl = oAuth2Client.generateAuthUrl({
+        access_type: 'offline', // Ensures a refresh token is returned
+        scope: ['https://www.googleapis.com/auth/calendar'], // The required scope for calendar access
+    });
+
+    console.log('Authorize this app by visiting this URL:', authUrl);
+
+    // After visiting the URL, paste the authorization code here
+    const rl = require('readline').createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    rl.question('Enter the code from the page: ', async (code) => {
+        rl.close();
+
+        try {
+            const { tokens } = await oAuth2Client.getToken(code);
+            oAuth2Client.setCredentials(tokens);
+
+            // Save the token to a file for later use
+            fs.writeFileSync(tokenPath, JSON.stringify(tokens));
+            console.log('Token stored to', tokenPath);
+        } catch (err) {
+            console.error('Error retrieving access token', err);
+        }
+    });
+}
+
+// Set credentials (load tokens from file)
+function setCredentials() {
+    if (fs.existsSync(tokenPath)) {
+        const token = fs.readFileSync(tokenPath, 'utf8');
+        oAuth2Client.setCredentials(JSON.parse(token));
+    } else {
+        console.error('No token file found. Run `getAndStoreToken` to authorize the app.');
+    }
+}
+
+// Function to convert "2025-01-20 10:00:00" into the ISO 8601 format "2025-01-20T10:00:00-07:00"
+function convertToISO8601(dateTimeString) {
+    const [date, time] = dateTimeString.split(' ');  // Split the date and time
+    const formattedDateTime = new Date(`${date}T${time}+03:00`);  // Append time zone offset
+    return formattedDateTime.toISOString();  // Convert to ISO format
+}
+
+// Create a Google Meet Link (via Calendar Event)
+async function createMeetLink(summary, startDateTime, endDateTime) {
+    const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+
+    try {
+        const event = {
+            summary: summary || 'Adconnect Online Consultation', // Replace with your event summary
+            start: {
+                dateTime: convertToISO8601(startDateTime), // Replace with your time
+                timeZone: 'Africa/Nairobi',
+            },
+            end: {
+                dateTime: convertToISO8601(endDateTime), //'2025-01-20T11:00:00-07:00' Replace with your time
+                timeZone: 'Africa/Nairobi',
+            },
+            conferenceData: {
+                createRequest: {
+                    requestId: 'random-string-or-id',
+                    conferenceSolutionKey: { type: 'hangoutsMeet' },
+                },
+            },
+        };
+
+        const response = await calendar.events.insert({
+            calendarId: 'primary',
+            resource: event,
+            conferenceDataVersion: 1,
+        });
+
+        const hangoutLink =
+            response.data.conferenceData?.entryPoints?.find(
+                (point) => point.entryPointType === 'video'
+            )?.uri;
+
+        if (hangoutLink) {
+            console.log('Google Meet Link:', hangoutLink);
+        } else {
+            console.log('No Google Meet link generated.');
+        }
+
+        return hangoutLink || null;
+    } catch (error) {
+        console.error('Error creating Google Meet event:', error.response?.data || error.message);
+    }
+}
+
+// API Endpoint to create Google Meet link
+app.post('/api/create-meet-link', async (req, res) => {
+    console.log('Request Body:', req.body);  // Log the request body
+    const { eventTitle, startDateTime, endDateTime } = req.body;
+
+    if (!eventTitle || !startDateTime || !endDateTime) {
+        return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    try {
+        const meetLink = await createMeetLink(eventTitle, startDateTime, endDateTime);
+        if (meetLink) {
+            return res.json({ meetLink });
+        } else {
+            return res.status(500).json({ error: 'Failed to create Google Meet link' });
+        }
+    } catch (error) {
+        console.error('Error in creating Google Meet link:', error.message);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Example usage
+(async () => {
+    if (!fs.existsSync(tokenPath)) {
+        await getAndStoreToken(); // Authorize the app and store the token
+    } else {
+        setCredentials(); // Load the token and set it in the OAuth2 client
+        const meetLink = await createMeetLink('Adconnect Online Consultation','2025-01-20 10:00:00', '2025-01-20 10:30:00');
+        console.log('Generated Google Meet link:', meetLink);
+    }
+})();
 
 app.post('/api/test-server', (req, res) => {
     res.status(200).json({ message: 'Test route works!' });

@@ -35,7 +35,10 @@ db.connect((err) => {
       clientStreet VARCHAR(255) NULL,
       clientProvince VARCHAR(255) NULL,
       clientZip VARCHAR(255) NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      clientSource VARCHAR(150) DEFAULT 'WEBSITE',
+      clientStatus VARCHAR(150) DEFAULT '1st CONTACT',
+      clientSubScription VARCHAR(150) DEFAULT 'SUBSCRIBED',
+      created_at TIMESTAMP
     );
   `;
   
@@ -60,16 +63,17 @@ db.connect((err) => {
     // Create ratings table SQL query
     const createTableMarketingStrategy = `
 CREATE TABLE IF NOT EXISTS marketing_strategy (
-    applicationDate INT PRIMARY KEY,
+    applicationDate VARCHAR(30) PRIMARY KEY,
     applicantFName VARCHAR(255) NOT NULL, 
-    applicantLName, VARCHAR(255) NOT NULL,
+    applicantLName VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(20) NOT NULL,
     occupation VARCHAR(50) NOT NULL,
     marketTriggers TEXT NOT NULL,
     strategyGoal TEXT NOT NULL,
+    strategyInvestment TEXT NOT NULL,
     status VARCHAR(20) DEFAULT 'N/SOLVED',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at VARCHAR(24)
 );`;
 
        // Create database and tables
