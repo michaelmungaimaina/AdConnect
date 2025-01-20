@@ -133,6 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
         btnClosePrivacyPolicy.addEventListener('click', closePrivacyPolicy);
         btnLeftApplication.addEventListener('click', openAppointmentBooking);
+
+        // Start the spinner
+        setInterval(updateTestimonials, 10000);
+
+        // Load the first testimonials
+        updateTestimonials();
     }
     if (pageId === 'contactUsPage') {
         navbarTogler.addEventListener('click', openNav);
@@ -1534,8 +1540,8 @@ const endDateTime = `${AppointmentBooking.meetingDate} ${endTime24}`;
             handleErrorMessage(errorMessages, errorMessageContainer);
 
             // Send Booking Email
-            await sendBookingEmail(AppointmentBooking.clientName, AppointmentBooking.clientEmail, AppointmentBooking.meetingDate, AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
-            await sendBookingReactionEmail(AppointmentBooking.clientName, AppointmentBooking.meetingDate, AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
+            await sendBookingEmail(AppointmentBooking.clientName, AppointmentBooking.clientEmail, formatDate(AppointmentBooking.meetingDate), AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
+            await sendBookingReactionEmail(AppointmentBooking.clientName, formatDate(AppointmentBooking.meetingDate), AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
 
             // Open the thank you page
             openAppointmentBookingThankYouPage();
@@ -1712,7 +1718,7 @@ async function sendBookingEmail(clientName, clientEmail, meetingDate, meetingTim
 }
 
 // Function to send a booking reaction email
-async function sendBookingReactionEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+async function sendBookingReactionEmail(clientName, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
     try {
         const response = await fetch(`${DOMAIN}send-booking-reaction-email`, {
             method: 'POST',
@@ -1740,3 +1746,107 @@ async function sendBookingReactionEmail(clientName, clientEmail, meetingDate, me
         throw error;
     }
 }
+
+
+const testimonials = [
+    {
+        image: "../public/resources/elixir.png",
+        clientName: "Irene",
+        companyName: "Elixir Salon & Spa",
+        text: "The team at Adconnect delivered an exceptional website for my salon and spa. From the initial consultation to the final launch, they ensured every detail was addressed. Their ability to combine functionality with modern design is unmatched, and the site has significantly boosted my online presence.",
+        stars: 5
+    },
+    {
+        image:"../public/resources/pic-back.png",
+        clientName: "John Kamau",
+        companyName: "Songa",
+        text: "Our company required a custom web application to streamline internal operations, and Adconnect delivered beyond expectations. Their developers were thorough, responsive, and ensured the application was intuitive and scalable.",
+        stars: 4
+    },
+    {
+        image: "../public/resources/pic-back.png",
+        clientName: "Ladybird",
+        companyName: "Nuloft Salon and Spa",
+        text: "What I love most about Adconnect is their reliability. They don’t just finish a project and disappear; they continue to provide support and guidance long after the site is live. Their maintenance and updates have kept my site running flawlessly.",
+        stars: 5
+    },
+    {
+        image: "../public/resources/pic-back.png",
+        clientName: "Michael Maina",
+        companyName: "Oriss Company",
+        text: "I was skeptical about SEO at first, but Adconnect changed my perspective. Within four months, my website ranked on the first page of Google for several key search terms, which has directly translated into more inquiries and sales.",
+        stars: 5
+    },
+    {
+        image: "../public/resources/ricosam.PNG",
+        clientName: "Eng. James",
+        companyName: "Ricosam",
+        text: "Our project involved integrating multiple third-party APIs, which was tricky. Adconnect not only handled it flawlessly but also optimized the process to ensure fast load times. Their technical expertise is impressive.",
+        stars: 5
+    },
+    {
+        image: "../public/resources/pic-back.png",
+        clientName: "Dr. Sam Smith",
+        companyName: "Real Estate",
+        text: "Their digital marketing campaigns transformed my business. From Google Ads to social media, their strategies brought measurable results. My online store saw a 200% increase in sales within the first six months of working with them.",
+        stars: 4
+    }
+];
+
+// HTML elements for the testimonials
+const testimonial1 = document.getElementById('testmonial1');
+const testimonial2 = document.getElementById('testmonial2');
+
+let currentIndex = 0;
+
+        function generateStars(container, starCount) {
+            // Select the div where the stars will be appended
+            const starDiv = container;
+            // Clear any existing content
+            starDiv.innerHTML = '';
+        
+            // Loop to create and append star images
+            for (let i = 0; i < starCount; i++) {
+                const img = document.createElement('img'); 
+                img.src = '../public/resources/starr.png'; 
+                img.alt = 'Star';
+                img.style.width = '20px'; 
+                img.style.height = '20px'; 
+                img.style.marginRight = '5px'; 
+        
+                starDiv.appendChild(img); // Append the image to the starIcon div
+            }
+        }
+
+
+        // Function to update the testimonials
+        function updateTestimonials() {
+            const testimonial1Data = testimonials[currentIndex];
+            const testimonial2Data = testimonials[(currentIndex + 1) % testimonials.length];
+
+                
+            // Update the first testimonial
+            testimonial1.classList.remove('active');
+            setTimeout(() => {
+                testimonial1.querySelector('#clientIcon').style.backgroundImage = `linear-gradient(90deg, rgba(46, 35, 1, 0.0) 100%, rgba(235, 206, 39, 0.4) 70%), url(${testimonial1Data.image})`;
+                testimonial1.querySelector('.testmonial-body').textContent = testimonial1Data.text;
+                generateStars(testimonial1.querySelector('.starIcon'), testimonial1Data.stars);
+                testimonial1.querySelector('#client-name').textContent = `${testimonial1Data.clientName}`;
+                testimonial1.querySelector('#client-company').textContent = `${testimonial1Data.companyName}`;
+                testimonial1.classList.add('active');
+            }, 1000);
+
+            // Update the second testimonial
+            testimonial2.classList.remove('active');
+            setTimeout(() => {
+                testimonial2.querySelector('#clientIcon').style.backgroundImage = `linear-gradient(90deg, rgba(46, 35, 1, 0.0) 100%, rgba(235, 206, 39, 0.4) 70%), url(${testimonial2Data.image})`;
+                testimonial2.querySelector('.testmonial-body').textContent = testimonial2Data.text;
+                generateStars(testimonial2.querySelector('.starIcon'),testimonial2Data.stars);
+                testimonial2.querySelector('.client').textContent = `${testimonial2Data.clientName}`;
+                testimonial2.querySelector('#client-company').textContent = `${testimonial2Data.companyName}`;
+                testimonial2.classList.add('active');
+            }, 1000);
+
+            // Increment the index and wrap around the array
+            currentIndex = (currentIndex + 2) % testimonials.length;
+        }

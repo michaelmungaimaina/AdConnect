@@ -231,7 +231,12 @@ const createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SSS"
 app.post('/api/clients', async (req, res) => {
     try {
         console.log(req.body); // Log the request body for debugging
-        const { clientId, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode,clientSource, clientStatus, clientSubScription} = req.body;
+        const { clientId, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription } = req.body;
+
+        // Check if any of the variables are null
+        if (clientId === null || clientName === null || clientEmail === null || clientPhone === null || clientCompany === null || clientLocation === null || clientStreet === null || clientProvince === null || clientZipCode === null || clientSource === null || clientStatus === null || clientSubScription === null) {
+            return res.status(400).json({ error: 'All fields are required and cannot be null' });
+        }
 
         // Check if the client already exists based on email or phone
         const checkQuery = `
@@ -255,7 +260,7 @@ app.post('/api/clients', async (req, res) => {
         await db.execute(insertQuery, [`${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, `${createdAt}`]);
 
         // Respond with success
-        res.status(201).json({ message: 'Lead created successfully', lead: { clientId: `${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription,} });
+        res.status(201).json({ message: 'Lead created successfully', lead: { clientId: `${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription} });
     } catch (error) {
         console.error(`Backend Error: `, error); // Log the error for debugging
         res.status(500).json({ error: `${error.message}` }); // Send the error message in the response
@@ -905,7 +910,7 @@ async function sendBookingReactionEmail(clientName, meetingDate, meetingTime, me
     const mailOptions = {
         from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
         to: 'info@adconnect.co.ke', // Recipient email
-        subject: 'New Appointment',
+        subject: `New Appointment - ${clientName}`,
         html: `
            <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
     <div style="

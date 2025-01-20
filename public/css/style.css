@@ -3448,3 +3448,55 @@ body section .contact-container .contact-footer div a:hover {
   .hidden {
     display: none;
   }
+
+
+
+
+  /* Responsiveness of the Testimonial Section */
+@media screen and (max-width: 880px) {
+    .testimonial-outer{
+        flex-direction: column !important;
+        gap: 60px;
+    }
+    .testimonials .content{
+        margin-left: 0px !important; 
+        width: 65% !important;
+    }
+    testimonials .container .image{
+        height: 70px !important;
+    width: 70px I !important;
+    }
+    #client-name{
+        font-size: 15px !important;
+    }
+    #client-company{
+        font-size: 10px;
+        font-weight: 400 !important;
+    }
+    #starIcons{
+        width: 100px !important;
+    }
+    #starIcons img{
+        height: 15px !important;
+        width: 15px !important;
+    }
+    .testimonials .container .star{
+        width: 230px !important;
+    }
+    .testimonials .container h1{
+        font-size: 50px !important;
+        margin-top: 0px !important;
+    }
+    .testimonials .container .icon-design{
+        height: 100% !important;
+        width: 30% !important;
+        margin-top: 30px !important;
+        margin-left: -145px !important;
+    }
+    #text-content{
+        font-size: 12px !important;
+    }
+    .testimonials{
+        height: 900px !important;
+    }
+}
