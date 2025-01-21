@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Elixir</title>
+    <!-- Logo Icon-->
+    <link rel="shortcut icon" href="./resources/elixir_logo.png" type="image/x-icon" />
+
+    <!-- link css -->
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/easy.css" />
+
+    <!-- Scroll cdn -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Font awesome cdn -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+        integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Font Oregano -->
+    <link href="https://fonts.googleapis.com/css2?family=Oregano&display=swap" rel="stylesheet" />
+    <!-- Font DM Sans  sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Font IBM Plex Sans Hebrew sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+    <header>
+        <nav id="nav-bar" class="h-layout">
+            <div class="left-nav-section h-layout">
+                <a href="/">
+                    <img src="resources/logo.png" alt="" />
+                </a>
+                <p>Dashboard</p>
+            </div>
+            <div class="right-nav-section h-layout">
+                <div class="v-layout">
+                    <p id="username">Maina Michael</p>
+                    <p>Kenya</p>
+                </div>
+                <img src="resources/avatar.png" alt="" />
+            </div>
+        </nav>
+    </header>
+
+    <section class="admin-hero">
+        <!-- Header Text -->
+        <div class="v-layout admin-header-text">
+            <div class="h-layout">
+                <div class="slash-rect"></div>
+                <p class="header-text">Admin Dashboard</p>
+            </div>
+            <img src="/resources/elipsis-line.png" alt="">
+        </div>
+
+        <!-- Navigation Section -->
+        <div class="admin-sidebar v-layout">
+            <ul>
+                <li><a href="#" class="nav-link active">User Management</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Content Management</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" class="dropdown-item">About Management</a></li>
+                        <li><a href="#" class="dropdown-item">Video Management</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" class="nav-link">Leads</a></li>
+                <li><a href="#" class="nav-link">CRM</a></li>
+                <li><a href="#" class="nav-link">Reports & Analytics</a></li>
+                <li><a href="#" class="nav-link">Settings & Customization</a></li>
+                <li><a href="#" class="nav-link">Automated Workflows</a></li>
+                <li><a href="#" class="nav-link">Communication Center</a></li>
+                <li><a href="#" class="nav-link">Document Management</a></li>
+            </ul>
+        </div>
+
+        <!-- Right Dashboard Content-->
+        <div class="v-layout content">
+            <!-- Manage Users -->
+            <div id="userContentMgt" class="v-layout">
+                <div id="userTopHeader">
+                    <div class="h-layout contact-top-controls">
+                        <div id="searchBar" class="h-layout">
+                            <i id="searchBarIcon" class="fa-solid fa-magnifying-glass"></i>
+                            <input id="searchUserInput" type="text" placeholder="Search User">
+                        </div>
+                        <button id="createUserButton" class="buttons">CREATE NEW USER</button>
+                    </div>
+
+                    <div class="h-layout field-bar">
+                        <p class="title-user-id">USER ID</p>
+                        <p class="title-user-name">USER NAME</p>
+                        <p class="title-user-email">USER EMAIL</p>
+                        <p class="title-user-roles">USER ROLES</p>
+                        <p class="title-user-access">ACCESS LEVEL</p>
+                        <p class="title-user-action">ACTIONS</p>
+                    </div>
+                </div>
+                <div class="v-layout field-item">
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">USER ID</p>
+                        <p class="item-user-name">USER NAME</p>
+                        <p class="item-user-email">USER EMAIL</p>
+                        <p class="item-user-roles">USER ROLES</p>
+                        <p class="item-user-access">ACCESS LEVEL</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+                    <div class="h-layout item-content">
+                        <p class="item-user-id">000000000000000000</p>
+                        <p class="item-user-name">MICHAEL MAINA MUNGAI</p>
+                        <p class="item-user-email">michaelmungaimaina@gmail.com</p>
+                        <p class="item-user-roles">SUPER ADMIN</p>
+                        <p class="item-user-access">CRUD</p>
+                        <button id="userUpdateBtn">UPDATE</button>
+                        <button id="userDeleteBtn">DELETE</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Manage About -->
+            <div id="aboutContentMgt" class="v-layout hidden"></div>
+
+            <!-- Manage Video -->
+            <div id="videoContentMgt" class="v-layout hidden"></div>
+
+            <!-- MAnage Leads -->
+            <div id="leadsContentMgt" class="v-layout hidden"></div>
+
+            <!-- Manage Reports -->
+            <div id="reportsContentMgt" class="v-layout hidden"></div>
+
+            <!-- Manage Settings -->
+            <div id="settingsContentMgt" class="v-layout"></div>
+
+            <!-- Manage Workflows -->
+            <div id="workflowsContentMgt" class="v-layout"></div>
+
+            <!-- Manage Communications -->
+            <div id="communicationContentMgt" class="v-layout"></div>
+
+            <!-- Manage Documents -->
+            <div id="documentContentMgt" class="v-layout"></div>
+
+        </div>
+
+
+    </section>
+
+    <section id="userPopUp" class="background-tint-black">
+        <div id="btnCloseApointment" onclick="closeUserPopup()" class="btn_hover1" style="position: fixed;">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        <div id="appointmentErrorMessage"
+            style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
+        </div>
+        <div class="appointment-layout outer-container" >
+            <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
+                <div class="slash-rect"></div>
+                <p id="popupHeaderText" class="header-text" style="font-size: 16px;">Register A New User</p>
+                <div class="slash-rect"></div>
+            </div>
+            <div id="loader" class="loader hidden"></div>
+            <form class="form-section">
+                <div class="h-layout">
+                    <div>
+                        <label class="label" for="name">Full Name:</label>
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <input id="name" type="text" class="input-field" placeholder="John Doe Doe" style="margin-left: 20px;">
+                </div>
+                <div class="h-layout">
+                    <div>
+                        <label class="label" for="email">E-Mail:</label>
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <input id="email" type="text" class="input-field" placeholder="johndoe@example.com" style="margin-left: 37px;">
+                </div>
+                <div class="h-layout">
+                    <div>
+                        <label class="label" for="role">User Roles:</label>
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <select id="role" class="input-field" style="margin-left: 18px;">
+                        <option value="" disabled selected>Select User Role</option>
+                        <option value="superAdmin">SUPER ADMIN</option>
+                        <option value="admin">ADMIN</option>
+                        <option value="genUser">GEN USER</option>
+                    </select>
+                </div>
+                <div class="h-layout">
+                    <div>
+                        <label class="label" for="access">User Access:</label>
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <select id="access" class="input-field" style="margin-left: 10px;">
+                        <option value="" disabled selected>Select User Access</option>
+                        <option value="crud">CRUD</option>
+                        <option value="0rud">0RUD</option>
+                        <option value="0ru0">0RU0</option>
+                        <option value="0r00">0R00</option>
+                        <option value="0r0d">0R0D</option>
+                    </select>
+                </div>
+                <button id="submitButton">SUBMIT</button>
+            </form>
+    </section>
+
+    <footer class="h-layout">
+        <div class="h-layout">
+            <p>© 2025 AdConnect | All rights reserved.</p>
+            <p>Follow Us:</p>
+            <a href="https://www.facebook.com/profile.php?id=61567259036362"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+    </footer>
+
+</body>
+
+
+</html>

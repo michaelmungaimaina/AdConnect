@@ -1,0 +1,311 @@
+
+
+#nav-bar{
+    position: fixed;
+    width: 100%;
+    height: 5%;
+    background-color: #302E2C;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    align-self: center;
+    top: 0%;
+}
+.left-nav-section{
+    height: 100%;
+    width: fit-content;
+    margin-left: 20px;
+    align-items: center;
+}
+.left-nav-section p{
+    color: azure;
+    font-size: 15px;
+    font-family: 'DM Sans';
+    font-weight: bolder;
+    margin-left: 20px;
+}
+.right-nav-section{
+    height: 100%;
+    width: fit-content;
+    margin-right: 20px;
+    align-items: center;
+}
+.right-nav-section img{
+    height: 90%;
+    width: fit-content;
+}
+.right-nav-section #username{
+    color: azure;
+    font-size: 11px;
+    font-family: 'DM Sans';
+    font-weight: bolder;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 2px;
+}
+.right-nav-section p{
+    color: rgb(164, 164, 164);
+    font-size: 10px;
+    font-family: 'DM Sans';
+    font-weight: 400;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: -5px;
+}
+nav a{
+    height: 90%;
+    width: 80px;
+}
+nav a img{
+    height: 80%;
+    width: 80px;
+}
+
+footer{
+    width: 100%;
+    height: 5%;
+    position: fixed;
+    bottom: 0%;
+    background-color: #302E2C;
+    align-items: center;
+}
+footer div{
+    align-items: center;
+    justify-items: center;
+}
+footer p{
+    color: azure;
+    font-size: 12px;
+    font-family: 'DM Sans';
+    font-weight: 500;
+    margin-left: 40px;
+}
+
+.admin-hero{
+    width: 100%;
+    height: 100vh;
+    margin-top: 2.3%;
+    position: fixed;
+    background: linear-gradient(to left, #646464, #4D4C4B);
+}
+
+.admin-header-text{
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    margin-top: 2.7%;
+    margin-left: 0.7%;
+}
+.admin-sidebar{
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    margin-top: 6%;
+    margin-left: 0.2%;
+    background-color: #737373;
+    border-radius: 0 10px 10px 0;
+    border: 1.5px solid #7D8489;
+    padding: 20px 0px;
+    height: 83%;
+}
+.admin-sidebar ul{
+    top: 0%;
+    align-items: top;
+    align-content: top;
+    justify-content: top;
+    justify-items: top;
+    justify-self: top;
+}
+.admin-sidebar li{
+    list-style: none;
+    background-color: #5f5f5f;
+    border-radius: 0 3px 3px 0;
+    border: 1.5px solid #7D8489;
+    margin-top: 8px;
+}
+.admin-sidebar a{
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.content{
+    height: 90.3%;
+    width: 100%;
+    margin-left: 12%;
+    padding: 20px 10px;
+    position: fixed;
+    align-items: start;
+}
+.content p{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    align-items: left;
+}
+
+#userContentMgt{
+    align-items: start;
+    justify-content: start;
+    justify-self: start;
+    height: 100%;
+    margin-left: 20px;
+}
+#userTopHeader{
+    position: fixed;
+    z-index: 1;
+    margin-top: 0%;
+}
+#userContentMgt .contact-top-controls{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+#searchBar{
+    border-radius: 5px;
+    width: fit-content;
+    align-items: center;
+    margin-left: 10px;
+}
+#searchUserInput{
+    margin-right: 8px;
+    border-radius: 5px;
+    border: 0;
+    height: 20px;
+    background-color: #adaeae;
+    margin-left: 8px;
+    padding-left: 10px;
+}
+#createUserButton{
+    background: #358939;
+    padding: 0 10px;
+    right: 0%;
+}
+#createUserButton:hover{
+    background: #F65730;
+}
+button{
+    height: 20px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 5px;
+    border: 0px;
+    color: white;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+button:hover{
+    background: #F65730;
+}
+.field-bar{
+    height: 40px;
+    background-color: #F65730;
+    border-radius: 6px 6px 0 0;
+    width: 100%;
+    align-items: center;
+}
+
+#userContentMgt .field-bar p{
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans';
+    color: aliceblue;
+    text-align: start;
+}
+
+#userContentMgt .field-bar .title-user-id{
+    margin: 0 20px 0 10px;
+    width: 160px;
+    text-align: start;
+}
+#userContentMgt .field-bar .title-user-name{
+    margin: 0 20px 0 10px;
+    width: 170px;
+}
+#userContentMgt .field-bar .title-user-email{
+    margin: 0 5px 0 5px;
+    width: 170px;
+}
+#userContentMgt .field-bar .title-user-roles{
+    margin: 0 10px 0 0px;
+    width: 100px;
+}
+#userContentMgt .field-bar .title-user-access{
+    margin: 0 20px 0 0px;
+    width: 110px;
+}
+#userContentMgt .field-bar .title-user-action{
+    margin: 0 50px 0 50px;
+    width: 100px;
+}
+.admin-hero .content #userContentMgt .field-item{
+    height: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 8.2%;
+}
+
+.item-content{
+    align-items: center;
+    height: 30px;
+    background-color: rgba(48, 46, 44, 0.25);
+    margin-bottom: 2px;
+}
+.content #userContentMgt .field-item .item-content p{
+    font-size: 12px;
+    font-weight: light;
+    font-family: 'DM Sans';
+    color: aliceblue;
+    text-align: left;
+}
+.admin-hero .content #userContentMgt .field-item .item-content .item-user-id{
+    margin: 0 20px 0 10px;
+    width: 160px;
+    text-align: start;
+}
+.item-content .item-user-name{
+    margin: 0 20px 0 10px;
+    width: 170px;
+}
+.item-content .item-user-email{
+    margin: 0 20px 0 10px;
+    width: 170px;
+}
+.item-content .item-user-roles{
+    margin: 0 20px 0 10px;
+    width: 100px;
+}
+.item-content .item-user-access{
+    margin: 0 20px 0 10px;
+    width: 100px;
+}
+#userUpdateBtn{
+    background-color: darkorange;
+    margin: 0 20px 0 10px;
+}
+#userUpdateBtn:hover{
+    background-color: #F65730;
+}
+#userDeleteBtn{
+    background-color: rgb(131, 8, 8);
+    margin: 0 10px 0 0px;
+}
+#userDeleteBtn:hover{
+    background-color: #F65730;
+}
+
+#submitButton{
+    height: 25px; 
+    width: 230px; 
+    margin-left: 17px; 
+    margin-top: 30px; 
+    background-color: rgb(68, 135, 1); 
+    color: rgb(255, 255, 255);
+}
+#submitButton:hover{
+background-color: #F65730;
+}
+
