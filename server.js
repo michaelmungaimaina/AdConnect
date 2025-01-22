@@ -75,46 +75,39 @@ async function connectAndStartServer() {
 // Call the function to start the server
 connectAndStartServer();
 
-// User
-app.post('/api/users', async (req, res) => {
-    try {
-        const { id, name, email, role, access_level } = req.body;
-        //const newUser = new User({ id, name, email, role, access_level });
-        //await newUser.save();
-        res.status(200).json({ message: 'User created successfully', user: newUser });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
 // Endpoint to create a user
 app.post('/api/users', async (req, res) => {
     try {
-        const { id, name, email, role, access_level } = req.body;
+        console.log(req.body); 
+        const {name, email, password, role, access_level } = req.body;
 
         // Validate input data
-        if (!id || !name || !email || !role || !access_level) {
+        if (!name || !email || !password || !role || !access_level) {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
         // SQL query to insert the new user
         const query = `
-            INSERT INTO users (id, name, email, role, access_level)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO users (id, name, email, password, role, access_level, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
         // Execute the query
-        const [result] = await db.execute(query, [id, name, email, role, access_level]);
+        const [result] = await db.execute(query, [clientID, name, email, password, role, access_level, createdAt]);
+
+        console.log(result);
 
         // Respond with success message
         res.status(200).json({
             message: 'User created successfully',
             user: {
-                id,
+                clientID,
                 name,
                 email,
+                password,
                 role,
-                access_level
+                access_level,
+                createdAt
             }
         });
     } catch (error) {
@@ -171,7 +164,7 @@ app.get('/api/users/:id', async (req, res) => {
 app.put('/api/users/:id', async (req, res) => {
     try {
         const userId = req.params.id;
-        const { name, email, role, access_level } = req.body;
+        const {name, email, password, role, access_level, created_at } = req.body;
 
         // Check if the user exists
         const [existingUser] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
@@ -182,15 +175,15 @@ app.put('/api/users/:id', async (req, res) => {
         // Update the user in the database
         const query = `
             UPDATE users 
-            SET name = ?, email = ?, role = ?, access_level = ?
+            SET name = ?, email = ?, password = ?, role = ?, access_level = ?, created_at = ?
             WHERE id = ?
         `;
-        await db.execute(query, [name, email, role, access_level, userId]);
+        await db.execute(query, [name, email, password, role, access_level, createdAt, userId]);
 
         // Respond with a success message
         res.status(200).json({ 
             message: 'User updated successfully', 
-            user: { id: userId, name, email, role, access_level } 
+            user: { id: userId, name, email, password, role, access_level , createdAt} 
         });
     } catch (error) {
         // Handle errors
@@ -204,29 +197,34 @@ app.put('/api/users/:id', async (req, res) => {
 app.delete('/api/users/:id', async (req, res) => {
     try {
         const userId = req.params.id;
+        console.log('Deleting user with ID:', userId);
 
         // Check if the user exists
         const [existingUser] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
+        console.log('Existing user:', existingUser);
+
         if (existingUser.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         // SQL query to delete the user
         const query = 'DELETE FROM users WHERE id = ?';
+        console.log('SQL Query:', query, 'Params:', [userId]);
+
         await db.execute(query, [userId]);
 
         // Respond with a success message
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         // Handle errors
-        console.error(error);
+        console.error('Error details:', error.message || error);
         res.status(500).json({ error: 'An error occurred while deleting the user' });
     }
 });
 
 // Format timestamp for EAT
 const clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS");
-const createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SSS");
+const createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SS");
 // Create a new client (lead)
 app.post('/api/clients', async (req, res) => {
     try {

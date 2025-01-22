@@ -103,7 +103,7 @@
                         <p class="title-user-action">ACTIONS</p>
                     </div>
                 </div>
-                <div class="v-layout field-item">
+                <div id="userList" class="v-layout field-item">
                     <div class="h-layout item-content">
                         <p class="item-user-id">USER ID</p>
                         <p class="item-user-name">USER NAME</p>
@@ -347,17 +347,21 @@
 
             <!-- Manage Documents -->
             <div id="documentContentMgt" class="v-layout"></div>
+            
+            <!-- Manage Documents -->
+            <div id="appointmentContentMgt" class="v-layout"></div>
 
         </div>
 
 
     </section>
 
+    <!-- User Popup -->
     <section id="userPopUp" class="background-tint-black">
-        <div id="btnCloseApointment" onclick="closeUserPopup()" class="btn_hover1" style="position: fixed;">
+        <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
             <i class="fa-solid fa-xmark"></i>
         </div>
-        <div id="appointmentErrorMessage"
+        <div id="errorMessage"
             style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
         </div>
         <div class="appointment-layout outer-container" >
@@ -380,7 +384,7 @@
                         <label class="label" for="email">E-Mail:</label>
                         <img src="/resources/starr.png" alt="">
                     </div>
-                    <input id="email" type="text" class="input-field" placeholder="johndoe@example.com" style="margin-left: 37px;">
+                    <input id="email" type="text" class="input-field" placeholder="johndoe@example.com" style="margin-left: 40px;">
                 </div>
                 <div class="h-layout">
                     <div>
@@ -389,9 +393,9 @@
                     </div>
                     <select id="role" class="input-field" style="margin-left: 18px;">
                         <option value="" disabled selected>Select User Role</option>
-                        <option value="superAdmin">SUPER ADMIN</option>
-                        <option value="admin">ADMIN</option>
-                        <option value="genUser">GEN USER</option>
+                        <option value="SUPER_ADMIN">SUPER ADMIN</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="GEN_USER">GEN USER</option>
                     </select>
                 </div>
                 <div class="h-layout">
@@ -401,29 +405,38 @@
                     </div>
                     <select id="access" class="input-field" style="margin-left: 10px;">
                         <option value="" disabled selected>Select User Access</option>
-                        <option value="crud">CRUD</option>
-                        <option value="0rud">0RUD</option>
-                        <option value="0ru0">0RU0</option>
-                        <option value="0r00">0R00</option>
-                        <option value="0r0d">0R0D</option>
+                        <option value="CRUD">CRUD</option>
+                        <option value="0RUD">0RUD</option>
+                        <option value="0RU0">0RU0</option>
+                        <option value="0R00">0R00</option>
+                        <option value="0R0D">0R0D</option>
                     </select>
+                </div>
+                <div class="h-layout">
+                    <div>
+                        <label class="label" for="password">Password:</label>
+                        <img src="/resources/starr.png" alt="">
+                    </div>
+                    <input id="password" type="password" class="input-field" placeholder="Password" style="margin-left: 23px;">
                 </div>
                 <button id="submitButton">SUBMIT</button>
             </form>
     </section>
 
+    <!-- Footer -->
     <footer class="h-layout">
         <div class="h-layout">
             <p>© 2025 AdConnect | All rights reserved.</p>
             <p>Follow Us:</p>
-            <a href="https://www.facebook.com/profile.php?id=61567259036362"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.facebook.com/profile.php?id=61567259036362" style="margin-left: 10px;"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.instagram.com/adconnect_digital/" style="margin-left: 10px;"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-youtube"></i></a>
         </div>
     </footer>
 
+    <script src="./scripts/admin.js"></script>
 </body>
 
 

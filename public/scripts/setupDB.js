@@ -24,7 +24,18 @@ db.connect((err) => {
     console.log('Connected to MySQL database.');
 
     const createDbQuery = 'CREATE DATABASE IF NOT EXISTS adconnect';
-    const createTableLeads = `
+    const createTableUsers = `
+    CREATE TABLE IF NOT EXISTS users (
+      id varchar(24) PRIMARY KEY ,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      role VARCHAR(15) NOT NULL,
+      access_level VARCHAR(10) NOT NULL,
+      created_at VARCHAR(24) NOT NULL,
+    );
+  `;
+  const createTableLeads = `
     CREATE TABLE IF NOT EXISTS clients (
       clientID BIGINT PRIMARY KEY ,
       clientName VARCHAR(255) NOT NULL,
