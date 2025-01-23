@@ -148,6 +148,7 @@ footer p{
     justify-content: start;
     justify-self: start;
     height: 100%;
+    width: 85%;
     margin-left: 20px;
 }
 #userTopHeader{
@@ -172,18 +173,28 @@ footer p{
     margin-right: 8px;
     border-radius: 5px;
     border: 0;
-    height: 20px;
+    height: 30px;
     background-color: #adaeae;
     margin-left: 8px;
     padding-left: 10px;
 }
 #createUserButton{
+    height: 30px;
     background: #358939;
-    padding: 0 10px;
+    padding: 5px 30px;
     right: 0%;
 }
 #createUserButton:hover{
     background: #F65730;
+}
+
+#refreshUserButton{
+    height: 30px;
+    background-color: #302E2C;
+    padding: 5px 30px;
+}
+#refreshUserButton:hover{
+    background: #e86d4e;
 }
 button{
     height: 20px;
@@ -195,6 +206,9 @@ button{
     color: white;
     transition: all 0.5s ease;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 button:hover{
@@ -257,6 +271,9 @@ button:hover{
     height: 30px;
     background-color: rgba(48, 46, 44, 0.25);
     margin-bottom: 2px;
+}
+.item-content:hover{
+    background-color: #F65730;
 }
 .content #userContentMgt .field-item .item-content p{
     font-size: 12px;
@@ -332,5 +349,163 @@ background-color: #F65730;
     border: 1.5px solid #F65730;
     background: inherit;
     color: #F65730;
+}
+
+.admin-hero .content #leadsContentMgt .field-item{
+    height: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 8.2%;
+    padding-top: 0; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: flex-start;
+}
+#leadsContentMgt{
+    align-items: start;
+    justify-content: start;
+    justify-self: start;
+    height: 100%;
+    width: 85%;
+    margin-left: 20px;
+}
+#leadsContentMgt .contact-top-controls{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+#leadsContentMgt #createUserButton{
+    color: transparent;
+    background-color: transparent;
+}
+#searchLeadsInput{
+    margin-right: 8px;
+    border-radius: 5px;
+    border: 0;
+    height: 30px;
+    width: 250px;
+    background-color: #adaeae;
+    margin-left: 8px;
+    padding-left: 10px;
+}
+#leadsContentMgt .field-bar p{
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans';
+    color: aliceblue;
+    text-align: start;
+}
+
+#leadsContentMgt .field-bar .title-lead-id{
+    margin: 0 0px 0 10px;
+    width: 105px;
+    text-align: start;
+}
+.field-bar .title-lead-name{
+    margin: 0 10px 0 25px;
+    width: 120px;
+}
+.field-bar .title-lead-email{
+    margin: 0 15px 0 0px;
+    width: 170px;
+}
+.field-bar .title-lead-phone{
+    margin: 0 0px 0 0px;
+    width: 70px;
+}
+.field-bar .title-lead-source{
+    margin: 0 10px 0 0px;
+    width: 70px;
+}
+.field-bar .title-lead-status{
+    margin: 0 5px 0 0px;
+    width: 75px;
+}
+.field-bar .title-lead-subscription{
+    margin: 0 5px 0 5px;
+    width: 100px;
+}
+.field-bar .title-lead-date{
+    margin: 0 5px 0 15px;
+    width: 100px;
+}
+.field-bar .title-lead-action{
+    margin: 0 35px 0 40px;
+    width: 100px;
+}
+.content #leadsContentMgt .field-item .item-content p{
+    font-size: 11px;
+    font-weight: light;
+    font-family: 'DM Sans';
+    color: aliceblue;
+    text-align: left;
+}
+.admin-hero .content #leadsContentMgt .field-item .item-content .item-lead-id{
+    margin: 0 5px 0 5px;
+    width: 130px;
+    text-align: start;
+}
+.item-content .item-lead-name{
+    margin: 0 5px 0 0px;
+    width: 123px;
+}
+.item-content .item-lead-email{
+    margin: 0 5px 0 0px;
+    width: 190px;
+}
+.item-content .item-lead-phone{
+    margin: 0 5px 0 0px;
+    width: 70px;
+}
+.item-content .item-lead-source{
+    margin: 0 5px 0 0px;
+    width: 70px;
+}
+.item-content .item-lead-status{
+    margin: 0 5px 0 0px;
+    width: 90px;
+}
+.item-content .item-lead-subscription{
+    margin: 0 5px 0 0px;
+    width: 100px;
+}
+.item-content .item-lead-date{
+    margin: 0 5px 0 0px;
+    width: 110px;
+}
+#leadPreviewMailBtn{
+    margin: 01px 5px 01px 20px;
+    width: 30px;
+    padding: 0 10px;
+    background-color: #35893900;
+    cursor: pointer;
+}
+#leadSendMailBtn{
+    margin: 01px 5px 01px 0px;
+    width: 30px;
+    padding: 0 10px;
+    background-color: #35893900;
+    cursor: pointer;
+}
+#leadUnsubscribeBtn{
+    margin: 1px 5px 01px 0px;
+    width: 30px;
+    padding: 0 10px;
+    background-color: rgba(255, 140, 0, 0);
+    cursor: pointer;
+}
+#leadDeleteBtn{
+    margin: 1px 5px 1px 0px;
+    width: 30px;
+    padding: 0 10px;
+    background-color: rgba(139, 0, 0, 0);
+    cursor: pointer;
+}
+
+#leadSendMailBtn:hover, #leadUnsubscribeBtn:hover,
+#leadDeleteBtn:hover{
+    background-color: #F65730;
 }
 

@@ -286,7 +286,7 @@ body main .page-sec {
     justify-content: center;
     background-color: #000000a6;
     width: 100%;
-    height: 100%;
+    height: 0%;
     position: fixed;
     z-index: 9999;
     border-radius: 0px;
@@ -501,4 +501,62 @@ body main .page-sec {
     display: none;
     transform: translateY(0%);
     overflow: hidden;
+}
+
+.fa-trash{
+    color: rgb(255, 0, 0);
+}
+.fa-envelope{
+    color: #009a08;
+}
+.fa-envelope-open{
+    color: #00a2ff;
+}
+.fa-sign-out{
+    color: rgb(255, 157, 0);
+}
+.fa-sign-out:hover,
+.fa-envelope-open:hover,
+.fa-envelope:hover,
+.fa-trash:hover{
+    color: white;
+}
+
+#leadsContentMgt .icon-container {
+    position: relative;
+    display: inline-block;
+}
+
+#leadsContentMgt .tooltip {
+    visibility: hidden; /* Initially hidden */
+    background-color: #333; /* Background color for the tooltip */
+    color: #fff; /* Text color */
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position tooltip above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap; /* Prevents wrapping */
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s; /* Smooth fade-in effect */
+}
+
+#leadsContentMgt .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* Arrow at the bottom of the tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent; /* Creates a small triangle */
+}
+
+#leadsContentMgt .fa-envelope-open:hover #leadsContentMgt .tooltip {
+    visibility: visible;
+    opacity: 1; /* Fade-in effect */
 }

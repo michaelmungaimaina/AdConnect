@@ -1,5 +1,8 @@
 console.log('Admin js Loaded');
 
+//<i class="fa fa-user-md" aria-hidden="true"></i>
+
+
 //let DOMAIN_NAME = 'https://adconnect.co.ke/';
 let DOMAIN_NAME = 'http://127.0.0.1:3000/';
 let API_PATH = 'api/';
@@ -11,9 +14,11 @@ const inputUserRole = document.getElementById('role');
 const inputUserAccess = document.getElementById('access');
 const inputUserPassword = document.getElementById('password');
 const inputUserSearch = document.getElementById('searchUserInput');
+const inputLeadSearch = document.getElementById('searchLeadsInput');
 
 const textUserPopupHeader = document.getElementById('popupHeaderText');
 const textErrorContainer = document.getElementById('errorMessage');
+const textLoaderText = document.getElementById('loadingText');
 
 const loader = document.getElementById('loader');
 
@@ -33,6 +38,7 @@ const sectionDocumentManagement = document.getElementById('documentContentMgt');
 const sectionAppointmentManagement = document.getElementById('appointmentContentMgt');
 
 const popupUserMgt = document.getElementById('userPopUp');
+const popupLoader = document.getElementById('loaderPopup');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const twoWordsPattern = /^\S+\s+\S+/;
@@ -46,24 +52,64 @@ let errorMessages = '';
 
 document.addEventListener("DOMContentLoaded", () => {
     // Fetch when the page loads
-    fetchUsers();
-    populateUsers();
+    //fetchUsers();
+
+    fetchLeads();
 });
+
+function navigateTo(section) {
+    document.querySelectorAll('.content').forEach(sec => sec.classList.add('hidden'));
+    section.classList.remove('hidden');
+}
+
+function userManagement(){
+    navigateTo(sectionUserManagement);
+    sectionUserManagement.style.height = '100%';
+    sectionContactManagement.style.height = '0%';
+    sectionVideoManagement.style.height = '0%';
+    sectionLeadsManagement.style.height = '0%';
+    sectionReportsManagement.style.height = '0%';
+    sectionSettingsManagement.style.height = '0%';
+    sectionWorkflowsManagement.style.height = '0%';
+    sectionCommunicationManagement.style.height = '0%';
+    sectionDocumentManagement.style.height = '0%';
+    sectionAppointmentManagement.style.height = '0%';
+
+    //Manage Lists
+    fetchUsers();
+}
+/**
+ * Refreshes the user table
+ */
+function refreshUserTable(){
+    userList = [];
+    fetchUsers();
+}
+
+function refreshLeadsTable(){
+    leadList = [];
+    fetchLeads();
+}
 
 // Function to show the loader
 function showLoader() {
     loader.classList.remove('hidden');
+    popupLoader.style.height ='100%';
   }
   
   // Function to hide the loader
   function hideLoader() {
     loader.classList.add('hidden');
+    popupLoader.style.height ='0%';
+    textLoaderText.textContent = '';
   }
 
 let userList = [];
+let leadList = [];
 
 async function fetchUsers() {
     showLoader();
+    textLoaderText.textContent = 'Fetching Users. Please Wait!';
     try {
         const response = await fetch(`${DOMAIN}users`);
 
@@ -76,9 +122,31 @@ async function fetchUsers() {
         populateUsers();
         clearInput();
     } catch (error) {
-        console.error('Error fetching contact messages:', error);
+        console.error('Error fetching users messages:', error);
     } finally{
         hideLoader();
+        textLoaderText.textContent = '';
+    }
+}
+
+async function fetchLeads() {
+    showLoader();
+    textLoaderText.textContent = 'Fetching Leads. Please Wait!';
+    try {
+        const response = await fetch(`${DOMAIN}clients`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        leadList = await response.json();
+    
+        populateLeads();
+    } catch (error) {
+        console.error('Error fetching Leads messages:', error);
+    } finally{
+        hideLoader();
+        textLoaderText.textContent = '';
     }
 }
 
@@ -87,7 +155,7 @@ function populateUsers() {
     dataList.innerHTML = ''; // Clear existing content
   
     if (userList.length === 0) {
-      dataList.innerHTML = '<p>No contact messages available.</p>';
+      dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Registered Users Available!</p>';
       return;
     }
   
@@ -106,6 +174,145 @@ function populateUsers() {
       dataList.appendChild(listItem);
     });
   }
+  
+  function populateLeads() {
+    const dataList = document.getElementById('leadList');
+    dataList.innerHTML = ''; // Clear existing content
+  
+    if (leadList.length === 0) {
+      dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Captured Leads Available!</p>';
+      return;
+    }
+  
+    leadList.forEach((item, index) => {
+      const listItem = document.createElement('div');
+      listItem.classList.add('h-layout', 'item-content');
+      listItem.innerHTML = `
+      <div class="h-layout item-content" onclick="clicked(${index})">
+        <p class="item-lead-id">${item.clientID}</p>
+        <p class="item-lead-name">${item.clientName}</p>
+        <p class="item-lead-email">${item.clientEmail}</p>
+        <p class="item-lead-phone">${item.clientPhone}</p>
+        <p class="item-lead-source">${item.clientSource}</p>
+        <p class="item-lead-status">${item.clientStatus}</p>
+        <p class="item-lead-subscription">${item.clientSubScription}</p>
+        <p class="item-lead-date">${item.created_at}</p>
+        <i id="leadPreviewMailBtn" onclick="previewEmailTemplate(${index})" class="fa fa-envelope-open" aria-hidden="true"></i>
+        <i id="leadSendMailBtn" onclick="sendSubsequentEmail(${index})" class="fa fa-envelope" aria-hidden="true"></i>
+        <i id="leadUnsubscribeBtn" onclick="unsubscribeFromLead(${index})" class="fa fa-sign-out" aria-hidden="true"></i>
+        <i id="leadDeleteBtn" onclick="deleteLead(${index})" class="fa fa-trash" aria-hidden="true"></i>
+        </div>
+      `;
+      dataList.appendChild(listItem);
+    });
+  }
+
+  function clicked(index){
+    console.log(`Item at position ${index} clicked.`);
+  }
+
+  async function previewEmailTemplate(index) {
+    textLoaderText.textContent = 'Preparing Email for Preview. Please Wait!';
+    showLoader();
+    const response = await fetch(`${DOMAIN}emailTemplate?status=${leadList[index].clientStatus}`);
+    const template = await response.json();
+
+    if (template) {
+        const previewWindow = window.open('', '_blank');
+        previewWindow.document.write(template.template_html);
+    } else {
+        alert('Template not found for the specified status.');
+    }
+    textLoaderText.textContent = '';
+    hideLoader();
+}
+
+async function unsubscribeFromLead(index) {
+    let clientID = leadList[index].clientID;
+    try {
+        textLoaderText.textContent = 'Unsubscribing. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}unsubscribeLead`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientID }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            leadList[index].clientSubScription = 'UNSUBSCRIBED';
+            populateLeads();
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed unsubscribe. Please try again.');
+    } finally{
+        textLoaderText.textContent = '';
+        hideLoader();
+    }
+}
+
+// Send subsequent emails
+async function sendSubsequentEmail(index) {
+    let clientID = leadList[index].clientID;
+    try {
+        textLoaderText.textContent = 'Sending Follow-up Email. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}sendSubsequentEmail`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientID }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to send email. Please try again.');
+    } finally{
+        textLoaderText.textContent = '';
+        hideLoader();
+    }
+}
+
+/**
+ * Delete lead
+ * @param {*} index postion of the lead to be deleted
+ */
+async function deleteLead(index){
+    if (confirm('Are you sure you want to delete this Lead?')) {
+        try {
+            textLoaderText.textContent = 'Deleting Lead. Please Wait...';
+            showLoader();
+            const response = await fetch(`${DOMAIN}clients/${leadList[index].clientID}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete lead');
+            errorMessages = 'Lead deleted successfully';
+
+            container.style.color = 'white';
+            container.style.backgroundColor = '#4abc5061';
+            handleErrorMessage(errorMessages, textErrorContainer);
+            container.style.color = 'rgb(236, 2, 2)';
+            container.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+            leadList.splice(index, 1);
+            populateLeads();
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            errorMessages = 'Failed to delete the Lead. Please try again.';
+            handleErrorMessage(errorMessages, textErrorContainer);
+        } finally{
+            hideLoader();
+        }
+      }
+}
 
   function openUpdateUser(index){
     textUserPopupHeader.textContent = 'Update User';
@@ -160,6 +367,7 @@ async function updateUser(index) {
     };
 
     try {
+        textLoaderText.textContent = 'Fetching Users. Please Wait!';
         showLoader();
         const response = await fetch(`${DOMAIN}users/${userList[index].id}`, {
             method: 'PUT',
@@ -169,6 +377,8 @@ async function updateUser(index) {
             body: JSON.stringify(user),
         });
 
+        textLoaderText.textContent = '';
+        textLoaderText.textContent = 'Users Fetched. Loading';
         if (response.ok) {
             const result = await response.json();
             errorMessages = 'User updated successfully!';
@@ -190,6 +400,7 @@ async function updateUser(index) {
         handleErrorMessage(errorMessages, textErrorContainer);
     } finally{
         hideLoader();
+        textLoaderText.textContent = '';
         isUpdate = false;
     }
 }
@@ -252,6 +463,7 @@ async function updateUser(index) {
     };
 
     try {
+        textLoaderText.textContent = 'Registering User. Please Wait!';
         // Show loader before the request
         showLoader();
 
@@ -276,6 +488,7 @@ async function updateUser(index) {
             setSuccessColor(textErrorContainer);
             handleErrorMessage(result.message || 'User created successfully!', textErrorContainer);
             setErrorColor(textErrorContainer);
+            fetchUsers(); // refresh list
             clearInput();
         } else {
             const errorData = await response.json();
@@ -289,6 +502,7 @@ async function updateUser(index) {
         // Hide loader after the request
         hideLoader();
         isUpdate = false;
+        textLoaderText.textContent = '';
     }
 }
 
@@ -380,6 +594,23 @@ function clearInput(){
 inputUserSearch.addEventListener('input', function (event) {
     const filter = event.target.value.toLowerCase();
     const rows = document.querySelectorAll('#userList .item-content');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+/**
+ * Filter leads
+ */
+inputLeadSearch.addEventListener('input', function (event) {
+    const filter = event.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#leadList .item-content');
 
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();

@@ -35,6 +35,14 @@ db.connect((err) => {
       created_at VARCHAR(24) NOT NULL,
     );
   `;
+  const createEmailTemplates = `
+    CREATE TABLE email_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    status VARCHAR(50) UNIQUE NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL
+);
+  `;
   const createTableLeads = `
     CREATE TABLE IF NOT EXISTS clients (
       clientID BIGINT PRIMARY KEY ,

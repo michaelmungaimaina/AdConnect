@@ -86,6 +86,17 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
+        // SQL query to fetch a user by ID and EMAIL
+        const query1 = 'SELECT * FROM users WHERE name = ? AND email = ?';
+
+        // Execute the query
+        const [rows] = await db.execute(query1, [name, email]);
+
+        // Check if a user was found
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User Already Exists!' });
+        }
+
         // SQL query to insert the new user
         const query = `
             INSERT INTO users (id, name, email, password, role, access_level, created_at)
@@ -310,6 +321,86 @@ app.get('/api/clients/:id', async (req, res) => {
     }
 });
 
+app.post('/api/sendSubsequentEmail', async (req, res) => {
+    const { clientID } = req.body;
+    console.log(clientID)
+    try {
+        // Get client details
+        const [client] = await db.execute('SELECT * FROM clients WHERE clientID = ?', [clientID]);
+        console.log(client)
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        console.log(`Client Subscription Value: "${client[0].clientSubScription}`);
+        if (client[0].clientSubScription?.trim().toUpperCase() !== 'SUBSCRIBED') {
+            return res.status(400).json({ error: 'Client is not subscribed to marketing emails' });
+        }
+
+        // Fetch email template based on current status
+        const [template] = await db.execute('SELECT subject, body FROM email_templates WHERE status = ?', [
+            client[0].clientStatus,
+        ]);
+
+        if (!template) {
+            return res.status(404).json({ error: `No email template found for status: ${client.clientStatus}` });
+        }
+
+        // Replace placeholders
+        //const emailBody = template.template_html
+        //    .replace(/\$\{clientName\}/g, client.clientName);
+        const emailBody = template[0].body.replace('[NAME]', client[0].clientName);
+
+        // Send email
+        await sendSubSequentEmail(client[0].clientEmail, template[0].subject, emailBody);
+
+        // Increment client status
+        const statusOrder = [
+            '1ST CONTACT',
+            '2ND CONTACT',
+            '3RD CONTACT',
+            '30TH CONTACT'
+            // Add up to '30TH CONTACT'
+        ];
+        const currentStatusIndex = statusOrder.indexOf(client[0].clientStatus.trim().toUpperCase());
+        const newStatus =
+            currentStatusIndex !== -1 && currentStatusIndex < statusOrder.length - 1
+                ? statusOrder[currentStatusIndex + 1]
+                : client[0].clientStatus; // Keep current status if it's the last one
+
+        // Update client status and timestamp
+        await db.execute(
+            `UPDATE clients SET clientStatus = ?, created_at = ? WHERE clientID = ?`,
+            [newStatus, createdAt, clientID]
+        );
+
+        res.status(200).json({ message: 'Email sent and status updated successfully!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while sending the email' });
+    }
+});
+
+// Unsubscribe a lead by ID
+app.put('/api/unsubscribeLead', async (req, res) => {
+    const { clientID } = req.body;
+    try {
+        if (!clientID) {
+            return res.status(404).json({ error: 'No Lead Id Passed' });
+        }
+
+        // Update client status and timestamp
+        await db.execute(
+            `UPDATE clients SET clientSubScription = ?, created_at = ? WHERE clientID = ?`,
+            ['UNSUBSCRIBED', createdAt, clientID]
+        );
+
+        res.status(200).json({ message: 'Lead Unsubscribed Successfully!' });
+    } catch(error){
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while unsubscribing!' });
+    }
+});
 
 // Update a lead by ID
 app.put('/api/clients/:id', async (req, res) => {
@@ -895,6 +986,26 @@ async function sendBookingEmail(clientName, clientEmail, meetingDate, meetingTim
         console.log('Booking email sent successfully!');
     } catch (error) {
         console.error('Error sending booking email:', error);
+        throw error;
+    }
+}
+
+/**]
+ * Function for sending follow-up emails
+ */
+async function sendSubSequentEmail(to, subject, body) {
+    const mailOptions = {
+        from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
+        to: `${to}`, // Recipient email
+        subject: `${subject}`,
+        html: `${body}`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Follow-Up Email sent successfully!');
+    } catch (error) {
+        console.error('Error sending follow-up email:', error);
         throw error;
     }
 }
