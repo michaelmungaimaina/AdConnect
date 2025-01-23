@@ -347,9 +347,9 @@ app.post('/api/sendSubsequentEmail', async (req, res) => {
         }
 
         // Replace placeholders
-        //const emailBody = template.template_html
-        //    .replace(/\$\{clientName\}/g, client.clientName);
-        const emailBody = template[0].body.replace('[NAME]', client[0].clientName);
+        const emailBody = template.body
+           .replace(/\$\{clientName\}/g, client[0].clientName);
+        //const emailBody = template[0].body.replace('[NAME]', client[0].clientName);
 
         // Send email
         await sendSubSequentEmail(client[0].clientEmail, template[0].subject, emailBody);
@@ -359,7 +359,8 @@ app.post('/api/sendSubsequentEmail', async (req, res) => {
             '1ST CONTACT',
             '2ND CONTACT',
             '3RD CONTACT',
-            '30TH CONTACT'
+            '30TH CONTACT',
+            '5TH CONTACT'
             // Add up to '30TH CONTACT'
         ];
         const currentStatusIndex = statusOrder.indexOf(client[0].clientStatus.trim().toUpperCase());
@@ -378,6 +379,35 @@ app.post('/api/sendSubsequentEmail', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while sending the email' });
+    }
+});
+
+// Endpoint to fetch email template by status
+app.get('/api/emailTemplate', async (req, res) => {
+    try {
+        const { status } = req.query;
+
+        // Validate that the status is provided
+        if (!status) {
+            return res.status(400).json({ error: 'Status is required' });
+        }
+
+        // Query the database for the template corresponding to the provided status
+        const query = 'SELECT subject, body FROM email_templates WHERE status = ?';
+        const [result] = await db.execute(query, [status]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No email template found for this status' });
+        }
+
+        // Respond with the template details
+        res.status(200).json({
+            subject: result[0].subject,
+            body: result[0].body,
+        });
+    } catch (error) {
+        console.error('Error fetching email template:', error);
+        res.status(500).json({ error: 'An error occurred while fetching the email template' });
     }
 });
 
@@ -449,7 +479,7 @@ app.delete('/api/clients/:id', async (req, res) => {
         const clientId = req.params.id;
 
         // SQL query to check if the client exists
-        const checkQuery = 'SELECT * FROM clients WHERE id = ?';
+        const checkQuery = 'SELECT * FROM clients WHERE clientID = ?';
         const [existingClient] = await db.execute(checkQuery, [clientId]);
 
         // If client does not exist, return 404
@@ -458,7 +488,7 @@ app.delete('/api/clients/:id', async (req, res) => {
         }
 
         // SQL query to delete the client
-        const deleteQuery = 'DELETE FROM clients WHERE id = ?';
+        const deleteQuery = 'DELETE FROM clients WHERE clientID = ?';
         await db.execute(deleteQuery, [clientId]);
 
         // Respond with a success message

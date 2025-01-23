@@ -219,7 +219,7 @@ function populateUsers() {
 
     if (template) {
         const previewWindow = window.open('', '_blank');
-        previewWindow.document.write(template.template_html);
+        previewWindow.document.write(template.body);
     } else {
         alert('Template not found for the specified status.');
     }
@@ -298,11 +298,11 @@ async function deleteLead(index){
             if (!response.ok) throw new Error('Failed to delete lead');
             errorMessages = 'Lead deleted successfully';
 
-            container.style.color = 'white';
-            container.style.backgroundColor = '#4abc5061';
+            textErrorContainer.style.color = 'white';
+            textErrorContainer.style.backgroundColor = '#4abc5061';
             handleErrorMessage(errorMessages, textErrorContainer);
-            container.style.color = 'rgb(236, 2, 2)';
-            container.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+            textErrorContainer.style.color = 'rgb(236, 2, 2)';
+            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
             leadList.splice(index, 1);
             populateLeads();
         } catch (error) {
