@@ -272,6 +272,7 @@ async function sendSubsequentEmail(index) {
 
         if (response.ok) {
             alert(result.message);
+            fetchLeads();
         } else {
             alert(`Error: ${result.error}`);
         }
