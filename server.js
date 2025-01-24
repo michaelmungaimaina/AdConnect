@@ -128,6 +128,35 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
+// API endpoint for user authentication
+app.post("/api/auth", async (req, res) => {
+    const { email, password } = req.body;
+  
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+  try{
+        const query = "SELECT * FROM users WHERE email = ? AND password = ?";
+        // Execute the query
+        const [rows] = await db.execute(query, [email, password]);
+
+        // Check if a user was found
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        //Successful Login
+            /* Store user data in the session
+            req.session.user = {
+                id: rows[0].id,
+                username: rows[0].name,
+            };**/
+        return res.status(200).json({ message: "Login successful", username: rows[0].name /*user: req.session.user*/ });
+    } catch(error)  {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+  });
+
 // Get all users
 app.get('/api/users', async (req, res) => {
     try {
@@ -564,10 +593,7 @@ app.get('/api/appointments', async (req, res) => {
         const [appointments] = await db.execute(query);
 
         // Respond with the fetched appointments
-        res.status(200).json({
-            message: 'Appointment(s) retrieved successfully',
-            appointments
-        });
+        res.status(200).json(appointments);
     } catch (error) {
         // Handle errors
         console.error('Backend Error: ', error);
@@ -629,13 +655,101 @@ app.get('/api/appointments-by-date/:appointmentDate', async (req, res) => {
     }
 });
 
+// Reschedule meeting and Notify client
+app.put('/api/rescheduleMeeting', async (req, res) => {
+    try {
+        const { clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink} = req.body;
 
+        // SQL query to check if the appointment exists
+        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+        const [existingAppointment] = await db.execute(checkQuery, [clientId]);
+
+        // If the appointment does not exist, return 404
+        if (existingAppointment.length === 0) {
+            console.log('Appointment not found');
+            return res.status(404).json({ error: 'Appointment not found' });
+        }
+
+        // SQL query to update the appointment
+        const updateQuery = `
+            UPDATE appointments 
+            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+            WHERE clientId = ?
+        `;
+
+        // Execute the update query
+        await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
+
+        // Send Email Notification
+        sendRescheduleEmail(name.split(' ')[0],email,appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
+        sendBookingReactionEmail(name.split(' ')[0],appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
+
+        // Respond with a success message
+        console.log('Meeting Rescheduled successfully');
+        res.status(200).json({
+            message: 'Meeting Rescheduled successfully',
+            appointment: {
+                clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
+            }
+        });
+    } catch (error) {
+        // Handle errors
+        console.error('Backend Error: ', error);
+        res.status(500).json({ error: 'An error occurred while updating the appointment' });
+    }
+});
+
+// Reminder notification to client
+app.put('/api/reminder-email', async (req, res) => {
+    try {
+        console.log(req.body)
+        const { clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink} = req.body;
+
+        console.log(req.body)
+        // SQL query to check if the appointment exists
+        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+        const [existingAppointment] = await db.execute(checkQuery, [clientId]);
+
+        // If the appointment does not exist, return 404
+        if (existingAppointment.length === 0) {
+            console.log('Appointment not found');
+            return res.status(404).json({ error: 'Appointment not found' });
+        }
+
+        /* SQL query to update the appointment reminder status
+        const updateQuery = `
+            UPDATE appointments 
+            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+            WHERE clientId = ?
+        `;*/
+
+        // Execute the update query
+       // await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
+
+       const [fname] = name.split(' ')
+        // Send Email Notification
+        sendReminderEmail(fname[0],email,appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
+
+        // Respond with a success message
+        console.log('Meeting Rescheduled successfully');
+        res.status(200).json({
+            message: 'Reminder Sent successfully',
+            appointment: {
+                clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
+            }
+        });
+    } catch (error) {
+        // Handle errors
+        console.error('Backend Error: ', error);
+        res.status(500).json({ error: 'An error occurred while updating the appointment' });
+    }
+});
 
 // Update an appointment by ID
 app.put('/api/appointments/:id', async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const { clientId, appointmentDate, service, status, notes } = req.body;
+        const { status } = req.body;
 
         // SQL query to check if the appointment exists
         const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
@@ -650,20 +764,20 @@ app.put('/api/appointments/:id', async (req, res) => {
         // SQL query to update the appointment
         const updateQuery = `
             UPDATE appointments 
-            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?
+            SET appointmentStatus = ?,
             WHERE clientId = ?
         `;
 
         // Execute the update query
-        await db.execute(updateQuery, [clientId, appointmentDate, service, status, notes, appointmentId]);
+        await db.execute(updateQuery, [status, appointmentId]);
 
         // Respond with a success message
-        console.log('Appointment updated successfully');
+        console.log('Appointment Status updated successfully');
         res.status(200).json({
-            message: 'Appointment updated successfully',
+            message: 'Appointment Status updated successfully',
             appointment: {
                 id: appointmentId,
-                clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, status, notes, meetingLink
+                status
             }
         });
     } catch (error) {
@@ -1036,6 +1150,179 @@ async function sendSubSequentEmail(to, subject, body) {
         console.log('Follow-Up Email sent successfully!');
     } catch (error) {
         console.error('Error sending follow-up email:', error);
+        throw error;
+    }
+}
+
+/**
+ * Send a Reschedule email to the client
+ * @param {string} clientName - Name of the client
+ * @param {string} clientEmail - Email of the client
+ */
+async function sendRescheduleEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    const mailOptions = {
+        from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
+        to: clientEmail, // Recipient email
+        subject: 'Meeting Reschedule: Consultation with Adconnect',
+        html: `
+        <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
+    <div style="
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(to right, #4d4c4b, #646464);
+      border-radius: 10px;
+    ">
+        <p style="line-height: 1.5;">
+            Dear <span style="font-weight: bold;">${clientName},</span>
+        </p>
+        <p style="line-height: 1.5;">
+            This is to inform you that your consultation meeting has been rescheduled as follows:
+        </p>
+        <p style="line-height: 1.5;"> <br>
+            <b>Date: </b> ${meetingDate}. <br>
+            <b>Time: </b> ${meetingTime} EAT. <br>
+            <b>Location: </b> ${meetingLocation}. <br>
+            <b>Agenda: </b> ${meetingAgenda}. <br>
+            <br>
+        </p>
+        <p style="line-height: 1.5;">
+            <a href='${meetingLink}' style="display: inline-block;
+            padding: 5px 30px;
+            background-color: #f65730;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;">
+                Proceed to Meeting
+            </a>
+            </p>
+        <p style="line-height: 1.5;">If you have any questions or need to reschedule, don't hesitate to contact the undersigned.</p>
+       
+        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
+
+        <p style="line-height: 1.5;">Warm regards,<br /></p>
+        <p style="line-height: 1.5;">
+            Misgina Fitwi<br />
+            <a href="https://adconnect.co.ke" style="color: #4abc4f;
+        text-decoration: none;">Adconnect Team</a><br />
+            Phone: 0790064130
+        </p>
+        <footer style="text-align: center;
+        margin-top: 30px;
+        color: #fff;
+        font-size: 14px;">
+            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
+                Powered By <br /><span style="color: #4abc4f;
+                font-weight: bold;
+                font-size: large;
+                transition: color 0.3s ease;
+                text-decoration: none;">AdConnect</span>
+            </p>
+            <p style="line-height: 1.5;">
+                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
+                text-decoration: none;
+                margin-top: -10px;"></a>
+            </p>
+        </footer>
+    </div>
+</body>
+`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Reschedule email sent successfully!');
+    } catch (error) {
+        console.error('Error sending reschedule email:', error);
+        throw error;
+    }
+}
+
+/**
+ * Send a Reschedule email to the client
+ * @param {string} clientName - Name of the client
+ * @param {string} clientEmail - Email of the client
+ */
+async function sendReminderEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    const mailOptions = {
+        from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
+        to: clientEmail, // Recipient email
+        subject: 'Meeting Reminder: Consultation with Adconnect',
+        html: `
+        <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
+    <div style="
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(to right, #4d4c4b, #646464);
+      border-radius: 10px;
+    ">
+        <p style="line-height: 1.5;">
+            Dear <span style="font-weight: bold;">${clientName},</span>
+        </p>
+        <p style="line-height: 1.5;">
+            This is to remind you of our upcoming consultation meeting as detailed below:
+        </p>
+        <p style="line-height: 1.5;"> <br>
+            <b>Date: </b> ${meetingDate}. <br>
+            <b>Time: </b> ${meetingTime} EAT. <br>
+            <b>Location: </b> ${meetingLocation}. <br>
+            <b>Agenda: </b> ${meetingAgenda}. <br>
+            <br>
+        </p>
+        <p style="line-height: 1.5;">
+            <a href='${meetingLink}' style="display: inline-block;
+            padding: 5px 30px;
+            background-color: #f65730;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;">
+                Proceed to Meeting
+            </a>
+            </p>
+       
+        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
+
+        <p style="line-height: 1.5;">Warm regards,<br /></p>
+        <p style="line-height: 1.5;">
+            Misgina Fitwi<br />
+            <a href="https://adconnect.co.ke" style="color: #4abc4f;
+        text-decoration: none;">Adconnect Team</a><br />
+            Phone: 0790064130
+        </p>
+        <footer style="text-align: center;
+        margin-top: 30px;
+        color: #fff;
+        font-size: 14px;">
+            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
+                Powered By <br /><span style="color: #4abc4f;
+                font-weight: bold;
+                font-size: large;
+                transition: color 0.3s ease;
+                text-decoration: none;">AdConnect</span>
+            </p>
+            <p style="line-height: 1.5;">
+                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
+                text-decoration: none;
+                margin-top: -10px;"></a>
+            </p>
+        </footer>
+    </div>
+</body>
+`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Reminder email sent successfully!');
+    } catch (error) {
+        console.error('Error sending reminder email:', error);
         throw error;
     }
 }

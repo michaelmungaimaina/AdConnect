@@ -42,6 +42,16 @@ db.connect((err) => {
     subject VARCHAR(255) NOT NULL,
     body TEXT NOT NULL
 );
+  `; 
+  
+  const createSampleTemplates = `
+    INSERT INTO email_templates (status, subject, body)
+VALUES
+    ('1ST CONTACT', 'Welcome to Our Service', 'Hello [NAME], we’re glad you joined us! Here’s what you can do next...'),
+    ('2ND CONTACT', 'Still Exploring?', 'Hello [NAME], let’s help you get started with these tips...'),
+    ('3RD CONTACT', 'We Miss You', 'Hi [NAME], we noticed you haven’t been active recently. Here’s what you’re missing...'),
+    -- Add up to 30 statuses with unique content
+    ('30TH CONTACT', 'Final Reminder', 'Hello [NAME], this is your last opportunity to engage with us...');
   `;
   const createTableLeads = `
     CREATE TABLE IF NOT EXISTS clients (

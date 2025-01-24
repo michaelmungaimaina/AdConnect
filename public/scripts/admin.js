@@ -15,16 +15,23 @@ const inputUserAccess = document.getElementById('access');
 const inputUserPassword = document.getElementById('password');
 const inputUserSearch = document.getElementById('searchUserInput');
 const inputLeadSearch = document.getElementById('searchLeadsInput');
+const inputAppointmentSearch = document.getElementById('searchAppointmentInput');
+const inputAppointmentEdit = document.getElementById('appointmentInput');
 
+const textUsernameSession = document.getElementById('usernameSession');
 const textUserPopupHeader = document.getElementById('popupHeaderText');
+const textUserPopupHeaderAppt = document.getElementById('popupHeaderTextAppt');
 const textErrorContainer = document.getElementById('errorMessage');
 const textLoaderText = document.getElementById('loadingText');
+const textTitle = document.getElementById('titleText');
+const textSubTitle = document.getElementById('subtitleText');
 
 const loader = document.getElementById('loader');
 
 const btnClosePopup = document.getElementById('btnClosePopup');
 const btnSubmitUserData = document.getElementById('submitButton');
-const btnCreateUser= document.getElementById('createUserButton');
+const btnCreateUser = document.getElementById('createUserButton');
+const btnReschedule = document.getElementById('btnReschedule');
 
 const sectionUserManagement = document.getElementById('userContentMgt');
 const sectionContactManagement = document.getElementById('aboutContentMgt');
@@ -37,46 +44,134 @@ const sectionCommunicationManagement = document.getElementById('communicationCon
 const sectionDocumentManagement = document.getElementById('documentContentMgt');
 const sectionAppointmentManagement = document.getElementById('appointmentContentMgt');
 
+const userMgt = document.getElementById('userMgt');
+const contentMgt = document.getElementById('contentMgt');
+const aboutMgt = document.getElementById('aboutMgt');
+const videoMgt = document.getElementById('videoMgt');
+const leadMgt = document.getElementById('leadMgt');
+const apptMgt = document.getElementById('apptMgt');
+const crmMgt = document.getElementById('crmMgt');
+const reportMgt = document.getElementById('reportMgt');
+const settingMgt = document.getElementById('settingMgt');
+const workflowMgt = document.getElementById('workflowMgt');
+const commMgt = document.getElementById('commMgt');
+const docsMgt = document.getElementById('docsMgt');
+
 const popupUserMgt = document.getElementById('userPopUp');
+const popupAppointment = document.getElementById('appointmentPopup');
 const popupLoader = document.getElementById('loaderPopup');
+
+const formLogin = document.getElementById('login-form');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const twoWordsPattern = /^\S+\s+\S+/;
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+const dateTimePattern = /^\d{4}-\d{2}-\d{2}, \d{2}\.\d{2} (AM|PM) - \d{2}\.\d{2} (AM|PM)$/;
 
 let isUpdate = false;
 let userIndex = null; // To store the index for updating a user
+let appointmentIndex = null; // To store the index for updating an appointment
 
 let errorMessages = '';
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Fetch when the page loads
-    //fetchUsers();
 
-    fetchLeads();
+    // Fetch when the page loads
+    document.getElementById('adminHero').style.display = 'block';
+    //userManagement();
+    //fetchLeads();
 });
 
 function navigateTo(section) {
-    document.querySelectorAll('.content').forEach(sec => sec.classList.add('hidden'));
-    section.classList.remove('hidden');
+    document.querySelectorAll('#content').forEach(sec => sec.classList.add('.hidden'));
+    section.classList.remove('.hidden');
+}
+function activeClass(nav) {
+    document.querySelectorAll('.admin-sidebar ul').forEach(sec => sec.classList.remove('activ'));
+    nav.classList.add('activ');
 }
 
 function userManagement(){
-    navigateTo(sectionUserManagement);
-    sectionUserManagement.style.height = '100%';
-    sectionContactManagement.style.height = '0%';
-    sectionVideoManagement.style.height = '0%';
-    sectionLeadsManagement.style.height = '0%';
-    sectionReportsManagement.style.height = '0%';
-    sectionSettingsManagement.style.height = '0%';
-    sectionWorkflowsManagement.style.height = '0%';
-    sectionCommunicationManagement.style.height = '0%';
-    sectionDocumentManagement.style.height = '0%';
-    sectionAppointmentManagement.style.height = '0%';
+    sectionUserManagement.style.display = 'flex';
+    sectionContactManagement.style.display = 'none';
+    sectionVideoManagement.style.display = 'none';
+    sectionLeadsManagement.style.display = 'none';
+    sectionReportsManagement.style.display = 'none';
+    sectionSettingsManagement.style.display = 'none';
+    sectionWorkflowsManagement.style.display = 'none';
+    sectionCommunicationManagement.style.display = 'none';
+    sectionDocumentManagement.style.display = 'none';
+    sectionAppointmentManagement.style.display = 'none';
 
+    userMgt.classList.add('activ');
+    contentMgt.classList.remove('activ');
+    aboutMgt.classList.remove('activ');
+    videoMgt.classList.remove('activ');
+    leadMgt.classList.remove('activ');
+    apptMgt.classList.remove('activ');
+    crmMgt.classList.remove('activ');
+    reportMgt.classList.remove('activ');
+    settingMgt.classList.remove('activ');
+    workflowMgt.classList.remove('activ');
+    commMgt.classList.remove('activ');
+    docsMgt.classList.remove('activ');
     //Manage Lists
     fetchUsers();
+}
+function leadsManagement(){
+    sectionUserManagement.style.display = 'none';
+    sectionContactManagement.style.display = 'none';
+    sectionVideoManagement.style.display = 'none';
+    sectionLeadsManagement.style.display = 'flex';
+    sectionReportsManagement.style.display = 'none';
+    sectionSettingsManagement.style.display = 'none';
+    sectionWorkflowsManagement.style.display = 'none';
+    sectionCommunicationManagement.style.display = 'none';
+    sectionDocumentManagement.style.display = 'none';
+    sectionAppointmentManagement.style.display = 'none';
+
+    userMgt.classList.remove('activ');
+    contentMgt.classList.remove('activ');
+    aboutMgt.classList.remove('activ');
+    videoMgt.classList.remove('activ');
+    leadMgt.classList.add('activ');
+    apptMgt.classList.remove('activ');
+    crmMgt.classList.remove('activ');
+    reportMgt.classList.remove('activ');
+    settingMgt.classList.remove('activ');
+    workflowMgt.classList.remove('activ');
+    commMgt.classList.remove('activ');
+    docsMgt.classList.remove('activ');
+
+    fetchLeads();
+}
+function appointmentManagement(){
+    sectionUserManagement.style.display = 'none';
+    sectionContactManagement.style.display = 'none';
+    sectionVideoManagement.style.display = 'none';
+    sectionLeadsManagement.style.display = 'none';
+    sectionReportsManagement.style.display = 'none';
+    sectionSettingsManagement.style.display = 'none';
+    sectionWorkflowsManagement.style.display = 'none';
+    sectionCommunicationManagement.style.display = 'none';
+    sectionDocumentManagement.style.display = 'none';
+    sectionAppointmentManagement.style.display = 'flex';
+
+    userMgt.classList.remove('activ');
+    contentMgt.classList.remove('activ');
+    aboutMgt.classList.remove('activ');
+    videoMgt.classList.remove('activ');
+    leadMgt.classList.remove('activ');
+    apptMgt.classList.add('activ');
+    crmMgt.classList.remove('activ');
+    reportMgt.classList.remove('activ');
+    settingMgt.classList.remove('activ');
+    workflowMgt.classList.remove('activ');
+    commMgt.classList.remove('activ');
+    docsMgt.classList.remove('activ');
+
+    fetchAppointments();
 }
 /**
  * Refreshes the user table
@@ -89,6 +184,88 @@ function refreshUserTable(){
 function refreshLeadsTable(){
     leadList = [];
     fetchLeads();
+}
+
+function refreshAppointmentTable(){
+    appointmentList = [];
+    fetchAppointments();
+}
+
+async function handleLogin() {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessageContainer = document.getElementById('errorMessage');
+
+    if(email === ''){
+        handleErrorMessage('Please Input Email', errorMessageContainer);
+        document.getElementById('email').focus();
+        return;
+    }
+    if(!emailPattern.test(email)){
+        handleErrorMessage('Enter a valid email!', errorMessageContainer);
+        document.getElementById('email').focus();
+        return;
+    }
+    if(password === ''){
+        handleErrorMessage('Please Input password', errorMessageContainer);
+        document.getElementById('email').focus();
+        return;
+    }
+    if(!passwordPattern.test(password)){
+        handleErrorMessage('Enter a valid password!', errorMessageContainer);
+        document.getElementById('password').focus();
+        return;
+    }
+
+    auth = { email, password };
+
+    showLoader();
+    try {
+        // Perform the fetch call
+        const response = await fetch(`${DOMAIN}auth`, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        });
+    
+        // Check if the response is OK
+        if (!response.ok) {
+          // Handle server-side errors (e.g., 401, 400)
+          const errorData = await response.json();
+          console.error('Error:', errorData);
+          alert(errorData.error || 'Invalid email or password.');
+          return;
+        }
+    
+        // Parse JSON response
+        const data = await response.json();
+        console.log('Response Data:', data);
+    
+        // If login is successful
+        alert('Login Successful!');
+        document.getElementById('adminHero').style.display = 'block';
+        document.getElementById('login-page').style.display = 'none';
+    
+        // Update Username
+        if (textUsernameSession) {
+          textUsernameSession.textContent = data.username; // Use the `username` from the server response
+        }
+
+        // Open Session with users loaded
+        userManagement();
+        populateUsers();
+      } catch (error) {
+        // Handle network errors
+        console.error('Network Error:', error);
+        alert('An error occurred while logging in. Please try again.');
+      }
+    hideLoader();
 }
 
 // Function to show the loader
@@ -106,6 +283,7 @@ function showLoader() {
 
 let userList = [];
 let leadList = [];
+let appointmentList = [];
 
 async function fetchUsers() {
     showLoader();
@@ -125,7 +303,26 @@ async function fetchUsers() {
         console.error('Error fetching users messages:', error);
     } finally{
         hideLoader();
-        textLoaderText.textContent = '';
+    }
+}
+
+async function fetchAppointments() {
+    showLoader();
+    textLoaderText.textContent = 'Fetching Appointments. Please Wait!';
+    try {
+        const response = await fetch(`${DOMAIN}appointments`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        appointmentList = await response.json();
+    
+        populateAppointments();
+    } catch (error) {
+        console.error('Error fetching Appointments messages:', error);
+    } finally{
+        hideLoader();
     }
 }
 
@@ -206,9 +403,196 @@ function populateUsers() {
       dataList.appendChild(listItem);
     });
   }
+  
+  function populateAppointments() {
+    const dataList = document.getElementById('appointmentList');
+    dataList.innerHTML = ''; // Clear existing content
+  
+    if (appointmentList.length === 0) {
+      dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Captured Appointments Available!</p>';
+      return;
+    }
+  
+    console.log(appointmentList);
+    appointmentList.forEach((item, index) => {
+      const listItem = document.createElement('div');
+      listItem.classList.add('h-layout', 'item-content');
+      listItem.innerHTML = `
+      <div class="h-layout item-content" onclick="clicked(${index})">
+        <p class="item-appointment-id">${item.clientId}</p>
+        <p class="item-appointment-name">${item.name}</p>
+        <p class="item-appointment-email">${item.email}</p>
+        <p class="item-appointment-phone">${item.phone}</p>
+        <p class="item-appointment-location">${item.location}</p>
+        <p class="item-appointment-date">${item.appointmentDate}</p>
+        <p class="item-appointment-time">${item.appointmentTime}</p>
+        <p class="item-appointment-type">${item.appointmentType}</p>
+        <p class="item-appointment-status">${item.appointmentStatus}</p>
+        <p class="item-appointment-notes" style="cursor: pointer" onclick="previewNotes(${index})">${item.appointmentNotes}</p>
+        <i id="apptReschedule" onclick="appointmentReschedule(${index})" class="fa fa-calendar" aria-hidden="true"></i>
+        <i id="apptReschedule" onclick="appointmentReminder(${index})" class="fa fa-clock" aria-hidden="true"></i>
+        <i id="leadSendMailBtn" onclick="appointmentStartMeeting(${index})" class="fa fa-video-camera" aria-hidden="true"></i>
+        <i id="leadUnsubscribeBtn" onclick="appointmentUpdateStatus(${index})" class="fa fa-check-circle" aria-hidden="true"></i>
+        <i id="leadDeleteBtn" onclick="deleteAppointment(${index})" class="fa fa-trash" aria-hidden="true"></i>
+        </div>
+      `;
+      dataList.appendChild(listItem);
+    });
+  }
 
   function clicked(index){
     console.log(`Item at position ${index} clicked.`);
+  }
+
+  function previewNotes(index){
+    textSubTitle.style.visibility = 'collapse';
+    inputAppointmentEdit.style.visibility = 'collapse';
+    btnReschedule.style.visibility = 'collapse';
+    textUserPopupHeaderAppt.style.visibility = 'visible';
+    textTitle.style.visibility = 'visible';
+
+    let name = (appointmentList[index].name).split(' ');
+    textUserPopupHeaderAppt.textContent = `Message From ${name[0]}`;
+    textTitle.textContent = appointmentList[index].appointmentNotes;
+
+    openAppointmentPopup();
+  }
+
+  function appointmentReschedule(index){
+    textSubTitle.style.visibility = 'visible';
+    inputAppointmentEdit.style.visibility = 'visible';
+    btnReschedule.style.visibility = 'visible';
+    textUserPopupHeaderAppt.style.visibility = 'visible';
+    textTitle.style.visibility = 'collapse';
+
+    textUserPopupHeaderAppt.textContent = `Reschedule Meeting for ${appointmentList[index].name.split(' ')[0]}`;
+    inputAppointmentEdit.value = appointmentList[index].appointmentTime;
+
+    appointmentIndex = index;
+    openAppointmentPopup();
+  }
+
+  async function rescheduleMeeting(){
+    const errorContainer = document.getElementById('errorMessage');
+    if (inputAppointmentEdit.value === ''){
+        handleErrorMessage('Input Date and Time', errorContainer);
+        inputAppointmentEdit.focus();
+        return;
+    }
+    if(!dateTimePattern.test(inputAppointmentEdit.value.trim)){
+        handleErrorMessage('Format Date to \'2025-01-20, 01.30 PM - 02.00 PM\'', errorContainer);
+        inputAppointmentEdit.focus();
+        return;
+    }
+
+    try {
+        textLoaderText.textContent = 'Rescheduling Meeting. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}rescheduleMeeting`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointmentList[appointmentIndex]),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            appointmentList[index].appointmentDate = result.appointment.appointmentDate;
+            appointmentList[index].appointmentTime = result.appointment.appointmentTime;
+            populateAppointments();
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to Reschedule Meeting. Please try again.');
+    } finally{
+        hideLoader();
+    }
+  }
+
+  async function appointmentReminder(index){
+    try {
+        textLoaderText.textContent = 'Sending Reminder. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}reminder-email`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointmentList[index]),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            populateAppointments();
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to send reminder. Please try again.');
+    } finally{
+        hideLoader();
+    }
+  }
+
+  function appointmentStartMeeting(index){
+    window.open(appointmentList[index].meetingLink);
+  }
+
+  async function appointmentUpdateStatus(index){
+    try {
+        textLoaderText.textContent = 'Updating Meeting Status. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}appointments/${appointmentList[index].clientId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({status:'DONE'}),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            appointmentList[index].appointmentStatus = 'DONE';
+            populateAppointments();
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to Update Status. Please try again.');
+    } finally{
+        hideLoader();
+    }
+  }
+
+  async function deleteAppointment(index){
+    if (confirm('Are you sure you want to delete this Appointment?')) {
+        try {
+            textLoaderText.textContent = 'Deleting Appointment. Please Wait...';
+            showLoader();
+            const response = await fetch(`${DOMAIN}appointments/${appointmentList[index].clientIs}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete Appointment');
+            errorMessages = 'Appointment deleted successfully';
+
+            textErrorContainer.style.color = 'white';
+            textErrorContainer.style.backgroundColor = '#4abc5061';
+            handleErrorMessage(errorMessages, textErrorContainer);
+            textErrorContainer.style.color = 'rgb(236, 2, 2)';
+            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+            appointmentList.splice(index, 1);
+            populateAppointments();
+        } catch (error) {
+            console.error('Error deleting Appointment:', error);
+            errorMessages = 'Failed to delete the Appointment. Please try again.';
+            handleErrorMessage(errorMessages, textErrorContainer);
+        } finally{
+            hideLoader();
+        }
+      }
   }
 
   async function previewEmailTemplate(index) {
@@ -624,16 +1008,37 @@ inputLeadSearch.addEventListener('input', function (event) {
 });
 
 /**
+ * Filter leads
+ */
+inputAppointmentSearch.addEventListener('input', function (event) {
+    const filter = event.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#appointmentList .item-content');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+/**
  * Opens the user popup
  */
 function openUserPopup(){
     popupUserMgt.style.height ='100%';
+}
+function openAppointmentPopup(){
+    popupAppointment.style.height ='100%';
 }
 /**
  * Close Popups
  */
 function closePopup(){
     popupUserMgt.style.height ='0%';
+    popupAppointment.style.height ='0%';
 }
 
   /**

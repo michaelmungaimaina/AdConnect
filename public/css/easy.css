@@ -515,6 +515,23 @@ body main .page-sec {
 .fa-sign-out{
     color: rgb(255, 157, 0);
 }
+.fa-clock{
+    color: rgb(0, 255, 255);
+}
+.fa-calendar{
+    color: chocolate;
+}
+.fa-video-camera{
+    color: #0e00a8;
+}
+.fa-check-circle{
+    color: #009a08;
+}
+
+.fa-video-camera:hover,
+.fa-calendar:hover,
+.fa-clock:hover,
+.fa-check-circle:hover,
 .fa-sign-out:hover,
 .fa-envelope-open:hover,
 .fa-envelope:hover,
@@ -559,4 +576,10 @@ body main .page-sec {
 #leadsContentMgt .fa-envelope-open:hover #leadsContentMgt .tooltip {
     visibility: visible;
     opacity: 1; /* Fade-in effect */
+}
+
+.activ{
+    width: 100%;
+    color: #ffffff;
+    background: #302E2C;
 }
