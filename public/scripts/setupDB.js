@@ -24,7 +24,28 @@ db.connect((err) => {
     console.log('Connected to MySQL database.');
 
     const createDbQuery = 'CREATE DATABASE IF NOT EXISTS adconnect';
-    const createTableUsers = `
+    const createTableABout = `
+    CREATE TABLE IF NOT EXISTS about (
+      id varchar(24) PRIMARY KEY ,
+      title TEXT NOT NULL,
+      introduction TEXT NOT NULL,
+      experience TEXT NOT NULL,
+      mission TEXT NOT NULL,
+      status VARCHAR(10) NOT NULL DEFAULT 'N/ACTIVE',
+      icon byte NOT NULL,
+      updated_at VARCHAR(24) NOT NULL,
+    );
+  `; 
+  
+  const createTableVideo = `
+    CREATE TABLE IF NOT EXISTS video (
+      id varchar(24) PRIMARY KEY ,
+      video byte NOT NULL,
+      status VARCHAR(10) NOT NULL DEFAULT 'N/ACTIVE',
+      updated_at VARCHAR(24) NOT NULL,
+    );
+  `; 
+  const createTableUsers = `
     CREATE TABLE IF NOT EXISTS users (
       id varchar(24) PRIMARY KEY ,
       name VARCHAR(255) NOT NULL,
