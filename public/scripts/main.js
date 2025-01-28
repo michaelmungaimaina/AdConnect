@@ -1,7 +1,8 @@
+// Load the main script
+
 console.log("main.js is loaded");
 
-const APP_API_URL= 'https://adconnect.co.ke/';
-
+//let DOMAIN_NAME = 'https://adconnect.co.ke/';
 let DOMAIN_NAME = 'http://127.0.0.1:3000/';
 let API_PATH = 'api/';
 const DOMAIN = `${DOMAIN_NAME}${API_PATH}`;
@@ -36,6 +37,7 @@ const sidepanel = document.getElementById('mySidePanel');
 const sectionApplyConsultation = document.getElementById('applicationFormSection');
 
 const sectionAppointmentApplication = document.getElementById('appointmentView');
+const sectionTestimonial = document.getElementById('testimonialSection');
 const btnCloseAppointmentApplication = document.getElementById('btnCloseApointment');
 const navbarTogler = document.getElementById('navbarTogler');
 const searchBarContainer = document.getElementById('searchBar');
@@ -65,10 +67,43 @@ const courseService = document.getElementById('courses');
 const developmentService = document.getElementById('development');
 const sectionPrivacyPolicy = document.getElementById('privacyPolicy');
 const btnClosePrivacyPolicy = document.getElementById('btnClosePrivacyPolicy');
+const btnLeftApplication = document.getElementById("btnLeftApplication");
+const btnRightApplication = document.getElementById("btnRightApplication");
+// Select the loader element
+const loader = document.getElementById('loader');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^(?:\+254|0)(7|1)\d{8}$/;
 const twoWordsPattern = /^\S+\s+\S+/;
+
+// Define the UserApplication object
+const UserApplicationObject = {
+    firstName: "",
+    lastName: "",
+    emailAddress: "",
+    phoneNumber: "",
+    occupation: "",
+    reason: "",
+    goal: "",
+    investment: ""
+};
+
+const AppointmentBooking = {
+    clientId: "",
+    clientName: "", 
+    clientEmail: "", 
+    clientPhone: "", 
+    meetingType: "",
+    meetingDate: "",
+    meetingTime: "",
+    meetingLocation: "",
+    meetingStatus: "",
+    meetingNotes: "",
+    meetingLink: "",
+    created_at: "",
+    updated_at: ""
+};
+
 
 // Attach event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -98,6 +133,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFooterFAQs.addEventListener('click', openFAQs);
         btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
         btnClosePrivacyPolicy.addEventListener('click', closePrivacyPolicy);
+        btnLeftApplication.addEventListener('click', openAppointmentBooking);
+
+        // Start the spinner
+        setInterval(updateTestimonials, 10000);
+
+        // Load the first testimonials
+        updateTestimonials();
     }
     if (pageId === 'contactUsPage') {
         navbarTogler.addEventListener('click', openNav);
@@ -517,6 +559,7 @@ function openValueVideo() {
         window.history.pushState({}, '', newUrl);
 
         sectionMainhero.style.display = "none"
+        sectionTestimonial.style.display = "none"
     } else {
         console.error('Error: Section Value Video not found')
     }
@@ -626,13 +669,13 @@ function closeLeadCapture() {
     }
 }
 
-function openAppointmentBooking() {
+async function openAppointmentBooking() {
     if (sectionAppointmentApplication) {
         sectionAppointmentApplication.style.height = '100%';
         const newUrl = `${baseUrl.slice(0, 0)}?appointment-booking=true`;
         window.history.pushState({}, '', newUrl);
 
-        appointmentAction()
+        await appointmentAction();
     }
 }
 
@@ -693,6 +736,17 @@ $('.video').each(function () {
     this.setAttribute('controlsList', 'nodownload'); // Disable download option
 });
 
+// Function to show the loader
+function showLoader() {
+  loader.classList.remove('hidden');
+}
+
+// Function to hide the loader
+function hideLoader() {
+  loader.classList.add('hidden');
+}
+
+let isSubmitting = false;
 
 /**
  * Input validation for Lead Capture
@@ -700,6 +754,10 @@ $('.video').each(function () {
  * @returns focus for the input field, end of function
  */
 async function submitLeads() {
+    event.preventDefault(); // Prevents default form submission
+    if (isSubmitting) return; // Prevent duplicate submissions
+    isSubmitting = true;
+
     const name = document.getElementById('name').value.toUpperCase();
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value.toUpperCase();
@@ -750,7 +808,8 @@ async function submitLeads() {
 
     // Submit data to Database and send an Email to the client
     try {
-        const response = await fetch(`${APP_API_URL}api/clients`, {
+        showLoader();
+        const response = await fetch(`${DOMAIN}clients`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -763,14 +822,25 @@ async function submitLeads() {
                 clientPhone: phone,
                 clientCompany: company || 'N/A',
                 clientStreet: street || 'N/A',
-                clientCity: city || 'N/A',
+                clientLocation: city || 'N/A',
                 clientProvince: province || 'N/A',
-                clientZip: zip || 'N/A',
+                clientZipCode: zip || 'N/A',
+                clientSource : 'WEBSITE',
+                clientStatus : '1st CONTACT',
+                clientSubScription : 'SUBSCRIBED'
             }),
         });
-    
+
+        // Set values for the UserApplicationObject
+        UserApplicationObject.firstName = name.split(' ')[0];
+        const nameParts = name.split(' ');
+        UserApplicationObject.lastName = nameParts.slice(1).join(' ');
+        UserApplicationObject.emailAddress = email;
+        UserApplicationObject.phoneNumber = phone;
+
         if (response.ok) {
             let result;
+
             try {
                 result = await response.json(); // Try parsing JSON
             } catch (error) {
@@ -785,20 +855,30 @@ async function submitLeads() {
             handleErrorMessage(result.message, errorMessage);
     
             setTimeout(async () => {
-                errorMessage.style.color = 'rgb(236, 2, 2)';
-                errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
                 // Call the sendWelcomeEmail function here
                 try {
                     await sendWelcomeEmail(name, email);
                     console.log('Welcome email sent successfully!');
+
+                    // Set values for the input texts in the application form
+                    const fname = document.getElementById('firstNameInput');
+                    fname.value = UserApplicationObject.firstName;
+                    const lname = document.getElementById('lastNameInput');
+                    lname.value = UserApplicationObject.lastName;
+                    const emailA = document.getElementById('emailAddressInput');
+                    emailA.value = UserApplicationObject.emailAddress;
+                    const phone = document.getElementById('phoneInput');
+                    phone.value = UserApplicationObject.phoneNumber;
                 } catch (emailError) {
+                    errorMessage.style.color = 'rgb(236, 2, 2)';
+                    errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
                     console.error('Error sending welcome email:', emailError);
                     handleErrorMessage('Failed to send welcome email', errorMessage);
                 }
                 openThankYouPage();
             }, 2000);
         } else {
-            const errorText = await response.text(); // Capture text response if any
+            const { error: errorText } = await response.json(); // Capture error text from response
             console.error('Error Response:', errorText || 'Unknown error occurred');
             handleErrorMessage(`Error: ${errorText || 'An error occurred'}`,errorMessage);
         }
@@ -806,7 +886,8 @@ async function submitLeads() {
         console.error('Error:', error);
         handleErrorMessage('Failed to create Lead', errorMessage);
     }
-    return true;
+    hideLoader();
+    isSubmitting = false; // Reset the state
 }
 
 /**
@@ -829,7 +910,7 @@ const getCurrentDatetime = () => {
 // Function to send a welcome email
 async function sendWelcomeEmail(clientName, clientEmail) {
     try {
-        const response = await fetch(`${APP_API_URL}api/send-welcome-email`, {
+        const response = await fetch(`${DOMAIN}send-welcome-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -888,11 +969,8 @@ const forms = [
     document.getElementById("occupation"),
     document.getElementById("reason"),
     document.getElementById("goal"),
-    document.getElementById("investment"),
+    document.getElementById("investment")
 ];
-
-const btnLeftApplication = document.getElementById("btnLeftApplication");
-const btnRightApplication = document.getElementById("btnRightApplication");
 
 const surveyData = {};
 let currentStep = 0;
@@ -907,7 +985,7 @@ function initializeForm() {
     btnRightApplication.textContent = "NEXT";
 }
 
-function goToNextStep() {
+async function goToNextStep() {
     const currentForm = forms[currentStep];
     const input = currentForm.querySelector("input, select");
 
@@ -961,7 +1039,7 @@ function goToNextStep() {
     // Switch case for structured validation
     switch (input.id) {
         case 'firstNameInput':
-            if (input.value.trim().length <= 4) {
+            if (input.value.trim().length < 3) {
                 errorMessages = 'Your Name is too short! Enter a valid Name.';
                 handleErrorMessage(errorMessages, errorMessageContainer);
                 input.focus();
@@ -972,7 +1050,7 @@ function goToNextStep() {
             break;
 
         case 'lastNameInput':
-            if (input.value.trim().length < 4) {
+            if (input.value.trim().length < 3) {
                 errorMessages = 'Your Name is too short! Enter a valid Name.';
                 handleErrorMessage(errorMessages, errorMessageContainer);
                 input.focus();
@@ -1090,24 +1168,59 @@ function goToNextStep() {
     if (currentStep === forms.length) {
         console.log("Survey completed. Data submitted:", surveyData);
         //API call
-        /**
-         * submit Data to DB
-         *
-        fetch('/submitApplication', {
+        /// Submit data to Database and send an Email to the client
+    try {
+        showLoader();
+        const response = await fetch(`${DOMAIN}marketing-strategy-applications`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(UserApplicationObject),
-        })
-            .then(response => response.json())
-            .then(data => console.log('Success:', data))
-            .catch(error => console.error('Error:', error));*/
-
-
-        // Close the application window
-        sectionApplyConsultation.style.transform = 'translateY(-100%)';
-        openAppointmentBooking();
+            //body: JSON.stringify(new Client(getCurrentDatetime(), name, email, phone, company || 'N/A', city || 'N/A', street || 'N/A', province || 'N/A', zip || 'N/A')),
+            body: JSON.stringify({
+                applicantFName: UserApplicationObject.firstName,
+                applicantLName: UserApplicationObject.lastName,
+                email: UserApplicationObject.emailAddress,
+                phone: UserApplicationObject.phoneNumber,
+                occupation: UserApplicationObject.occupation,
+                marketTriggers: UserApplicationObject.reason,
+                strategyGoal: UserApplicationObject.goal,
+                strategyInvestment: UserApplicationObject.investment,
+                status: 'N/SOLVED'
+            }),
+        });
+    
+        if (response.ok) {
+            let result;
+            try {
+                result = await response.json(); // Try parsing JSON
+            } catch (error) {
+                console.warn('Empty or non-JSON response, using fallback');
+                result = { message: 'Form submitted successfully' }; // Default fallback message
+            }
+    
+            console.log('Response:', result);
+            errorMessageContainer.style.color = 'white';
+            errorMessageContainer.style.backgroundColor = '#4abc5061';
+            errorMessageContainer.style.display = 'block';
+            handleErrorMessage(result.message, errorMessageContainer);
+    
+            setTimeout(async () => {
+                // Close the application window
+                sectionApplyConsultation.style.transform = 'translateY(-100%)';
+                openAppointmentBooking();
+            }, 2000);
+        } else {
+            const { error: errorText } = await response.json(); // Capture error text from response
+            console.error('Error Response:', errorText || 'Unknown error occurred');
+            handleErrorMessage(`Error: ${errorText || 'An error occurred'}`,errorMessageContainer);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        handleErrorMessage('Failed to create Lead', errorMessageContainer);
+    }
+    hideLoader();
+    isSubmitting = false; // Reset the state
     }
 
 }
@@ -1135,7 +1248,7 @@ const dateChanged = false;
  * Sets a default date and disables Sundays
  * Calls the Action for booking
  */
-function appointmentAction() {
+async function appointmentAction() {
     const fullNameInput = document.getElementById('appointeeName');
     const emailInput = document.getElementById('appointeeEmail');
     const phoneInput = document.getElementById('appointeePhone');
@@ -1177,7 +1290,7 @@ function appointmentAction() {
     let errorMessage = '';
 
     // Disable Sundays and Kenyan holidays
-    dateInput.addEventListener('change', function () {
+    dateInput.addEventListener('change', async function () {
         const selectedDate = new Date(this.value);
         const day = selectedDate.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
         const formattedDate = this.value;
@@ -1187,7 +1300,6 @@ function appointmentAction() {
             errorMessage = 'Sundays are not available for appointments. Please select another date.';
             handleErrorMessage(errorMessage, errorMessageContainer);
             this.value = ''; // Clear the invalid date
-            dateChanged = false;
             return;
         }
 
@@ -1196,30 +1308,58 @@ function appointmentAction() {
             errorMessage = 'The selected date falls on a holiday. Please choose another date.';
             handleErrorMessage(errorMessage, errorMessageContainer)
             this.value = ''; // Clear the invalid date
-            dateChanged = false;
             return;
         }
-        // Date changed to an acceptable value
-        dateChanged = true;
-    });
 
-    switch (dateChanged) {
-        case true:
-            checkAvailableDates();
-            break;
-        default:
-            handleErrorMessage('Select an Active Date', errorMessageContainer)
-    }
+        // Select all `.child` elements inside `.time-layout`
+        const children = document.querySelectorAll('.time-layout .child');
+
+        // Iterate over each element and reset the styles
+        children.forEach(child => {
+            child.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0)';
+            child.style.borderColor = 'rgb(125, 132, 137)';
+        });
+
+        await checkAvailableDates(dateInput.value);
+    });
 
 }
 
-function checkAvailableDates() {
+// Get appointments for the selected Date
+const getAppointmentsForDate = async (date) => {
+    const errorMessageContainer = document.getElementById('appointmentErrorMessage');
+    let list = [];
+    try {
+        // Show loader while fetching data
+        showLoader();
+
+        try {
+            const response = await fetch(`${DOMAIN}appointments-by-date/${date}`);
+            list = await response.json(); // Parse the response as JSON
+            console.log("Fetched ratings:", list); // Debugging
+            return list.appointmentTime || [];
+        } catch (error) {
+            console.error("Error fetching ratings:", error);
+            handleErrorMessage("Failed to fetch ratings", errorMessageContainer);
+        }
+    } catch (error) {
+        // Handle fetch/network errors
+        console.error('Fetch Error:', error);
+        handleErrorMessage('Failed to retrieve appointment times', errorMessageContainer);
+    } finally {
+        // Hide the loader
+        hideLoader();
+    }
+};
+
+
+async function checkAvailableDates(selectedDate) {
     const timeSlots = [
         { id: 'eit', time: '08.30 AM - 09.00 AM' },
         { id: 'nine', time: '09.15 AM - 09.45 AM' },
         { id: 'ten', time: '10.15 AM - 10.45 AM' },
         { id: 'eleven', time: '11.00 AM - 11.30 AM' },
-        { id: 'telve', time: '11.45 AM - 12.15 PM' },
+        { id: 'twelve', time: '11.45 AM - 12.15 PM' },
         { id: 'noon', time: '12.30 PM - 01.00 PM' },
         { id: 'one', time: '01.30 PM - 02.00 PM' },
         { id: 'two', time: '02.15 PM - 02.45 PM' },
@@ -1238,15 +1378,26 @@ function checkAvailableDates() {
     ];
 
     // Example of booked time slots, fetched from database
-    const bookedTimes = ['eit', 'two', 'six'];
+    //const bookedTimes = ['eit', 'two', 'six'];
+    const bookedTimes = await getAppointmentsForDate(selectedDate);
+    console.log('Booked Times:', bookedTimes);
+    // Extract the appointment times into an array
+    const bookedTimesArray = bookedTimes.map(item => item.appointmentTime);
 
     timeSlots.forEach(slot => {
+        console.log('Checking element for ID:', slot.id);
         const element = document.getElementById(slot.id);
-        const child = element.querySelector('p');
-        if (bookedTimes.includes(slot.id)) {
+        console.log('Element:', element);
+
+        if (!element) {
+            console.warn(`Element not found for ID: ${slot.id}`);
+            return; // Skip this iteration
+        }
+        //const child = element.querySelector('p');
+        if (bookedTimesArray.includes(slot.time)) {
             element.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0.9)';
             element.style.borderColor = 'rgb(251, 150, 125)';
-            child.style.color = 'rgb(251, 150, 125)';
+            //child.style.color = 'rgb(251, 150, 125)';
         } else {
             //element.classList.add('available'); 
             element.addEventListener('click', () => selectTime(slot.time));
@@ -1255,21 +1406,31 @@ function checkAvailableDates() {
 }
 
 function selectTime(time) {
-    dateSelected = true;
     // Display Date Selected
+    console.log(`You selected: ${formatTimeString(time)}`);
     errorMessage.style.color = 'white';
     errorMessage.style.backgroundColor = '#4abc5061';
     errorMessage.style.display = 'block';
     errorMessages = `You selected: ${time}`;
     handleErrorMessage(errorMessages, errorMessage);
-    AppointmentBooking.time = time;
+    AppointmentBooking.meetingTime = formatTimeString(time);
     // Send email or make an API call to confirm the booking 
+}
+
+// Function to format the time string
+function formatTimeString(time) {
+    const parts = time.split(' ');
+    if (parts.length === 4) {
+        // Join the first two parts, insert " - ", and add the last two parts
+        return `${parts[0]} ${parts[1]} - ${parts[2]} ${parts[3]}`;
+    }
+    return time; // Return the original string if it doesn't match the expected format
 }
 
 /**
  * Method for submitting appointment data and launch the thank you page
  */
-function submitAppointMent() {
+async function submitAppointMent() {
     // Perform Checks(Validation) and Open a Thank you page
 
     const fullNameInput = document.getElementById('appointeeName');
@@ -1311,7 +1472,7 @@ function submitAppointMent() {
         dateInput.focus();
         return;
     }
-    if (!dateSelected) {
+    if (AppointmentBooking.meetingTime === '') {
         handleErrorMessage('Select your appointment time!', errorMessageContainer);
         return;
     }
@@ -1320,18 +1481,139 @@ function submitAppointMent() {
         messageInput.focus();
         return;
     }
-    const date = new Date(dateInput.value); // Ensure the date is valid 
+
+    const date = new Date(dateInput.value);
     if (!isNaN(date.getTime())) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
         //Store Values
-        AppointmentBooking.date = formattedDate;
+        AppointmentBooking.meetingDate = formattedDate;
         console.log(`Formatted Date: ${formattedDate}`);
     } else {
         handleErrorMessage('Invalid date value', errorMessageContainer);
     }
 
-    openAppointmentBookingThankYouPage();
+    AppointmentBooking.clientName = fullNameInput.value;
+    AppointmentBooking.clientEmail = emailInput.value;
+    AppointmentBooking.clientPhone = phoneInput.value;
+    AppointmentBooking.clientMessage = messageInput.value;
+    AppointmentBooking.meetingDate = dateInput.value;
+    //AppointmentBooking.meetingTime = AppointmentBooking.meetingTime;
+    AppointmentBooking.meetingLocation = locationInput.value;
+
+    // Get the time range in 24-hour format
+    const { startTime24, endTime24 } = convertToTimeRange(AppointmentBooking.meetingTime);
+
+    const startDateTime = `${AppointmentBooking.meetingDate} ${startTime24}`;
+const endDateTime = `${AppointmentBooking.meetingDate} ${endTime24}`;
+
+    // Get the Google Meet link for the appointment
+    AppointmentBooking.meetingLink = await getGoogleMeetLink('Adconnect Online Consultation', `${startDateTime}`, `${endDateTime}`);
+
+    // Send the data to the backend API
+    showLoader();
+    try {
+        const response = await fetch(`${DOMAIN}appointments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Make sure you're sending JSON data
+            },
+            body: JSON.stringify({
+                clientName: AppointmentBooking.clientName,
+                clientEmail: AppointmentBooking.clientEmail,
+                clientPhone: AppointmentBooking.clientPhone,
+                appointmentNotes: AppointmentBooking.clientMessage,
+                appointmentDate: AppointmentBooking.meetingDate,
+                appointmentTime: AppointmentBooking.meetingTime,
+                clientLocation: AppointmentBooking.meetingLocation,
+                meetingLink: AppointmentBooking.meetingLink,
+                appointmentType: 'Online Consultation',
+                appointmentStatus: 'PENDING'
+        }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Display success message
+            errorMessageContainer.style.color = 'white';
+            errorMessageContainer.style.backgroundColor = '#4abc5061';
+            errorMessageContainer.style.display = 'block';
+            errorMessages = `Booking Successful!`;
+            handleErrorMessage(errorMessages, errorMessageContainer);
+
+            // Send Booking Email
+            await sendBookingEmail(AppointmentBooking.clientName, AppointmentBooking.clientEmail, formatDate(AppointmentBooking.meetingDate), AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
+            await sendBookingReactionEmail(AppointmentBooking.clientName, formatDate(AppointmentBooking.meetingDate), AppointmentBooking.meetingTime, AppointmentBooking.meetingLocation, AppointmentBooking.clientMessage, AppointmentBooking.meetingLink);
+
+            // Open the thank you page
+            openAppointmentBookingThankYouPage();
+        } else {
+            // Display error message
+            handleErrorMessage(result.error, errorMessageContainer);
+        }
+    } catch (error) {
+        // Handle any network or server errors
+        handleErrorMessage('An error occurred while booking the appointment.', errorMessageContainer);
+        console.error('Error:', error);
+    }
+    hideLoader();
+}
+
+function convertToTimeRange(timeRange) {
+    // Split the input time range into start and end times
+    const [startTime, endTime] = timeRange.split(' - ');
+
+    // Function to convert time in "hh.mm AM/PM" format to "HH:mm:ss"
+    function convertTimeTo24HourFormat(time) {
+        const [timeString, period] = time.split(' ');
+        let [hours, minutes] = timeString.split('.').map(Number);
+        
+        // Convert hours and minutes into a 24-hour format
+        if (period === 'PM' && hours !== 12) {
+            hours += 12;  // Convert PM to 24-hour format (12 PM is 12)
+        } else if (period === 'AM' && hours === 12) {
+            hours = 0;  // Convert 12 AM to 00:xx
+        }
+
+        // Format the time as HH:mm:ss
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    }
+
+    // Convert both start and end times
+    const startTime24 = convertTimeTo24HourFormat(startTime);
+    const endTime24 = convertTimeTo24HourFormat(endTime);
+
+    return { startTime24, endTime24 };
+}
+
+async function getGoogleMeetLink(eventTitle, startDateTime, endDateTime) {
+    try {
+        const response = await fetch(`${DOMAIN}create-meet-link`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                eventTitle: eventTitle,
+                startDateTime: startDateTime,
+                endDateTime: endDateTime,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Google Meet Link:', data.meetLink);
+            return data.meetLink;  // Use the meet link as needed
+        } else {
+            const errorData = await response.json();
+            console.error('Error:', errorData.error);
+            return null;
+        }
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        return null;
+    }
 }
 
 
@@ -1354,11 +1636,11 @@ function openAppointmentBookingThankYouPage() {
 
 function actionOnApptThankYouPage() {
     const br = document.createElement('br');
-    if (txtMeetingDate) txtMeetingDate.textContent = `${AppointmentBooking.date}`;
+    if (txtMeetingDate) txtMeetingDate.textContent = `${formatDate(AppointmentBooking.meetingDate)}`;
     txtMeetingDate.appendChild(br);
-    const timeText = document.createTextNode(`${AppointmentBooking.time}`);
+    const timeText = document.createTextNode(`${AppointmentBooking.meetingTime}`);
     txtMeetingDate.appendChild(timeText);
-    console.log(`Success ${AppointmentBooking.date} \n${AppointmentBooking.time}`);
+    console.log(`Success ${AppointmentBooking.meetingDate} \n${AppointmentBooking.meetingTime}`);
 }
 
 /**
@@ -1385,3 +1667,189 @@ document.querySelectorAll('.time-layout .grey-bordered').forEach((slot) => {
         }
     });
 });
+
+function formatDate(inputDate) {
+    // Parse the input date string
+    const date = new Date(inputDate);
+
+    // Array for day names and month names
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Get the day, date, month, and year
+    const dayName = days[date.getDay()];
+    const day = date.getDate();
+    const monthName = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    // Return the formatted date
+    return `${dayName}, ${day} ${monthName}, ${year}`;
+}
+
+// Function to send a booking email
+async function sendBookingEmail(clientName, clientEmail, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    try {
+        const response = await fetch(`${DOMAIN}send-booking-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                clientName: clientName,
+                clientEmail: clientEmail,
+                meetingDate: meetingDate,
+                meetingTime: meetingTime,
+                meetingLocation: meetingLocation,
+                meetingAgenda: meetingAgenda,
+                meetingLink: meetingLink,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to send email');
+        }
+
+        console.log('Email sent successfully');
+    } catch (error) {
+        console.error('Error while sending booking email:', error);
+        throw error;
+    }
+}
+
+// Function to send a booking reaction email
+async function sendBookingReactionEmail(clientName, meetingDate, meetingTime, meetingLocation, meetingAgenda, meetingLink) {
+    try {
+        const response = await fetch(`${DOMAIN}send-booking-reaction-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                clientName: clientName,
+                meetingDate: meetingDate,
+                meetingTime: meetingTime,
+                meetingLocation: meetingLocation,
+                meetingAgenda: meetingAgenda,
+                meetingLink: meetingLink,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to send email');
+        }
+
+        console.log('Email sent successfully');
+    } catch (error) {
+        console.error('Error while sending booking email:', error);
+        throw error;
+    }
+}
+
+
+const testimonials = [
+    {
+        image: "../resources/elixir.png",
+        clientName: "Irene",
+        companyName: "Elixir Salon & Spa",
+        text: "The team at Adconnect delivered an exceptional website for my salon and spa. From the initial consultation to the final launch, they ensured every detail was addressed. Their ability to combine functionality with modern design is unmatched, and the site has significantly boosted my online presence.",
+        stars: 5
+    },
+    {
+        image:"../resources/pic-back.png",
+        clientName: "John Kamau",
+        companyName: "Songa",
+        text: "Our company required a custom web application to streamline internal operations, and Adconnect delivered beyond expectations. Their developers were thorough, responsive, and ensured the application was intuitive and scalable.",
+        stars: 4
+    },
+    {
+        image: "../resources/pic-back.png",
+        clientName: "Ladybird",
+        companyName: "Nuloft Salon and Spa",
+        text: "What I love most about Adconnect is their reliability. They don’t just finish a project and disappear; they continue to provide support and guidance long after the site is live. Their maintenance and updates have kept my site running flawlessly.",
+        stars: 5
+    },
+    {
+        image: "../resources/pic-back.png",
+        clientName: "Michael Maina",
+        companyName: "Oriss Company",
+        text: "I was skeptical about SEO at first, but Adconnect changed my perspective. Within four months, my website ranked on the first page of Google for several key search terms, which has directly translated into more inquiries and sales.",
+        stars: 5
+    },
+    {
+        image: "../resources/ricosam.PNG",
+        clientName: "Eng. James",
+        companyName: "Ricosam",
+        text: "Our project involved integrating multiple third-party APIs, which was tricky. Adconnect not only handled it flawlessly but also optimized the process to ensure fast load times. Their technical expertise is impressive.",
+        stars: 5
+    },
+    {
+        image: "../resources/pic-back.png",
+        clientName: "Dr. Sam Smith",
+        companyName: "Real Estate",
+        text: "Their digital marketing campaigns transformed my business. From Google Ads to social media, their strategies brought measurable results. My online store saw a 200% increase in sales within the first six months of working with them.",
+        stars: 4
+    }
+];
+
+// HTML elements for the testimonials
+const testimonial1 = document.getElementById('testmonial1');
+const testimonial2 = document.getElementById('testmonial2');
+
+let currentIndex = 0;
+
+        function generateStars(container, starCount) {
+            // Select the div where the stars will be appended
+            const starDiv = container;
+            // Clear any existing content
+            starDiv.innerHTML = '';
+        
+            // Loop to create and append star images
+            for (let i = 0; i < starCount; i++) {
+                const img = document.createElement('img'); 
+                img.src = '../resources/starr.png'; 
+                img.alt = 'Star';
+                img.style.width = '20px'; 
+                img.style.height = '20px'; 
+                img.style.marginRight = '5px'; 
+        
+                starDiv.appendChild(img); // Append the image to the starIcon div
+            }
+        }
+
+
+        // Function to update the testimonials
+        function updateTestimonials() {
+            const testimonial1Data = testimonials[currentIndex];
+            const testimonial2Data = testimonials[(currentIndex + 1) % testimonials.length];
+
+                
+            // Update the first testimonial
+            testimonial1.classList.remove('active');
+            setTimeout(() => {
+                testimonial1.querySelector('#clientIcon').style.backgroundImage = `linear-gradient(90deg, rgba(46, 35, 1, 0.0) 100%, rgba(235, 206, 39, 0.4) 70%), url(${testimonial1Data.image})`;
+                testimonial1.querySelector('.testmonial-body').textContent = testimonial1Data.text;
+                generateStars(testimonial1.querySelector('.starIcon'), testimonial1Data.stars);
+                testimonial1.querySelector('#client-name').textContent = `${testimonial1Data.clientName}`;
+                testimonial1.querySelector('#client-company').textContent = `${testimonial1Data.companyName}`;
+                testimonial1.classList.add('active');
+            }, 1000);
+
+            // Update the second testimonial
+            testimonial2.classList.remove('active');
+            setTimeout(() => {
+                testimonial2.querySelector('#clientIcon').style.backgroundImage = `linear-gradient(90deg, rgba(46, 35, 1, 0.0) 100%, rgba(235, 206, 39, 0.4) 70%), url(${testimonial2Data.image})`;
+                testimonial2.querySelector('.testmonial-body').textContent = testimonial2Data.text;
+                generateStars(testimonial2.querySelector('.starIcon'),testimonial2Data.stars);
+                testimonial2.querySelector('.client').textContent = `${testimonial2Data.clientName}`;
+                testimonial2.querySelector('#client-company').textContent = `${testimonial2Data.companyName}`;
+                testimonial2.classList.add('active');
+            }, 1000);
+
+            // Increment the index and wrap around the array
+            currentIndex = (currentIndex + 2) % testimonials.length;
+        }

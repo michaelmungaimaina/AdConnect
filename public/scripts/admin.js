@@ -173,6 +173,34 @@ function appointmentManagement(){
 
     fetchAppointments();
 }
+
+function aboutManageent(){
+    sectionUserManagement.style.display = 'none';
+    sectionContactManagement.style.display = 'none';
+    sectionVideoManagement.style.display = 'none';
+    sectionLeadsManagement.style.display = 'none';
+    sectionReportsManagement.style.display = 'none';
+    sectionSettingsManagement.style.display = 'none';
+    sectionWorkflowsManagement.style.display = 'none';
+    sectionCommunicationManagement.style.display = 'none';
+    sectionDocumentManagement.style.display = 'none';
+    sectionAppointmentManagement.style.display = 'none';
+
+    userMgt.classList.remove('activ');
+    contentMgt.classList.remove('activ');
+    aboutMgt.classList.remove('activ');
+    videoMgt.classList.remove('activ');
+    leadMgt.classList.remove('activ');
+    apptMgt.classList.add('activ');
+    crmMgt.classList.remove('activ');
+    reportMgt.classList.remove('activ');
+    settingMgt.classList.remove('activ');
+    workflowMgt.classList.remove('activ');
+    commMgt.classList.remove('activ');
+    docsMgt.classList.remove('activ');
+
+    fetchAppointments();
+}
 /**
  * Refreshes the user table
  */
