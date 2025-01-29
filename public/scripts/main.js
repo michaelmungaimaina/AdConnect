@@ -670,6 +670,7 @@ function closeLeadCapture() {
 }
 
 async function openAppointmentBooking() {
+    console.log('Book Appointment');
     if (sectionAppointmentApplication) {
         sectionAppointmentApplication.style.height = '100%';
         const newUrl = `${baseUrl.slice(0, 0)}?appointment-booking=true`;
@@ -678,16 +679,6 @@ async function openAppointmentBooking() {
         await appointmentAction();
     }
 }
-
-function navigateToNextPage() {
-    alert('Redirecting to the Contact Us page...');
-    // Redirect to next page
-    window.location.href = '.html';
-}
-
-/*function scrollToAboutPage() {
-    document.getElementById('contactDiv').scrollIntoView();
-}*/
 
 /* toggle dropdown in mobile view */
 document.querySelectorAll('.collapse-btn').forEach(item => {
@@ -962,8 +953,8 @@ function handleErrorMessage(errorMessage, errorMessageElement) {
  */
 // Select all form elements and buttons
 const forms = [
-    document.getElementById("fname"),
-    document.getElementById("lastname"),
+    document.getElementById("fName"),
+    document.getElementById("lastName"),
     document.getElementById("eaddresss"),
     document.getElementById("phoneNumber"),
     document.getElementById("occupation"),
@@ -986,6 +977,7 @@ function initializeForm() {
 }
 
 async function goToNextStep() {
+    event.preventDefault();
     const currentForm = forms[currentStep];
     const input = currentForm.querySelector("input, select");
 
@@ -1152,7 +1144,8 @@ async function goToNextStep() {
 
     // Hide current form and show the next
     currentForm.style.display = "none";
-    currentStep++;
+    if (currentStep < forms.length)  currentStep++;
+    else currentStep = forms.length;
 
     if (currentStep < forms.length) {
         forms[currentStep].style.display = "flex";
@@ -1166,7 +1159,7 @@ async function goToNextStep() {
 
     // Submit data on the last step
     if (currentStep === forms.length) {
-        console.log("Survey completed. Data submitted:", surveyData);
+        console.log("Survey completed. Data submitted:", UserApplicationObject);
         //API call
         /// Submit data to Database and send an Email to the client
     try {
@@ -1226,21 +1219,24 @@ async function goToNextStep() {
 }
 
 function goToPreviousStep() {
+    event.preventDefault();
     if (currentStep === 0) return;
 
     forms[currentStep].style.display = "none";
     currentStep--;
     forms[currentStep].style.display = "flex";
 
-    if (currentStep === 0) btnLeftApplication.style.filter = "blur(5px)";
-    btnRightApplication.textContent = "NEXT";
+    if (currentStep === 0) {
+        btnLeftApplication.style.filter = "blur(5px)";
+        btnRightApplication.textContent = "NEXT";
+    }
 }
 
 // Initialize the survey form
 initializeForm();
 
-const dateSelected = false;
-const dateChanged = false;
+let dateSelected = false;
+let dateChanged = false;
 
 /**
  * Process all pre-actions in the booking of an Appointment

@@ -283,11 +283,15 @@ app.post('/api/clients', async (req, res) => {
         `;
         const [existingClient] = await db.execute(checkQuery, [clientEmail, clientPhone]);
 
+        // Construct the base URL from the request object
+        const baseUrl = `${req.protocol}://${req.get('host')}${req.path}`;
+
         if (existingClient.length > 0) {
             const errorMessage = existingClient[0].clientEmail === clientEmail
                 ? 'Email already exists'
                 : 'Phone number already exists';
-            return res.status(400).json({error:`${errorMessage}` });
+            // Redirect user to strategy page
+            return res.redirect(`${baseUrl}?value-video-opt-in=true`);
         }
 
         // Insert the new client into the database

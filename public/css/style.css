@@ -110,31 +110,31 @@ iframe {
 
 h1 {
     font-size: 75px;
-    font-weight: 800px;
+    font-weight: 800;
     line-height: 85px;
 }
 
 h2 {
     font-size: 45px;
-    font-weight: 800px;
+    font-weight: 800;
     line-height: 51px;
 }
 
 h3 {
     font-size: 25px;
-    font-weight: 800px;
+    font-weight: 800;
     line-height: 31px;
 }
 
 h4 {
     font-size: 22px;
-    font-weight: 800px;
+    font-weight: 800;
     line-height: 28px;
 }
 
 h5 {
     font-size: 20px;
-    font-weight: 600px;
+    font-weight: 600;
     line-height: 26px;
 }
 
@@ -2644,7 +2644,7 @@ body section .contact-container .contact-footer div a:hover {
     width: 100%;
     height: 100%;
     padding: 20px 10px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(/resources/background-image.jpeg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(../resources/background-image.jpeg);
     background-position: center;
     background-size: cover;
     display: flex;
@@ -2827,7 +2827,7 @@ body section .contact-container .contact-footer div a:hover {
     width: 100%;
     height: 100%;
     padding: 70px 10px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(/resources/background-image.jpeg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(../resources/background-image.jpeg);
     background-position: center;
     background-size: cover;
     display: flex;
@@ -3140,7 +3140,7 @@ body section .contact-container .contact-footer div a:hover {
 #leadCaptureSection .outer-container .bordered-container .h-layout div{
     display: flex;
     flex-direction: row;
-    align-items: start center;
+    align-items: start;
     margin-top: 6px;
 
 }
@@ -3609,7 +3609,7 @@ body section .contact-container .contact-footer div a:hover {
     }
     #testimonialSection .testimonials .container .image{
         height: 70px !important;
-    width: 70px I !important;
+    width: 70px !important;
     }
     #client-name{
         font-size: 15px !important;
