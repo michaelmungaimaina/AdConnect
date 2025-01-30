@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFooterFAQs.addEventListener('click', openFAQs);
         btnCloseApointmentThanksView.addEventListener('click', closeAppointmentThanksView);
         btnClosePrivacyPolicy.addEventListener('click', closePrivacyPolicy);
-        btnLeftApplication.addEventListener('click', openAppointmentBooking);
+        //btnLeftApplication.addEventListener('click', openAppointmentBooking);
 
         // Start the spinner
         setInterval(updateTestimonials, 10000);
@@ -975,6 +975,11 @@ function initializeForm() {
     btnLeftApplication.style.filter = "blur(5px)";
     btnRightApplication.textContent = "NEXT";
 }
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+    });
+});
 
 async function goToNextStep() {
     event.preventDefault();

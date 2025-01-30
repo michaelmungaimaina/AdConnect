@@ -2878,7 +2878,7 @@ body section .contact-container .contact-footer div a:hover {
     cursor: pointer;
     border-radius: 10px;
     position: fixed;
-    top: 10px;
+    top: 60px;
     right: 10px;
     color: white;
 }
@@ -2996,6 +2996,9 @@ body section .contact-container .contact-footer div a:hover {
         margin-top: 100px;
     }
     #btnCloseApplicationForm {
+        right: 20px;
+    }
+    #btnCloseApplicationForm {
         width: 40px;
         height: 40px;
         position: -webkit-sticky;
@@ -3006,7 +3009,7 @@ body section .contact-container .contact-footer div a:hover {
 
     #applicationFormSection h5{
         width: 100%;
-        font-size: 12px;
+        font-size: 11px;
         align-items: stretch;
     }
 
@@ -3599,6 +3602,9 @@ body section .contact-container .contact-footer div a:hover {
 
   /* Responsiveness of the Testimonial Section */
 @media screen and (max-width: 880px) {
+    #testimonialSection{
+        height: 850px !important;
+    }
     #testimonialSection .testimonial-outer{
         flex-direction: column !important;
         gap: 60px;
@@ -3642,6 +3648,6 @@ body section .contact-container .contact-footer div a:hover {
         font-size: 12px !important;
     }
     #testimonialSection .testimonials{
-        height: 900px !important;
+        height: 850px !important;
     }
 }

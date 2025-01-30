@@ -146,7 +146,7 @@
   <!-- Hero Section -->
 
   <section id="heroSection" class="hero">
-    <div class="overlay"></div>
+
     <h1 style="animation: loadFromLeft 2s ease-out forwards;">
       Powering <span >Real Estate Businesses</span> with
       <span class="one"> HI-ROI</span> Digital Marketing And Other Business.
@@ -203,7 +203,7 @@
         <div class="slash-rect"></div>
         <p class="header-text" style="margin-left: 10px">Testimonials</p>
       </div>
-      <img src="/resources/base-line.png" alt="" />
+      <img src="../resources/base-line.png" alt="bas-line" />
       <div class="testimonial-outer h-layout">
         <div id="testmonial1" class="testimonial-inner">
           <div class="container">
@@ -405,45 +405,45 @@
         style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;">
       </div>
       <div class="v-layout">
-        <form id="fName" action="submit" class="form-section">
+        <form id="fName" action="submit" onsubmit="return false;" class="form-section">
           <label for="fname" class="label">What's Your First Name?</label>
           <input id="firstNameInput" type="text" class="input-field" placeholder="Type Your Name Here ...">
         </form>
 
-        <form id="lastName" action="submit" class="form-section" style="display: none;">
+        <form id="lastName" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="lastname" class="label">What's Your Last Name,</label>
           <input id="lastNameInput" type="text" class="input-field" placeholder="Type Your Last Name Here ...">
         </form>
 
-        <form id="eaddresss" action="submit" class="form-section" style="display: none;">
+        <form id="eaddresss" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="eaddress" class="label">What's Your Email Address,</label>
           <input id="emailAddressInput" type="email" class="input-field" placeholder="example@example.com">
         </form>
 
-        <form id="phoneNumber" action="submit" class="form-section" style="display: none;">
+        <form id="phoneNumber" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="phonelabel" class="label">What's Your Phone Number,</label>
           <input id="phoneInput" type="tel" class="input-field" placeholder="(0) 123 456 789">
         </form>
 
-        <form id="occupation" action="submit" class="form-section" style="display: none;">
+        <form id="occupation" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="occupation" class="label">What’s Your Current Ocupation, and How Long Have You Been in This
             Role?</label>
           <input id="occupationInput" type="text" class="input-field" placeholder="Eg, Digital Marketing (etc)">
         </form>
 
-        <form id="reason" action="submit" class="form-section" style="display: none;">
+        <form id="reason" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="reason" class="label">What is happening in your company right now that has you considering a
             change in your marketing approach?</label>
           <input id="reasonInput" type="text" class="input-field" placeholder="I have been experiencing ...">
         </form>
 
-        <form id="goal" action="submit" class="form-section" style="display: none;">
+        <form id="goal" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="goal" class="label">What is your goal with a new marketing strategy, and how many new customers
             would you like to gain monthly or annually?</label>
           <input id="goalInput" type="text" class="input-field" placeholder="I have a goal of ...">
         </form>
 
-        <form id="investment" action="submit" class="form-section" style="display: none;">
+        <form id="investment" action="submit" onsubmit="return false;" class="form-section" style="display: none;">
           <label for="investment" class="label">If you were 100% certain you could achieve your goals, how much would
             you invest directly in making it happen?</label>
           <select id="investmentInput" class="input-field">
@@ -458,8 +458,8 @@
         </form>
         <div id="h-buttons">
           <button id="btnLeftApplication" class="btn-class" style="filter: blur(5px);"
-            onclick="goToPreviousStep()">PREV</button>
-          <button id="btnRightApplication" class="btn-class" onclick="goToNextStep()">NEXT</button>
+            >PREV</button>
+          <button id="btnRightApplication" class="btn-class" >NEXT</button>
         </div>
 
       </div>
