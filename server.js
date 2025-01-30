@@ -18,12 +18,13 @@ app.use(express.json());
 app.use(cors());
 
 app.use(cors({
-    origin: ['127.0.0.1'], // frontend domains
+    origin: ['http://127.0.0.1:3000', 'http://localhost:3000', 'https://adconnect.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// 
+
+//
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url}`);
     next();
@@ -43,42 +44,53 @@ app.get('*', (req, res) => {
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded({ extended: false }));
 
-    // MySQL Connection
-// Create a connection pool to your SQL database hosted on Truehost
-const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost', 
-    user: process.env.DB_USER || 'root',      
-    password: process.env.DB_PASSWORD,  
-    database:  process.env.DB_NAME || 'adconnect' 
+console.log("DB Config:", {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD ? "****" : "MISSING",
+    database: process.env.DB_NAME
 });
 
-async function connectAndStartServer() {
-    try {
-        // Get a connection from the pool
-        const connection = await db.getConnection();
-        
-        console.log('Connected to MySQL database.');
+// MySQL Connection
+// Create a connection pool to your SQL database hosted on Truehost
+const db = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'eshhfecq_admin',
+    password: process.env.DB_PASSWORD || '13579QEtuo...',
+    database:  process.env.DB_NAME || 'eshhfecq_adconnect',
+    debug: true,
+});
 
-        // Start the server
+async function testConnection() {
+    try {
+        const connection = await db.getConnection(); // Use global pool
+        console.log('✅ Connected to MySQL database.');
+        connection.release();
+    } catch (err) {
+        console.error('❌ Database connection failed:', err);
+    }
+}
+
+testConnection();
+
+
+// Start the server
+async function startServer() {
+    try {
+        await testConnection(); // Ensure database connection is successful
         const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
             console.log(`Server running on ${process.env.APP_API_URL}:${PORT}`);
         });
-
-        // Release the connection back to the pool
-        connection.release();
     } catch (err) {
-        console.error('Database connection failed:', err);
+        console.error('Failed to start server:', err);
     }
 }
-
-// Call the function to start the server
-connectAndStartServer();
-
+startServer();
 // Endpoint to create a user
 app.post('/api/users', async (req, res) => {
     try {
-        console.log(req.body); 
+        console.log(req.body);
         const {name, email, password, role, access_level } = req.body;
 
         // Validate input data
@@ -131,11 +143,11 @@ app.post('/api/users', async (req, res) => {
 // API endpoint for user authentication
 app.post("/api/auth", async (req, res) => {
     const { email, password } = req.body;
-  
+
     if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({ error: "Email and password are required" });
     }
-  try{
+    try{
         const query = "SELECT * FROM users WHERE email = ? AND password = ?";
         // Execute the query
         const [rows] = await db.execute(query, [email, password]);
@@ -146,16 +158,16 @@ app.post("/api/auth", async (req, res) => {
         }
 
         //Successful Login
-            /* Store user data in the session
-            req.session.user = {
-                id: rows[0].id,
-                username: rows[0].name,
-            };**/
+        /* Store user data in the session
+        req.session.user = {
+            id: rows[0].id,
+            username: rows[0].name,
+        };**/
         return res.status(200).json({ message: "Login successful", username: rows[0].name /*user: req.session.user*/ });
     } catch(error)  {
         return res.status(401).json({ error: "Invalid email or password" });
-      }
-  });
+    }
+});
 
 // Get all users
 app.get('/api/users', async (req, res) => {
@@ -214,16 +226,16 @@ app.put('/api/users/:id', async (req, res) => {
 
         // Update the user in the database
         const query = `
-            UPDATE users 
+            UPDATE users
             SET name = ?, email = ?, password = ?, role = ?, access_level = ?, created_at = ?
             WHERE id = ?
         `;
         await db.execute(query, [name, email, password, role, access_level, createdAt, userId]);
 
         // Respond with a success message
-        res.status(200).json({ 
-            message: 'User updated successfully', 
-            user: { id: userId, name, email, password, role, access_level , createdAt} 
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: { id: userId, name, email, password, role, access_level , createdAt}
         });
     } catch (error) {
         // Handle errors
@@ -263,8 +275,8 @@ app.delete('/api/users/:id', async (req, res) => {
 });
 
 // Format timestamp for EAT
-const clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS");
-const createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SS");
+let clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS");
+let createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SS");
 // Create a new client (lead)
 app.post('/api/clients', async (req, res) => {
     try {
@@ -278,7 +290,7 @@ app.post('/api/clients', async (req, res) => {
 
         // Check if the client already exists based on email or phone
         const checkQuery = `
-            SELECT * FROM clients 
+            SELECT * FROM clients
             WHERE clientEmail = ? OR clientPhone = ?
         `;
         const [existingClient] = await db.execute(checkQuery, [clientEmail, clientPhone]);
@@ -336,7 +348,7 @@ app.get('/api/clients/:id', async (req, res) => {
 
         // SQL query to fetch the client by ID
         const query = 'SELECT * FROM clients WHERE id = ?';
-        
+
         // Execute the query
         const [clients] = await db.execute(query, [clientId]);
 
@@ -381,7 +393,7 @@ app.post('/api/sendSubsequentEmail', async (req, res) => {
 
         // Replace placeholders
         const emailBody = template.body
-           .replace(/\$\{clientName\}/g, client[0].clientName);
+            .replace(/\$\{clientName\}/g, client[0].clientName);
         //const emailBody = template[0].body.replace('[NAME]', client[0].clientName);
 
         // Send email
@@ -484,7 +496,7 @@ app.put('/api/clients/:id', async (req, res) => {
         const updateQuery = `
             UPDATE clients
             SET clientEmail = ?, clientPhone = ?, clientName = ?, company = ?, updated_at = CURRENT_TIMESTAMP
-            ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
+                ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
             WHERE id = ?
         `;
 
@@ -539,17 +551,17 @@ app.post('/api/appointments', async (req, res) => {
     try {
         console.log(req.body);
 
-        const { 
-            clientName, 
-            clientEmail, 
-            clientPhone, 
+        const {
+            clientName,
+            clientEmail,
+            clientPhone,
             clientLocation,
-            appointmentDate, 
-            appointmentTime, 
-            appointmentType, 
-            appointmentStatus, 
-            appointmentNotes, 
-            meetingLink 
+            appointmentDate,
+            appointmentTime,
+            appointmentType,
+            appointmentStatus,
+            appointmentNotes,
+            meetingLink
         } = req.body;
 
         // Check if all required fields are provided
@@ -564,8 +576,8 @@ app.post('/api/appointments', async (req, res) => {
         `;
 
         // Execute the insert query
-        const [result] = await db.execute(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation, 
-            appointmentDate, appointmentTime, appointmentType, appointmentStatus, 
+        const [result] = await db.execute(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation,
+            appointmentDate, appointmentTime, appointmentType, appointmentStatus,
             appointmentNotes, meetingLink]);
 
         // Respond with the newly created appointment
@@ -573,9 +585,9 @@ app.post('/api/appointments', async (req, res) => {
             message: 'Appointment Booked successfully',
             appointment: {
                 //id: result.insertId, // Auto-generated ID after insertion
-                clientID, clientName, clientEmail, clientPhone, clientLocation, 
-        appointmentDate, appointmentTime, appointmentType, appointmentStatus, 
-        appointmentNotes, meetingLink
+                clientID, clientName, clientEmail, clientPhone, clientLocation,
+                appointmentDate, appointmentTime, appointmentType, appointmentStatus,
+                appointmentNotes, meetingLink
             }
         });
     } catch (error) {
@@ -728,9 +740,9 @@ app.put('/api/reminder-email', async (req, res) => {
         `;*/
 
         // Execute the update query
-       // await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
+        // await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
 
-       const [fname] = name.split(' ')
+        const [fname] = name.split(' ')
         // Send Email Notification
         sendReminderEmail(fname[0],email,appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
 
@@ -883,7 +895,7 @@ app.get('/api/marketing-strategy-applications/:id', async (req, res) => {
 
         // SQL query to fetch the application by ID
         const selectQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
-        
+
         // Execute the query to get the application
         const [application] = await db.execute(selectQuery, [applicationId]);
 
@@ -1050,7 +1062,7 @@ async function sendWelcomeEmail(clientName, clientEmail) {
         console.error('Error sending welcome email:', error);
         throw error;
     }
-} 
+}
 /**
  * Send a welcome email to the client
  * @param {string} clientName - Name of the client
