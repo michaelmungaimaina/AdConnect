@@ -727,7 +727,7 @@ header {
 
 .hero .elip-image {
     display: flex;
-    width: 500px; 
+    width: 500px;
 }
 
 .hero p {
@@ -810,8 +810,8 @@ header {
     border: 1.5px solid #F65730;
     cursor: pointer;
     transition: 0.5s;
-     margin: 0px 20px;
-     z-index: 10px;
+    margin: 0px 20px;
+    z-index: 10px;
 }
 
 .cta .cta-btn:hover {
@@ -1207,39 +1207,39 @@ body {
         grid-template-columns: 1fr 1fr; /* Two columns of equal width */
         grid-template-rows: auto auto; /* Auto height for rows */
         gap: 0px; /* Space between grid items */
-      }
+    }
 
-      .footer-container .footer-logo{
+    .footer-container .footer-logo{
         display: flex;
         margin-bottom: -100px;
         padding-top: 20px;
-      }
-      
-      /* Position each section within the grid */
-      .footer-container .footer-logo {
-        grid-column: 1;
-      }
-      .footer-container .consultation {
-        grid-column: 2; /* Right column */
-      }
-      
-      .footer-container .company-info {
-        grid-column: 1; /* Left column */
-      }
-      
-      .footer-container .services {
-        grid-column: 2; /* Right column */
-      }
-      
-      .footer-container .newsletter {
-        grid-column: 1; /* Left column */
-      }
-      
-      .footer-container .footer-faq-section {
-        grid-column: 1 2; /* Span both columns */
-      }
+    }
 
-      .footer-container .consultation{
+    /* Position each section within the grid */
+    .footer-container .footer-logo {
+        grid-column: 1;
+    }
+    .footer-container .consultation {
+        grid-column: 2; /* Right column */
+    }
+
+    .footer-container .company-info {
+        grid-column: 1; /* Left column */
+    }
+
+    .footer-container .services {
+        grid-column: 2; /* Right column */
+    }
+
+    .footer-container .newsletter {
+        grid-column: 1; /* Left column */
+    }
+
+    .footer-container .footer-faq-section {
+        grid-column: 1 2; /* Span both columns */
+    }
+
+    .footer-container .consultation{
         width: fit-content;
     }
 
@@ -1291,7 +1291,7 @@ body {
     .footer-faq-section:hover,
     .footer-container .company-info:hover{
         h5 {
-           border-bottom: 2px solid #F65730;
+            border-bottom: 2px solid #F65730;
         }
     }
 }
@@ -1353,7 +1353,7 @@ body {
     .footer-faq-section:hover,
     .footer-container .company-info:hover{
         h5 {
-           border-bottom: 2px solid #F65730;
+            border-bottom: 2px solid #F65730;
         }
     }
 }
@@ -1624,64 +1624,64 @@ body section .contact-container .contact-footer div a:hover {
  **************************      About Page Syles     ****************************
  ***********************************************************************************
  ***********************************************************************************/
- #aboutSection{
+#aboutSection{
     width: 100%;
     height: 100%;
     background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.6)70%, rgba(0, 0, 0, 0.6)70%), url(/resources/background-image.jpeg);
     padding: 80px 100px;
- }
- #aboutSection .about-container{
+}
+#aboutSection .about-container{
     width: 100%;
     height: fit-content;
     display: flex;
     flex-direction: column;
     justify-content: start;
     padding: 15px 20px;
- }
- #aboutSection .header-text-layout{
+}
+#aboutSection .header-text-layout{
     display: flex;
     flex-direction: row;
     align-items: start;
- }
- #aboutSection img{
+}
+#aboutSection img{
     width: 400px;
- }
+}
 
- #aboutSection .about-inner-container{
+#aboutSection .about-inner-container{
     display: grid;
     grid-template-columns: 0.2fr 1fr; /* Two columns of equal width */
     grid-template-rows: auto auto; /* Auto height for rows */
     gap: 0px; /* Space between grid items */
     margin: 20px 0;
- }
+}
 #aboutSection .about-inner-container img{
     width: 300px;
     border-radius: 50%;
     grid-column: 0;
- }
- #aboutSection .about-inner-container .grid-element{
+}
+#aboutSection .about-inner-container .grid-element{
     grid-column: 0 1;
- }
- #aboutSection .about-inner-container .grid-element-bottom{
+}
+#aboutSection .about-inner-container .grid-element-bottom{
     grid-column: 2;
- }
+}
 
- #aboutSection .about-inner-container .styled-text{
+#aboutSection .about-inner-container .styled-text{
     display: flex;
     flex-direction: column;
     width: fit-content;
     height: fit-content;
     margin-top: 60px;
     margin-left: 40px;
- }
- #aboutSection .about-inner-container .about-content{
+}
+#aboutSection .about-inner-container .about-content{
     margin: 10px;
     padding: 0 0 3px;
     height: fit-content;
     width: 100%;
- }
+}
 
- #aboutSection .about-inner-container .styled-text p{
+#aboutSection .about-inner-container .styled-text p{
     font-size: 20px;
     color: white;
     font-family: 'Oregano', cursive;
@@ -1689,11 +1689,11 @@ body section .contact-container .contact-footer div a:hover {
     font-style: italic;
     text-align: start;
     width:fit-content;
-    
- }
- #aboutSection .about-inner-container .styled-text img{
+
+}
+#aboutSection .about-inner-container .styled-text img{
     width: fit-content;
- }
+}
 #aboutSection .about-inner-container .about-content p{
     background-image: url('/resources/msg.png');
     background-size: cover;
@@ -1704,13 +1704,13 @@ body section .contact-container .contact-footer div a:hover {
     height: fit-content;
     margin: 0 3px 0 0;
     font-size: 15px;
- }
- #aboutSection .v-layout{
+}
+#aboutSection .v-layout{
     width: fit-content;
     height: fit-content;
- }
+}
 
- /*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
+/*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
 @media screen and (max-width: 880px) {
     #aboutSection{
         padding: 67px 10px;
@@ -1752,12 +1752,12 @@ body section .contact-container .contact-footer div a:hover {
  **************************      OUR SERVICES Page Syles     ****************************
  ***********************************************************************************
  ***********************************************************************************/
- #ourServiceSection{
+#ourServiceSection{
     width: 100%;
     height: 100%;
     background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.6)70%, rgba(0, 0, 0, 0.6)70%), url(/resources/background-image.jpeg);
     padding: 80px 100px;
- }
+}
 #ourServiceSection .our-service-container{
     width: 100%;
     height: fit-content;
@@ -1950,8 +1950,8 @@ body section .contact-container .contact-footer div a:hover {
     font-size: large;
 }
 
- /*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
- @media screen and (max-width: 880px) {
+/*-----------------------------ABOUT PAGE RESPONSIVENESS-----------------------------------*/
+@media screen and (max-width: 880px) {
     #ourServiceSection{
         padding: 67px 10px;
     }
@@ -2004,7 +2004,7 @@ body section .contact-container .contact-footer div a:hover {
     #ourServiceSection #development .v-layout .top-item{
         padding: 10px;
     }
- }
+}
 
 
 /**************************      Appointment Page Syles     ****************************/
@@ -2019,7 +2019,7 @@ body section .contact-container .contact-footer div a:hover {
     border-radius: 0.25em;
     border: 1.5px solid #F65730;
     color: white;
-    margin: 30px;
+    margin: 60px;
     cursor: pointer;
 }
 
@@ -2148,8 +2148,8 @@ body section .contact-container .contact-footer div a:hover {
 .background-tint-black .appointment-layout .h-layout .left-col-time .time-layout{
     width: 270px;
     padding: 10px;
-    display: grid; 
-    grid-template-columns: repeat(4, 1fr); 
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
@@ -2178,7 +2178,7 @@ body section .contact-container .contact-footer div a:hover {
 .background-tint-black .appointment-layout .h-layout .right-col-message {
     width: 270px;
     padding: 10px;
-    display: flex; 
+    display: flex;
     flex-direction: column;
     justify-content: start;
     align-items: start;
@@ -2230,12 +2230,15 @@ body section .contact-container .contact-footer div a:hover {
         flex-direction: column !important;
     }
     body section .contact-countainer .contact-inner-container {
-        margin: 30px 10px 10px 10px !important;
+        margin: 70px 10px 10px 10px !important;
     }
     .background-tint-black .appointment-layout {
         width: fit-content;
         height: fit-content;
         margin: 50px 50px;
+    }
+    #btnCloseApointment {
+        margin-top: 50x !important;
     }
 }
 
@@ -2332,7 +2335,7 @@ body section .contact-container .contact-footer div a:hover {
     border-radius: 0.25em;
     border: 1.5px solid #F65730;
     color: white;
-    margin: 30px;
+    margin: 60px;
     cursor: pointer;
 }
 
@@ -2431,10 +2434,10 @@ body section .contact-container .contact-footer div a:hover {
 /* Responsiveness of the Appointment Thanks Section */
 @media screen and (max-width: 880px) {
     .background-tint-black-appt .appointment-layout {
-        margin: 80px 20px !important;
+        margin: 120px 20px !important;
     }
     #btnCloseApointmentThanks {
-        margin-top: 10px;
+        margin-top: 50px;
     }
 
     .background-tint-black-appt .appointment-layout .v-layout h5{
@@ -2620,9 +2623,9 @@ body section .contact-container .contact-footer div a:hover {
     }
 
     #valueVideoSection img{
-       display: none;
-    }   
-    
+        display: none;
+    }
+
     #valueVideoSection .lable-bg p{
         font-size: 18px;
         margin-bottom: 20px;
@@ -2631,7 +2634,7 @@ body section .contact-container .contact-footer div a:hover {
     #valueVideoSection .h-layout div .circle img{
         display: inline;
     }
-    
+
 }
 
 /**********************************************************************************************************
@@ -3038,9 +3041,9 @@ body section .contact-container .contact-footer div a:hover {
         width: 100%;
     }
 
-    
 
-    
+
+
 }
 
 @media screen and (max-width: 720px) {
@@ -3435,22 +3438,22 @@ body section .contact-container .contact-footer div a:hover {
     width: 50px;
     height: 50px;
     animation: spin 1s linear infinite;
-  }
-  
-  /* Animation for spinning */
-  @keyframes spin {
+}
+
+/* Animation for spinning */
+@keyframes spin {
     0% {
-      transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
     }
     100% {
-      transform: translate(-50%, -50%) rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
     }
-  }
-  
-  /* Hidden state for the loader */
-  .hidden {
+}
+
+/* Hidden state for the loader */
+.hidden {
     display: none;
-  }
+}
 
 /* Testimonial Section */
 #testimonialSection{
@@ -3600,7 +3603,7 @@ body section .contact-container .contact-footer div a:hover {
     font-weight: lighter;
 }
 
-  /* Responsiveness of the Testimonial Section */
+/* Responsiveness of the Testimonial Section */
 @media screen and (max-width: 880px) {
     #testimonialSection{
         height: 850px !important;
@@ -3610,12 +3613,12 @@ body section .contact-container .contact-footer div a:hover {
         gap: 60px;
     }
     #testimonialSection .testimonials .content{
-        margin-left: 0px !important; 
+        margin-left: 0px !important;
         width: 65% !important;
     }
     #testimonialSection .testimonials .container .image{
         height: 70px !important;
-    width: 70px !important;
+        width: 70px !important;
     }
     #client-name{
         font-size: 15px !important;

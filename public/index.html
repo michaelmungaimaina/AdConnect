@@ -401,6 +401,7 @@
         Please take a few moments to answer these questions so we can hit the ground
         running during our call. The more detailed your answers, the better we can serve you!</h5>
       <img class="base-line" src="/resources/elipsis-line.png" alt="" style="margin: 5px 100px;">
+      <div id="loader" class="loader hidden"></div>
       <div id="formErrorMessage"
         style="color: rgb(236, 2, 2); display: none; margin: 0px 0px 0px 0px; background-color: #fc7b7b; align-items: center; font-size: 11px; padding: 4px 15px; border-radius: 5px;">
       </div>
@@ -473,6 +474,7 @@
     <div id="appointmentErrorMessage"
       style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
     </div>
+    <div id="loader" class="loader hidden"></div>
     <div class="appointment-layout outer-container">
       <div class="h-layout">
         <div class="slash-rect"></div>
@@ -499,7 +501,7 @@
             <input id="appointeeEmail" type="email" class="input-field" placeholder="Enter Your Email Here" />
             <label for="phone" class="label">Enter Your Phone Number</label>
             <input id="appointeePhone" type="phone" class="input-field" placeholder="Enter Your Phone Number Here" />
-            <label for="location" class="label">Enter Your Location</label>
+            <label for="appointeeLocation" class="label">Enter Your Location</label>
             <input id="appointeeLocation" type="text" class="input-field"
               placeholder="Enter Your Current Location Here" />
             <label for="date" class="label">Select Date</label>
@@ -512,72 +514,72 @@
           <p>Available Dates</p>
           <!--Time Selection-->
           <div class="grey-bordered time-layout">
-            <div id="eit" class="grey-bordered">
+            <div id="eit" class="grey-bordered child">
               <p>08.30 AM <br>09.00 AM</p>
             </div>
-            <div id="nine" class="grey-bordered">
+            <div id="nine" class="grey-bordered child">
               <p>09.15 AM <br>09.45 AM</p>
             </div>
-            <div id="ten" class="grey-bordered">
+            <div id="ten" class="grey-bordered child">
               <p>10.15 AM <br>10.45 AM</p>
             </div>
-            <div id="eleven" class="grey-bordered">
+            <div id="eleven" class="grey-bordered child">
               <p>11.00 AM <br>11.30 AM</p>
             </div>
-            <div id="twelve" class="grey-bordered">
+            <div id="twelve" class="grey-bordered child">
               <p>11.45 AM <br>12.15 PM</p>
             </div>
-            <div id="noon" class="grey-bordered">
+            <div id="noon" class="grey-bordered child">
               <p>12.30 AM <br>01.00 PM</p>
             </div>
-            <div id="one" class="grey-bordered">
+            <div id="one" class="grey-bordered child">
               <p>01.30 PM <br>02.00 PM</p>
             </div>
-            <div id="two" class="grey-bordered">
+            <div id="two" class="grey-bordered child">
               <p>02.15 PM <br>02.45 PM</p>
             </div>
-            <div id="three" class="grey-bordered">
+            <div id="three" class="grey-bordered child">
               <p>03.00 PM <br>03.30 PM</p>
             </div>
-            <div id="four" class="grey-bordered">
+            <div id="four" class="grey-bordered child">
               <p>03.45 PM <br>04.15 PM</p>
             </div>
-            <div id="four30" class="grey-bordered">
+            <div id="four30" class="grey-bordered child">
               <p>04.30 PM <br>05.00 PM</p>
             </div>
-            <div id="five" class="grey-bordered">
+            <div id="five" class="grey-bordered child">
               <p>05.15 PM <br>05.45 PM</p>
             </div>
-            <div id="six" class="grey-bordered">
+            <div id="six" class="grey-bordered child">
               <p>06.00 PM <br>06.30 PM</p>
             </div>
-            <div id="six45" class="grey-bordered">
+            <div id="six45" class="grey-bordered child">
               <p>06.45 PM <br>07.15 PM</p>
             </div>
-            <div id="seven" class="grey-bordered">
+            <div id="seven" class="grey-bordered child">
               <p>07.30 PM <br>08.00 PM</p>
             </div>
-            <div id="eightPm" class="grey-bordered">
+            <div id="eightPm" class="grey-bordered child">
               <p>08.15 PM <br>08.45 PM</p>
             </div>
-            <div id="ninePm" class="grey-bordered">
+            <div id="ninePm" class="grey-bordered child">
               <p>09.00 PM <br>09.30 PM</p>
             </div>
-            <div id="tenPm" class="grey-bordered">
+            <div id="tenPm" class="grey-bordered child">
               <p>09.45 PM <br>10.15 PM</p>
             </div>
-            <div id="ten30Pm" class="grey-bordered">
+            <div id="ten30Pm" class="grey-bordered child">
               <p>10.30 PM <br>11.00 PM</p>
             </div>
-            <div id="elevenPm" class="grey-bordered">
+            <div id="elevenPm" class="grey-bordered child">
               <p>11.15 PM <br>11.45 PM</p>
             </div>
           </div>
         </div>
         <div class="v-layout right-col-message">
-          <label for="message" class="label">Additional Message</label>
+          <label for="appointeeMessage" class="label">Meeting Details</label>
           <textarea id="appointeeMessage" type="text" class="input-field"
-            placeholder="Your Appointment Message..."></textarea>
+            placeholder="Your Appointment Message... "></textarea>
           <div id="btnSubmitAppointment" class="experience" onclick="submitAppointment()">
             <p>Book Appointment</p>
           </div>
@@ -678,7 +680,7 @@
       </div>
       <div class="v-layout">
         <img src="/resources/check-icon.png" alt="">
-        <h5>Thanks, Your Booking has Been successfully scheduled!</h5>
+        <h5>Thank You. Your Booking has Been successfully scheduled!</h5>
         <p>We’ve received your details and will be ready to discuss how our strategies can help you achieve your goals.
           Please check your E-mail for receipt and Booking Details</p>
         <div class="inner-container">
@@ -748,8 +750,8 @@
           </form>
         </div>
         <div class="v-layout right-col">
-          <label for="message" class="label">Your Question(s)</label>
-          <textarea name="message" id="question" class="input-field" placeholder="Your Question Here"></textarea>
+          <label for="question" class="label">Your Question(s)</label>
+          <textarea name="question" id="question" class="input-field" placeholder="Your Question Here"></textarea>
         </div>
       </div>
       <div id="submitFAQsFormButton" onclick="submitFAQsForm()" class="submit-button">

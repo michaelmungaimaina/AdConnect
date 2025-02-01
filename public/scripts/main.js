@@ -797,88 +797,96 @@ async function submitLeads() {
         return true;
     }
 
-    // Submit data to Database and send an Email to the client
     try {
         showLoader();
-        const response = await fetch(`${DOMAIN}clients`, {
+
+        // Check if the client exists
+        const exist_response = await fetch(`${DOMAIN}lead-exists`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            //body: JSON.stringify(new Client(getCurrentDatetime(), name, email, phone, company || 'N/A', city || 'N/A', street || 'N/A', province || 'N/A', zip || 'N/A')),
-            body: JSON.stringify({
-                clientID: getCurrentDatetime(),
-                clientName: name,
-                clientEmail: email,
-                clientPhone: phone,
-                clientCompany: company || 'N/A',
-                clientStreet: street || 'N/A',
-                clientLocation: city || 'N/A',
-                clientProvince: province || 'N/A',
-                clientZipCode: zip || 'N/A',
-                clientSource : 'WEBSITE',
-                clientStatus : '1st CONTACT',
-                clientSubScription : 'SUBSCRIBED'
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientEmail: email, clientPhone: phone }),
         });
 
-        // Set values for the UserApplicationObject
-        UserApplicationObject.firstName = name.split(' ')[0];
-        const nameParts = name.split(' ');
-        UserApplicationObject.lastName = nameParts.slice(1).join(' ');
-        UserApplicationObject.emailAddress = email;
-        UserApplicationObject.phoneNumber = phone;
+        const check_response = await exist_response.json(); // Parse response JSON
 
-        if (response.ok) {
-            let result;
-
-            try {
-                result = await response.json(); // Try parsing JSON
-            } catch (error) {
-                console.warn('Empty or non-JSON response, using fallback');
-                result = { message: 'Client created successfully' }; // Default fallback message
-            }
-    
-            console.log('Response:', result);
+        if (check_response.exists) {
+            console.log('Client already exists:', check_response.message);
             errorMessage.style.color = 'white';
             errorMessage.style.backgroundColor = '#4abc5061';
             errorMessage.style.display = 'block';
-            handleErrorMessage(result.message, errorMessage);
-    
-            setTimeout(async () => {
-                // Call the sendWelcomeEmail function here
-                try {
-                    await sendWelcomeEmail(name, email);
-                    console.log('Welcome email sent successfully!');
+            handleErrorMessage('Welcome Back', errorMessage);
 
-                    // Set values for the input texts in the application form
-                    const fname = document.getElementById('firstNameInput');
-                    fname.value = UserApplicationObject.firstName;
-                    const lname = document.getElementById('lastNameInput');
-                    lname.value = UserApplicationObject.lastName;
-                    const emailA = document.getElementById('emailAddressInput');
-                    emailA.value = UserApplicationObject.emailAddress;
-                    const phone = document.getElementById('phoneInput');
-                    phone.value = UserApplicationObject.phoneNumber;
-                } catch (emailError) {
-                    errorMessage.style.color = 'rgb(236, 2, 2)';
-                    errorMessage.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-                    console.error('Error sending welcome email:', emailError);
-                    handleErrorMessage('Failed to send welcome email', errorMessage);
-                }
+            // Populate application form fields
+            document.getElementById('firstNameInput').value = name.split(' ')[0];
+            document.getElementById('lastNameInput').value = name.split(' ').slice(1).join(' ');
+            document.getElementById('emailAddressInput').value = email;
+            document.getElementById('phoneInput').value = phone;
+
+            // Open Thank You Page
+            setTimeout(async () => {
                 openThankYouPage();
             }, 2000);
         } else {
-            const { error: errorText } = await response.json(); // Capture error text from response
-            console.error('Error Response:', errorText || 'Unknown error occurred');
-            handleErrorMessage(`Error: ${errorText || 'An error occurred'}`,errorMessage);
+            console.log('Email or Phone does not exist, creating new client.');
+
+            // Submit new lead since it does not exist
+            const response = await fetch(`${DOMAIN}clients`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientID: getCurrentDatetime(),
+                    clientName: name,
+                    clientEmail: email,
+                    clientPhone: phone,
+                    clientCompany: company || 'N/A',
+                    clientStreet: street || 'N/A',
+                    clientLocation: city || 'N/A',
+                    clientProvince: province || 'N/A',
+                    clientZipCode: zip || 'N/A',
+                    clientSource: 'WEBSITE',
+                    clientStatus: '1st CONTACT',
+                    clientSubScription: 'SUBSCRIBED',
+                }),
+            });
+
+            const result = await response.json(); // Parse response JSON
+
+            if (response.ok) {
+                console.log('Response:', result);
+                errorMessage.style.color = 'white';
+                errorMessage.style.backgroundColor = '#4abc5061';
+                errorMessage.style.display = 'block';
+                handleErrorMessage(result.message, errorMessage);
+
+                setTimeout(async () => {
+                    try {
+                        await sendWelcomeEmail(name, email);
+                        console.log('Welcome email sent successfully!');
+
+                        // Populate application form fields
+                        document.getElementById('firstNameInput').value = name.split(' ')[0];
+                        document.getElementById('lastNameInput').value = name.split(' ').slice(1).join(' ');
+                        document.getElementById('emailAddressInput').value = email;
+                        document.getElementById('phoneInput').value = phone;
+                    } catch (emailError) {
+                        console.error('Error sending welcome email:', emailError);
+                        handleErrorMessage('Failed to send welcome email', errorMessage);
+                    }
+                    openThankYouPage();
+                }, 2000);
+            } else {
+                // Use the already parsed result for error handling
+                console.error('Error Response:', result.error || 'Unknown error occurred');
+                handleErrorMessage(`Error: ${result.error || 'An error occurred'}`, errorMessage);
+            }
         }
     } catch (error) {
         console.error('Error:', error);
-        handleErrorMessage('Failed to create Lead', errorMessage);
+        handleErrorMessage('Failed to process request', errorMessage);
+    } finally {
+        hideLoader();
+        isSubmitting = false; // Reset state
     }
-    hideLoader();
-    isSubmitting = false; // Reset the state
 }
 
 /**
@@ -1136,15 +1144,15 @@ async function goToNextStep() {
     if (currentStep === 0) {
         userFirstName = input.value.trim(); // Capture the first name
         const lnameLabel = document.querySelector("label[for='lastname']");
-        lnameLabel.textContent = `What's Your Last Name, ${userFirstName}?`;
+        lnameLabel.textContent = `What's Your Last Name, ${userFirstName.charAt(0).toUpperCase() + userFirstName.slice(1).toLowerCase()}?`;
     }
     if (currentStep === 1) {
         const lnameLabel = document.querySelector("label[for='eaddress']");
-        lnameLabel.textContent = `What's Your Email Address, ${userFirstName}?`;
+        lnameLabel.textContent = `What's Your Email Address, ${userFirstName.charAt(0).toUpperCase() + userFirstName.slice(1).toLowerCase()}?`;
     }
     if (currentStep === 2) {
         const eAdressLabel = document.querySelector("label[for='phonelabel']");
-        eAdressLabel.textContent = `What's Your Phone Number, ${userFirstName}?`;
+        eAdressLabel.textContent = `What's Your Phone Number, ${userFirstName.charAt(0).toUpperCase() + userFirstName.slice(1).toLowerCase()}?`;
     }
 
     // Hide current form and show the next
@@ -1313,17 +1321,18 @@ async function appointmentAction() {
         }
 
         // Select all `.child` elements inside `.time-layout`
-        const children = document.querySelectorAll('.time-layout .child');
+        const children = document.querySelectorAll('.grey-bordered .child');
 
         // Iterate over each element and reset the styles
         children.forEach(child => {
-            child.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0)';
+            child.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
             child.style.borderColor = 'rgb(125, 132, 137)';
+            child.clickable = true;
+            child.style.cursor = 'pointer';
         });
 
         await checkAvailableDates(dateInput.value);
     });
-
 }
 
 // Get appointments for the selected Date
@@ -1353,9 +1362,13 @@ const getAppointmentsForDate = async (date) => {
     }
 };
 
+let bookedTimeSlots = [];
+let timeSlots = [];
+let isTimeChanged = false;
+let availableTimeSlots = [];
 
 async function checkAvailableDates(selectedDate) {
-    const timeSlots = [
+    timeSlots = [
         { id: 'eit', time: '08.30 AM - 09.00 AM' },
         { id: 'nine', time: '09.15 AM - 09.45 AM' },
         { id: 'ten', time: '10.15 AM - 10.45 AM' },
@@ -1389,24 +1402,28 @@ async function checkAvailableDates(selectedDate) {
         console.log('Checking element for ID:', slot.id);
         const element = document.getElementById(slot.id);
         console.log('Element:', element);
-
+        
         if (!element) {
             console.warn(`Element not found for ID: ${slot.id}`);
             return; // Skip this iteration
         }
+
         //const child = element.querySelector('p');
         if (bookedTimesArray.includes(slot.time)) {
             element.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0.9)';
             element.style.borderColor = 'rgb(251, 150, 125)';
             //child.style.color = 'rgb(251, 150, 125)';
-        } else {
-            //element.classList.add('available'); 
-            element.addEventListener('click', () => selectTime(slot.time));
-        }
+            element.clickable = false;
+            element.style.cursor = 'not-allowed';
+            bookedTimeSlots.push(slot.id);
+        } //else bookedTimeSlots.push(slot.id);
+        //element.classList.add('available'); 
+        element.addEventListener('click', () => selectTime(slot.time));
     });
 }
 
 function selectTime(time) {
+    isTimeChanged = true;
     // Display Date Selected
     console.log(`You selected: ${formatTimeString(time)}`);
     errorMessage.style.color = 'white';
@@ -1415,7 +1432,30 @@ function selectTime(time) {
     errorMessages = `You selected: ${time}`;
     handleErrorMessage(errorMessages, errorMessage);
     AppointmentBooking.meetingTime = formatTimeString(time);
-    // Send email or make an API call to confirm the booking 
+
+    if (bookedTimeSlots.length === 0 || bookedTimeSlots === undefined){
+        availableTimeSlots = timeSlots;
+    } else {
+        availableTimeSlots = timeSlots.filter(slot => !bookedTimeSlots.includes(slot.id));
+    }
+        availableTimeSlots.forEach(slot => {
+            const element = document.getElementById(slot.id);
+            if (!element) {
+                console.error(`Element with id ${slot.id} not found.`);
+                return; // Skip this iteration
+            }
+
+            // Default styles for available slots
+            element.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
+            element.style.borderColor = 'rgb(125, 132, 137)';
+
+            // Special styles for the selected time slot
+            if (slot.time === time) {
+                element.style.boxShadow = '0 4px 8px rgba(246, 87, 48, 0.8)';
+                element.style.borderColor = 'rgb(251, 150, 125)';
+            }
+        });
+    console.log(`End of Iteration`);
 }
 
 // Function to format the time string
@@ -1508,11 +1548,11 @@ async function submitAppointMent() {
     const startDateTime = `${AppointmentBooking.meetingDate} ${startTime24}`;
 const endDateTime = `${AppointmentBooking.meetingDate} ${endTime24}`;
 
+    showLoader();
     // Get the Google Meet link for the appointment
     AppointmentBooking.meetingLink = await getGoogleMeetLink('Adconnect Online Consultation', `${startDateTime}`, `${endDateTime}`);
 
     // Send the data to the backend API
-    showLoader();
     try {
         const response = await fetch(`${DOMAIN}appointments`, {
             method: 'POST',
@@ -1661,13 +1701,14 @@ function closeAppointmentThanksView() {
     }
 }
 
+/*
 document.querySelectorAll('.time-layout .grey-bordered').forEach((slot) => {
     slot.addEventListener('click', function () {
         if (!this.classList.contains('booked')) {
             alert(`You selected: ${this.querySelector('p').innerText}`);
         }
     });
-});
+});*/
 
 function formatDate(inputDate) {
     // Parse the input date string

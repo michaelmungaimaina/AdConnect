@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 const moment = require("moment-timezone");
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -8,6 +8,8 @@ const path = require('path');
 const { google } = require('googleapis');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const config = require('./config');
+const readline = require('readline');
 
 const app = express();
 
@@ -52,29 +54,35 @@ console.log("DB Config:", {
 });
 
 // MySQL Connection
-// Create a connection pool to your SQL database hosted on Truehost
-const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'eshhfecq_admin',
-    password: process.env.DB_PASSWORD || '13579QEtuo...',
-    database:  process.env.DB_NAME || 'eshhfecq_adconnect',
-    debug: true,
+const db = mysql.createPool(config.db);
+/*db.connect((err) => {
+    if (err) {
+        console.error('Error Connecting to Database ', err);
+        return;
+    }
+    console.log('Connected to the MySQL database.');
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on ${process.env.APP_API_URL || 'http://localhost'}:${PORT}`);
+    });
+});*/
+// Check database connection
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error('❌ Error Connecting to Database:', err);
+        return;
+    }
+    console.log('✅ Connected to the MySQL database.');
+    connection.release(); // Always release the connection back to the pool
+
+    // Start Express server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on ${process.env.APP_API_URL || 'http://localhost'}:${PORT}`);
+    });
 });
 
-async function testConnection() {
-    try {
-        const connection = await db.getConnection(); // Use global pool
-        console.log('✅ Connected to MySQL database.');
-        connection.release();
-    } catch (err) {
-        console.error('❌ Database connection failed:', err);
-    }
-}
-
-testConnection();
-
-
-// Start the server
+/*Start the server
 async function startServer() {
     try {
         await testConnection(); // Ensure database connection is successful
@@ -86,370 +94,317 @@ async function startServer() {
         console.error('Failed to start server:', err);
     }
 }
-startServer();
-// Endpoint to create a user
-app.post('/api/users', async (req, res) => {
-    try {
-        console.log(req.body);
-        const {name, email, password, role, access_level } = req.body;
+startServer();*/
 
-        // Validate input data
-        if (!name || !email || !password || !role || !access_level) {
-            return res.status(400).json({ error: 'All fields are required' });
+// Function to handle user creation (register a new user)
+app.post('/api/users', (req, res) => {
+    const {name, email, password, role, access_level} = req.body;
+
+    // Validate that all required fields are provided
+    if (!name || !email || !password || !role || !access_level) {
+        return res.status(400).json({error: 'All fields are required'});
+    }
+
+    // Check if a user with the same name and email already exists
+    const query1 = 'SELECT * FROM users WHERE name = ? AND email = ?';
+    db.query(query1, [name, email], (err, rows) => {
+        if (err) {
+            console.error(err); // Log the error
+            return res.status(500).json({error: 'Database error'}); // Return a server error response
         }
-
-        // SQL query to fetch a user by ID and EMAIL
-        const query1 = 'SELECT * FROM users WHERE name = ? AND email = ?';
-
-        // Execute the query
-        const [rows] = await db.execute(query1, [name, email]);
-
-        // Check if a user was found
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'User Already Exists!' });
+        // If the user already exists, return an error
+        if (rows.length > 0) {
+            return res.status(400).json({error: 'User Already Exists!'});
         }
+        
 
-        // SQL query to insert the new user
-        const query = `
-            INSERT INTO users (id, name, email, password, role, access_level, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        // Execute the query
-        const [result] = await db.execute(query, [clientID, name, email, password, role, access_level, createdAt]);
-
-        console.log(result);
-
-        // Respond with success message
-        res.status(200).json({
-            message: 'User created successfully',
-            user: {
-                clientID,
-                name,
-                email,
-                password,
-                role,
-                access_level,
-                createdAt
+        // Insert the new user into the database
+        const query = `INSERT INTO users (id, name, email, password, role, access_level, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        db.query(query, [clientID, name, email, password, role, access_level, createdAt], (err) => {
+            if (err) {
+                console.error(err); // Log the error
+                return res.status(500).json({error: 'Database error'}); // Return a server error response
             }
+
+            // Return a success response with the generated user information
+            res.status(201).json({
+                message: 'User created successfully',
+                user: {clientID, name, email, role, access_level, createdAt},
+            });
         });
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while creating the user' });
-    }
+    });
 });
 
-// API endpoint for user authentication
-app.post("/api/auth", async (req, res) => {
-    const { email, password } = req.body;
-
+// Function to handle user authentication (Login user)
+app.post('/api/auth', (req, res) => {
+    const {email, password} = req.body;
+    // Ensure email and password values are provided
     if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({error: 'Email and password are required'});
     }
-    try{
-        const query = "SELECT * FROM users WHERE email = ? AND password = ?";
-        // Execute the query
-        const [rows] = await db.execute(query, [email, password]);
-
-        // Check if a user was found
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+    const query = 'SELECT * FROM users WHERE email = ? AND password = ?';
+    db.query(query, [email, password], (err, rows) => {
+        // Log database error if any occurs
+        if (err) {
+            console.error(err);
+            return res.status(500).json({error: 'Database error'});
         }
-
-        //Successful Login
-        /* Store user data in the session
-        req.session.user = {
-            id: rows[0].id,
-            username: rows[0].name,
-        };**/
-        return res.status(200).json({ message: "Login successful", username: rows[0].name /*user: req.session.user*/ });
-    } catch(error)  {
-        return res.status(401).json({ error: "Invalid email or password" });
-    }
+        // Check if user exists in the database
+        if (rows.length === 0) {
+            return res.status(404).json({error: 'User not found'});
+        }
+        // Return login success message along with username
+        res.status(200).json({message: 'Login successful', username: rows[0].name});
+    });
 });
 
-// Get all users
-app.get('/api/users', async (req, res) => {
-    try {
-        // SQL query to fetch all users
-        const query = 'SELECT * FROM users';
 
-        // Execute the query
-        const [users] = await db.execute(query);
-
-        // Respond with the list of users
+// Endpoint to get all users
+app.get('/api/users', (req, res) => {
+    const query = 'SELECT * FROM users';
+    db.query(query, (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({error: 'Database error'});
+        }
         res.status(200).json(users);
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while fetching users' });
-    }
+    });
 });
 
-// Get a single user by ID
-app.get('/api/users/:id', async (req, res) => {
-    try {
-        const userId = req.params.id;
-
-        // SQL query to fetch a user by ID
-        const query = 'SELECT * FROM users WHERE id = ?';
-
-        // Execute the query
-        const [rows] = await db.execute(query, [userId]);
-
-        // Check if a user was found
+// Endpoint to get user by id
+app.get('/api/users/:id', (req, res) => {
+    const {id} = req.params; // Extract the user ID from request parameters
+    const query = 'SELECT * FROM users WHERE id = ?'; // Query to retrieve the user by ID
+    db.query(query, [id], (err, rows) => {
+        if (err) {
+            console.error(err); // Log the error if any occurs
+            return res.status(500).json({error: 'Database error'}); // Send a 500 response for database error
+        }
         if (rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({error: 'User not found'}); // Send a 404 response if no user is found
         }
-
-        // Respond with the user
-        res.status(200).json(rows[0]);
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while fetching the user' });
-    }
+        res.status(200).json(rows[0]); // Send the user data in a success response
+    });
+});
+// Endpoint to update user by id
+app.put('/api/users/:id', (req, res) => {
+    const {id} = req.params; // Extract the user ID from request parameters
+    const {name, email, password, role, access_level} = req.body; // Extract the fields to be updated from the request body
+    const query = `UPDATE users SET name = ?, email = ?, password = ?, role = ?, access_level = ? WHERE id = ?`; // Query to update the user
+    db.query(query, [name, email, password, role, access_level, id], (err) => {
+        if (err) {
+            console.error(err); // Log the error if any occurs
+            return res.status(500).json({error: 'Database error'}); // Send a 500 response for database error
+        }
+        res.status(200).json({message: 'User updated successfully'}); // Send a success response
+    });
 });
 
-// Update a user by ID
-app.put('/api/users/:id', async (req, res) => {
-    try {
-        const userId = req.params.id;
-        const {name, email, password, role, access_level, created_at } = req.body;
-
-        // Check if the user exists
-        const [existingUser] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
-        if (existingUser.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+// Endpoint to delete user by id
+app.delete('/api/users/:id', (req, res) => {
+    const {id} = req.params; // Extract the user ID from request parameters
+    const query = 'DELETE FROM users WHERE id = ?'; // Query to delete the user
+    db.query(query, [id], (err) => {
+        if (err) {
+            console.error(err); // Log the error if any occurs
+            return res.status(500).json({error: 'Database error'}); // Send a 500 response for database error
         }
-
-        // Update the user in the database
-        const query = `
-            UPDATE users
-            SET name = ?, email = ?, password = ?, role = ?, access_level = ?, created_at = ?
-            WHERE id = ?
-        `;
-        await db.execute(query, [name, email, password, role, access_level, createdAt, userId]);
-
-        // Respond with a success message
-        res.status(200).json({
-            message: 'User updated successfully',
-            user: { id: userId, name, email, password, role, access_level , createdAt}
-        });
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while updating the user' });
-    }
-});
-
-
-// Delete a user by ID
-app.delete('/api/users/:id', async (req, res) => {
-    try {
-        const userId = req.params.id;
-        console.log('Deleting user with ID:', userId);
-
-        // Check if the user exists
-        const [existingUser] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
-        console.log('Existing user:', existingUser);
-
-        if (existingUser.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        // SQL query to delete the user
-        const query = 'DELETE FROM users WHERE id = ?';
-        console.log('SQL Query:', query, 'Params:', [userId]);
-
-        await db.execute(query, [userId]);
-
-        // Respond with a success message
-        res.status(200).json({ message: 'User deleted successfully' });
-    } catch (error) {
-        // Handle errors
-        console.error('Error details:', error.message || error);
-        res.status(500).json({ error: 'An error occurred while deleting the user' });
-    }
+        res.status(200).json({message: 'User deleted successfully'}); // Send a success response
+    });
 });
 
 // Format timestamp for EAT
-let clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS");
+//const clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS") + Math.floor(1000 + Math.random() * 9000);
+let clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS") + Math.floor(Math.random() * 1000);
 let createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SS");
 // Create a new client (lead)
-app.post('/api/clients', async (req, res) => {
-    try {
-        console.log(req.body); // Log the request body for debugging
-        const { clientId, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription } = req.body;
+// Endpoint to add a new client
+app.post('/api/clients', (req, res) => {
+    console.log(req.body); // Log the request body for debugging
+    const {clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription } = req.body;
 
-        // Check if any of the variables are null
-        if (clientId === null || clientName === null || clientEmail === null || clientPhone === null || clientCompany === null || clientLocation === null || clientStreet === null || clientProvince === null || clientZipCode === null || clientSource === null || clientStatus === null || clientSubScription === null) {
-            return res.status(400).json({ error: 'All fields are required and cannot be null' });
+    // Check if any of the variables are null
+    if (!clientName || !clientEmail || !clientPhone || !clientCompany || !clientLocation || !clientStreet || !clientProvince || !clientZipCode || !clientSource || !clientStatus || !clientSubScription) {
+        return res.status(400).json({ error: 'All fields are required and cannot be null' });
+    }
+
+    // Insert the new client into the database
+    const insertQuery = `
+        INSERT INTO clients (clientID, clientName, clientEmail, clientPhone, clientCity, clientCompany, clientStreet, clientProvince, clientZip, clientSource, clientStatus, clientSubScription, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, createdAt], (err) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'Failed to Create Lead' });
         }
 
-        // Check if the client already exists based on email or phone
-        const checkQuery = `
-            SELECT * FROM clients
-            WHERE clientEmail = ? OR clientPhone = ?
-        `;
-        const [existingClient] = await db.execute(checkQuery, [clientEmail, clientPhone]);
+        // Respond with success
+        res.status(201).json({
+            message: 'Lead created successfully',
+            lead: {
+                clientID,
+                clientName,
+                clientEmail,
+                clientPhone,
+                clientCompany,
+                clientLocation,
+                clientStreet,
+                clientProvince,
+                clientZipCode,
+                clientSource,
+                clientStatus,
+                clientSubScription,
+                createdAt
+            },
+        });
+    });
+});
 
-        // Construct the base URL from the request object
-        const baseUrl = `${req.protocol}://${req.get('host')}${req.path}`;
+// Endpoint to check if a client (lead) already exists
+app.post('/api/lead-exists', (req, res) => {
+    console.log(req.body); // Debugging request body
+    const { clientEmail, clientPhone } = req.body;
+
+    // Validate request
+    if (!clientEmail || !clientPhone) {
+        return res.status(400).json({ error: 'Email and phone are required' });
+    }
+
+    // Check if the client already exists
+    const checkQuery = `
+        SELECT * FROM clients
+        WHERE clientEmail = ? OR clientPhone = ?
+    `;
+
+    db.query(checkQuery, [clientEmail, clientPhone], (err, existingClient) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
 
         if (existingClient.length > 0) {
             const errorMessage = existingClient[0].clientEmail === clientEmail
                 ? 'Email already exists'
                 : 'Phone number already exists';
-            // Redirect user to strategy page
-            return res.redirect(`${baseUrl}?value-video-opt-in=true`);
+
+            return res.status(200).json({
+                exists: true,
+                message: errorMessage,
+            });
         }
 
-        // Insert the new client into the database
-        const insertQuery = `
-            INSERT INTO clients (clientID, clientName, clientEmail, clientPhone, clientCity, clientCompany, clientStreet, clientProvince, clientZip, clientSource, clientStatus, clientSubScription,created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        await db.execute(insertQuery, [`${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, `${createdAt}`]);
-
-        // Respond with success
-        res.status(201).json({ message: 'Lead created successfully', lead: { clientId: `${clientID}`, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription} });
-    } catch (error) {
-        console.error(`Backend Error: `, error); // Log the error for debugging
-        res.status(500).json({ error: `${error.message}` }); // Send the error message in the response
-    }
+        // ✅ If no client found, return a success response indicating non-existence
+        res.status(200).json({ exists: false, message: "Client does not exist" });
+    });
 });
 
+// Endpoint to get all clients (leads)
+app.get('/api/clients', (req, res) => {
+    const query = 'SELECT * FROM clients';
 
-// Get all clients (leads)
-app.get('/api/clients', async (req, res) => {
-    try {
-        // SQL query to fetch all clients
-        const query = 'SELECT * FROM clients';
+    db.query(query, (err, clients) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'An error occurred while fetching the clients' });
+        }
 
-        // Execute the query
-        const [clients] = await db.execute(query);
-
-        // Respond with the list of clients
         res.status(200).json(clients);
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while fetching the clients' });
-    }
+    });
 });
 
+// Endpoint to get a single client (lead) by ID
+app.get('/api/clients/:id', (req, res) => {
+    const clientId = req.params.id;
+    const query = 'SELECT * FROM clients WHERE id = ?';
 
-// Get a single client (lead) by ID
-app.get('/api/clients/:id', async (req, res) => {
-    try {
-        const clientId = req.params.id;
+    db.query(query, [clientId], (err, clients) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'An error occurred while fetching the client' });
+        }
 
-        // SQL query to fetch the client by ID
-        const query = 'SELECT * FROM clients WHERE id = ?';
-
-        // Execute the query
-        const [clients] = await db.execute(query, [clientId]);
-
-        // Check if client exists
         if (clients.length === 0) {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        // Respond with the client
         res.status(200).json(clients[0]);
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while fetching the client' });
-    }
+    });
 });
 
-app.post('/api/sendSubsequentEmail', async (req, res) => {
+// Endpoint to send a subsequent email to a client
+app.post('/api/sendSubsequentEmail', (req, res) => {
     const { clientID } = req.body;
-    console.log(clientID)
-    try {
-        // Get client details
-        const [client] = await db.execute('SELECT * FROM clients WHERE clientID = ?', [clientID]);
-        console.log(client)
-        if (!client) {
+    console.log(clientID);
+
+    const clientQuery = 'SELECT * FROM clients WHERE clientID = ?';
+    db.query(clientQuery, [clientID], (err, client) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (client.length === 0) {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        console.log(`Client Subscription Value: "${client[0].clientSubScription}`);
+        console.log(`Client Subscription Value: "${client[0].clientSubScription}"`);
         if (client[0].clientSubScription?.trim().toUpperCase() !== 'SUBSCRIBED') {
             return res.status(400).json({ error: 'Client is not subscribed to marketing emails' });
         }
 
-        // Fetch email template based on current status
-        const [template] = await db.execute('SELECT subject, body FROM email_templates WHERE status = ?', [
-            client[0].clientStatus,
-        ]);
+        const templateQuery = 'SELECT subject, body FROM email_templates WHERE status = ?';
+        db.query(templateQuery, [client[0].clientStatus], (err, template) => {
+            if (err) {
+                console.error('Database Error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-        if (!template) {
-            return res.status(404).json({ error: `No email template found for status: ${client.clientStatus}` });
-        }
+            if (template.length === 0) {
+                return res.status(404).json({ error: `No email template found for status: ${client[0].clientStatus}` });
+            }
 
-        // Replace placeholders
-        const emailBody = template.body
-            .replace(/\$\{clientName\}/g, client[0].clientName);
-        //const emailBody = template[0].body.replace('[NAME]', client[0].clientName);
+            const emailBody = template[0].body.replace(/\$\{clientName\}/g, client[0].clientName);
+            sendSubSequentEmail(client[0].clientEmail, template[0].subject, emailBody)
+                .then(() => {
+                    const statusOrder = ['1ST CONTACT', '2ND CONTACT', '3RD CONTACT', '30TH CONTACT', '5TH CONTACT'];
+                    const currentStatusIndex = statusOrder.indexOf(client[0].clientStatus.trim().toUpperCase());
+                    const newStatus =
+                        currentStatusIndex !== -1 && currentStatusIndex < statusOrder.length - 1
+                            ? statusOrder[currentStatusIndex + 1]
+                            : client[0].clientStatus;
 
-        // Send email
-        await sendSubSequentEmail(client[0].clientEmail, template[0].subject, emailBody);
-
-        // Increment client status
-        const statusOrder = [
-            '1ST CONTACT',
-            '2ND CONTACT',
-            '3RD CONTACT',
-            '30TH CONTACT',
-            '5TH CONTACT'
-            // Add up to '30TH CONTACT'
-        ];
-        const currentStatusIndex = statusOrder.indexOf(client[0].clientStatus.trim().toUpperCase());
-        const newStatus =
-            currentStatusIndex !== -1 && currentStatusIndex < statusOrder.length - 1
-                ? statusOrder[currentStatusIndex + 1]
-                : client[0].clientStatus; // Keep current status if it's the last one
-
-        // Update client status and timestamp
-        await db.execute(
-            `UPDATE clients SET clientStatus = ?, created_at = ? WHERE clientID = ?`,
-            [newStatus, createdAt, clientID]
-        );
-
-        res.status(200).json({ message: 'Email sent and status updated successfully!' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while sending the email' });
-    }
+                    const updateQuery = 'UPDATE clients SET clientStatus = ?, updated_at = CURRENT_TIMESTAMP WHERE clientID = ?';
+                    db.query(updateQuery, [newStatus, clientID], (err) => {
+                        if (err) {
+                            console.error('Database Error:', err);
+                            return res.status(500).json({ error: 'Database error' });
+                        }
+                        res.status(200).json({ message: 'Email sent and status updated successfully!' });
+                    });
+                })
+                .catch((err) => {
+                    console.error('Email Sending Error:', err);
+                    res.status(500).json({ error: 'An error occurred while sending the email' });
+                });
+        });
+    });
 });
 
 // Endpoint to fetch email template by status
 app.get('/api/emailTemplate', async (req, res) => {
     try {
         const { status } = req.query;
-
-        // Validate that the status is provided
         if (!status) {
             return res.status(400).json({ error: 'Status is required' });
         }
-
-        // Query the database for the template corresponding to the provided status
         const query = 'SELECT subject, body FROM email_templates WHERE status = ?';
         const [result] = await db.execute(query, [status]);
-
         if (result.length === 0) {
             return res.status(404).json({ error: 'No email template found for this status' });
         }
-
-        // Respond with the template details
-        res.status(200).json({
-            subject: result[0].subject,
-            body: result[0].body,
-        });
+        res.status(200).json({ subject: result[0].subject, body: result[0].body });
     } catch (error) {
         console.error('Error fetching email template:', error);
         res.status(500).json({ error: 'An error occurred while fetching the email template' });
@@ -463,69 +418,74 @@ app.put('/api/unsubscribeLead', async (req, res) => {
         if (!clientID) {
             return res.status(404).json({ error: 'No Lead Id Passed' });
         }
-
-        // Update client status and timestamp
         await db.execute(
             `UPDATE clients SET clientSubScription = ?, created_at = ? WHERE clientID = ?`,
-            ['UNSUBSCRIBED', createdAt, clientID]
+            ['UNSUBSCRIBED', new Date(), clientID]
         );
-
         res.status(200).json({ message: 'Lead Unsubscribed Successfully!' });
-    } catch(error){
+    } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while unsubscribing!' });
     }
 });
 
-// Update a lead by ID
-app.put('/api/clients/:id', async (req, res) => {
-    try {
-        const clientId = req.params.id;
-        const { clientEmail, clientPhone, clientName, company, ...otherFields } = req.body;
+/// Update a lead by ID
+app.put('/api/clients/:id', (req, res) => {
+    const { id } = req.params;
+    const { clientEmail, clientPhone, clientName, company, ...otherFields } = req.body;
 
-        // SQL query to check if the client exists
-        const checkQuery = 'SELECT * FROM clients WHERE id = ?';
-        const [existingClient] = await db.execute(checkQuery, [clientId]);
+    // SQL query to check if the client exists
+    const checkQuery = 'SELECT * FROM clients WHERE id = ?';
+
+    db.query(checkQuery, [id], (err, existingClient) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
 
         // If client does not exist, return 404
         if (existingClient.length === 0) {
             return res.status(404).json({ error: 'Lead not found' });
         }
 
-        // SQL query to update the client
+        // Prepare update query and values
         const updateQuery = `
-            UPDATE clients
-            SET clientEmail = ?, clientPhone = ?, clientName = ?, company = ?, updated_at = CURRENT_TIMESTAMP
-                ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
-            WHERE id = ?
-        `;
-
-        // Collect values to update
-        const updateValues = [clientEmail, clientPhone, clientName, company, ...Object.values(otherFields), clientId];
+      UPDATE clients
+      SET clientEmail = ?, clientPhone = ?, clientName = ?, company = ?, updated_at = CURRENT_TIMESTAMP
+      ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
+      WHERE id = ?
+    `;
+        const updateValues = [clientEmail, clientPhone, clientName, company, ...Object.values(otherFields), id];
 
         // Execute the update query
-        await db.execute(updateQuery, updateValues);
+        db.query(updateQuery, updateValues, (updateErr) => {
+            if (updateErr) {
+                console.error(updateErr);
+                return res.status(500).send('Database error');
+            }
 
-        // Respond with the updated client data
-        res.status(200).json({
-            message: 'Lead updated successfully',
-            client: { clientId, clientEmail, clientPhone, clientName, company, ...otherFields }
+            // Respond with the updated client data
+            res.status(200).json({
+                message: 'Lead updated successfully',
+                client: { id, clientEmail, clientPhone, clientName, company, ...otherFields }
+            });
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while updating the lead' });
-    }
+    });
 });
 
 
 // Delete a lead by ID
-app.delete('/api/clients/:id', async (req, res) => {
-    try {
-        const clientId = req.params.id;
+app.delete('/api/clients/:id', (req, res) => {
+    const { id } = req.params;
 
-        // SQL query to check if the client exists
-        const checkQuery = 'SELECT * FROM clients WHERE clientID = ?';
-        const [existingClient] = await db.execute(checkQuery, [clientId]);
+    // SQL query to check if the client exists
+    const checkQuery = 'SELECT * FROM clients WHERE clientID = ?';
+
+    db.query(checkQuery, [id], (err, existingClient) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
 
         // If client does not exist, return 404
         if (existingClient.length === 0) {
@@ -534,100 +494,98 @@ app.delete('/api/clients/:id', async (req, res) => {
 
         // SQL query to delete the client
         const deleteQuery = 'DELETE FROM clients WHERE clientID = ?';
-        await db.execute(deleteQuery, [clientId]);
 
-        // Respond with a success message
-        res.status(200).json({ message: 'Lead deleted successfully' });
-    } catch (error) {
-        // Handle errors
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while deleting the lead' });
-    }
+        db.query(deleteQuery, [id], (deleteErr) => {
+            if (deleteErr) {
+                console.error(deleteErr);
+                return res.status(500).send('Database error');
+            }
+
+            // Respond with a success message
+            res.status(200).send('Lead deleted successfully');
+        });
+    });
 });
 
 
-// Create a new appointment booking
-app.post('/api/appointments', async (req, res) => {
-    try {
-        console.log(req.body);
 
-        const {
-            clientName,
-            clientEmail,
-            clientPhone,
-            clientLocation,
-            appointmentDate,
-            appointmentTime,
-            appointmentType,
-            appointmentStatus,
-            appointmentNotes,
-            meetingLink
-        } = req.body;
+/// Create a new appointment booking
+app.post('/api/appointments', (req, res) => {
+    const {
+        clientName,
+        clientEmail,
+        clientPhone,
+        clientLocation,
+        appointmentDate,
+        appointmentTime,
+        appointmentType,
+        appointmentStatus,
+        appointmentNotes,
+        meetingLink
+    } = req.body;
 
-        // Check if all required fields are provided
-        if (!appointmentDate || !clientPhone) {
-            return res.status(400).json({ error: 'Missing required fields: appointmentDate, or service' });
+    // Check if all required fields are provided
+    if (!appointmentDate || !clientPhone) {
+        return res.status(400).json({ error: 'Missing required fields: appointmentDate, or clientPhone' });
+    }
+
+    // SQL query to insert a new appointment
+    const insertQuery = `
+    INSERT INTO appointments (clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink,created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+  `;
+
+    db.query(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'An error occurred while booking the appointment' });
         }
-
-        // SQL query to insert a new appointment
-        const insertQuery = `
-            INSERT INTO appointments (clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        // Execute the insert query
-        const [result] = await db.execute(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation,
-            appointmentDate, appointmentTime, appointmentType, appointmentStatus,
-            appointmentNotes, meetingLink]);
 
         // Respond with the newly created appointment
         res.status(201).json({
             message: 'Appointment Booked successfully',
             appointment: {
-                //id: result.insertId, // Auto-generated ID after insertion
-                clientID, clientName, clientEmail, clientPhone, clientLocation,
+                // auto-generated ID will be in result.insertId
+                clientName, clientEmail, clientPhone, clientLocation,
                 appointmentDate, appointmentTime, appointmentType, appointmentStatus,
                 appointmentNotes, meetingLink
             }
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while booking the appointment' });
-    }
+    });
 });
 
-
 // Get all appointments
-app.get('/api/appointments', async (req, res) => {
-    try {
-        console.log('Getting all appointments');
+app.get('/api/appointments', (req, res) => {
+    console.log('Getting all appointments');
 
-        // SQL query to fetch all appointments
-        const query = 'SELECT * FROM appointments';
+    // SQL query to fetch all appointments
+    const query = 'SELECT * FROM appointments';
 
-        // Execute the query
-        const [appointments] = await db.execute(query);
+    // Execute the query
+    db.query(query, (err, appointments) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(500).json({ error: 'An error occurred while retrieving appointments' });
+        }
 
         // Respond with the fetched appointments
         res.status(200).json(appointments);
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while retrieving appointments' });
-    }
+    });
 });
 
-
 // Get a single appointment by ID
-app.get('/api/appointments/:id', async (req, res) => {
-    try {
-        const appointmentId = req.params.id;
+app.get('/api/appointments/:id', (req, res) => {
+    const appointmentId = req.params.id;
 
-        // SQL query to fetch the appointment by ID
-        const query = 'SELECT * FROM appointments WHERE clientId = ?';
+    // SQL query to fetch the appointment by ID
+    const query = 'SELECT * FROM appointments WHERE clientId = ?';
 
-        // Execute the query with the appointment ID
-        const [appointment] = await db.execute(query, [appointmentId]);
+    // Execute the query with the appointment ID
+    db.query(query, [appointmentId], (err, appointment) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(500).json({ error: 'An error occurred while retrieving the appointment' });
+        }
 
         // If the appointment does not exist, return 404
         if (appointment.length === 0) {
@@ -636,23 +594,25 @@ app.get('/api/appointments/:id', async (req, res) => {
 
         // Respond with the fetched appointment
         res.status(200).json(appointment[0]);
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while retrieving the appointment' });
-    }
+    });
 });
 
-app.get('/api/appointments-by-date/:appointmentDate', async (req, res) => {
-    try {
-        const appointmentDate = req.params.appointmentDate;
+// Get appointments by appointment date
+app.get('/api/appointments-by-date/:appointmentDate', (req, res) => {
+    const appointmentDate = req.params.appointmentDate;
 
-        // Log the input date for debugging
-        console.log('Received appointmentDate:', appointmentDate);
+    // Log the input date for debugging
+    console.log('Received appointmentDate:', appointmentDate);
 
-        // Fetch appointments from the database
-        const query = 'SELECT appointmentTime FROM appointments WHERE appointmentDate = ?';
-        const [appointments] = await db.execute(query, [appointmentDate]);
+    // SQL query to fetch appointments for the given date
+    const query = 'SELECT appointmentTime FROM appointments WHERE appointmentDate = ?';
+
+    // Execute the query
+    db.query(query, [appointmentDate], (err, appointments) => {
+        if (err) {
+            console.error('Backend Error:', err);
+            return res.status(500).json({ error: 'An error occurred while retrieving appointment times' });
+        }
 
         // Log the database result
         console.log('Database response:', appointments);
@@ -665,20 +625,24 @@ app.get('/api/appointments-by-date/:appointmentDate', async (req, res) => {
             message: 'Appointment time(s) retrieved successfully',
             appointmentTime: appointments,
         });
-    } catch (error) {
-        console.error('Backend Error:', error);
-        res.status(500).json({ error: 'An error occurred while retrieving appointment times' });
-    }
+    });
 });
 
 // Reschedule meeting and Notify client
-app.put('/api/rescheduleMeeting', async (req, res) => {
-    try {
-        const { clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink} = req.body;
+app.put('/api/rescheduleMeeting', (req, res) => {
+    const {
+        clientId, name, email, phone, location, appointmentDate, appointmentTime,
+        appointmentType, appointmentStatus, appointmentNotes, meetingLink
+    } = req.body;
 
-        // SQL query to check if the appointment exists
-        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
-        const [existingAppointment] = await db.execute(checkQuery, [clientId]);
+    // SQL query to check if the appointment exists
+    const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+
+    db.query(checkQuery, [clientId], (err, existingAppointment) => {
+        if (err) {
+            console.error('Backend Error:', err);
+            return res.status(500).json({ error: 'An error occurred while checking the appointment' });
+        }
 
         // If the appointment does not exist, return 404
         if (existingAppointment.length === 0) {
@@ -688,43 +652,48 @@ app.put('/api/rescheduleMeeting', async (req, res) => {
 
         // SQL query to update the appointment
         const updateQuery = `
-            UPDATE appointments 
-            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
-            WHERE clientId = ?
-        `;
+      UPDATE appointments 
+      SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, 
+          appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+      WHERE clientId = ?
+    `;
 
         // Execute the update query
-        await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
-
-        // Send Email Notification
-        sendRescheduleEmail(name.split(' ')[0],email,appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
-        sendBookingReactionEmail(name.split(' ')[0],appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
-
-        // Respond with a success message
-        console.log('Meeting Rescheduled successfully');
-        res.status(200).json({
-            message: 'Meeting Rescheduled successfully',
-            appointment: {
-                clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
+        db.query(updateQuery, [clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, new Date(), clientId], (updateErr) => {
+            if (updateErr) {
+                console.error('Backend Error:', updateErr);
+                return res.status(500).json({ error: 'An error occurred while updating the appointment' });
             }
+
+            // Send Email Notification
+            sendRescheduleEmail(name.split(' ')[0], email, appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
+            sendBookingReactionEmail(name.split(' ')[0], appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
+
+            // Respond with a success message
+            console.log('Meeting Rescheduled successfully');
+            res.status(200).json({
+                message: 'Meeting Rescheduled successfully',
+                appointment: {
+                    clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
+                }
+            });
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while updating the appointment' });
-    }
+    });
 });
 
 // Reminder notification to client
-app.put('/api/reminder-email', async (req, res) => {
-    try {
-        console.log(req.body)
-        const { clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink} = req.body;
+app.put('/api/reminder-email', (req, res) => {
+    console.log(req.body);
+    const { clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink } = req.body;
 
-        console.log(req.body)
-        // SQL query to check if the appointment exists
-        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
-        const [existingAppointment] = await db.execute(checkQuery, [clientId]);
+    // SQL query to check if the appointment exists
+    const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+
+    db.query(checkQuery, [clientId], (err, existingAppointment) => {
+        if (err) {
+            console.error('Backend Error:', err);
+            return res.status(500).json({ error: 'An error occurred while checking the appointment' });
+        }
 
         // If the appointment does not exist, return 404
         if (existingAppointment.length === 0) {
@@ -733,43 +702,45 @@ app.put('/api/reminder-email', async (req, res) => {
         }
 
         /* SQL query to update the appointment reminder status
-        const updateQuery = `
-            UPDATE appointments 
-            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
-            WHERE clientId = ?
-        `;*/
+       const updateQuery =
+           UPDATE appointments
+           SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+           WHERE clientId = ?
+       ;*/
 
         // Execute the update query
         // await db.execute(updateQuery, [clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt, clientId]);
 
-        const [fname] = name.split(' ')
+        // Split name to get first name
+        const [fname] = name.split(' ');
+
         // Send Email Notification
-        sendReminderEmail(fname[0],email,appointmentDate,appointmentTime,location,appointmentNotes,meetingLink);
+        sendReminderEmail(fname, email, appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
 
         // Respond with a success message
-        console.log('Meeting Rescheduled successfully');
+        console.log('Reminder Sent successfully');
         res.status(200).json({
             message: 'Reminder Sent successfully',
             appointment: {
-                clientId,name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
+                clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink
             }
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while updating the appointment' });
-    }
+    });
 });
 
 // Update an appointment by ID
-app.put('/api/appointments/:id', async (req, res) => {
-    try {
-        const appointmentId = req.params.id;
-        const { status } = req.body;
+app.put('/api/appointments/:id', (req, res) => {
+    const appointmentId = req.params.id;
+    const { status } = req.body;
 
-        // SQL query to check if the appointment exists
-        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
-        const [existingAppointment] = await db.execute(checkQuery, [appointmentId]);
+    // SQL query to check if the appointment exists
+    const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+
+    db.query(checkQuery, [appointmentId], (err, existingAppointment) => {
+        if (err) {
+            console.error('Backend Error:', err);
+            return res.status(500).json({ error: 'An error occurred while checking the appointment' });
+        }
 
         // If the appointment does not exist, return 404
         if (existingAppointment.length === 0) {
@@ -779,39 +750,43 @@ app.put('/api/appointments/:id', async (req, res) => {
 
         // SQL query to update the appointment
         const updateQuery = `
-            UPDATE appointments 
-            SET appointmentStatus = ?,
-            WHERE clientId = ?
-        `;
+      UPDATE appointments 
+      SET appointmentStatus = ?
+      WHERE clientId = ?
+    `;
 
         // Execute the update query
-        await db.execute(updateQuery, [status, appointmentId]);
-
-        // Respond with a success message
-        console.log('Appointment Status updated successfully');
-        res.status(200).json({
-            message: 'Appointment Status updated successfully',
-            appointment: {
-                id: appointmentId,
-                status
+        db.query(updateQuery, [status, appointmentId], (updateErr) => {
+            if (updateErr) {
+                console.error('Backend Error:', updateErr);
+                return res.status(500).json({ error: 'An error occurred while updating the appointment' });
             }
+
+            // Respond with a success message
+            console.log('Appointment Status updated successfully');
+            res.status(200).json({
+                message: 'Appointment Status updated successfully',
+                appointment: {
+                    id: appointmentId,
+                    status
+                }
+            });
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while updating the appointment' });
-    }
+    });
 });
 
-
 // Delete an appointment by ID
-app.delete('/api/appointments/:id', async (req, res) => {
-    try {
-        const appointmentId = req.params.id;
+app.delete('/api/appointments/:id', (req, res) => {
+    const appointmentId = req.params.id;
 
-        // SQL query to check if the appointment exists
-        const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
-        const [existingAppointment] = await db.execute(checkQuery, [appointmentId]);
+    // SQL query to check if the appointment exists
+    const checkQuery = 'SELECT * FROM appointments WHERE clientId = ?';
+
+    db.query(checkQuery, [appointmentId], (err, existingAppointment) => {
+        if (err) {
+            console.error('Backend Error:', err);
+            return res.status(500).json({ error: 'An error occurred while checking the appointment' });
+        }
 
         // If the appointment does not exist, return 404
         if (existingAppointment.length === 0) {
@@ -820,84 +795,84 @@ app.delete('/api/appointments/:id', async (req, res) => {
 
         // SQL query to delete the appointment
         const deleteQuery = 'DELETE FROM appointments WHERE clientId = ?';
-        await db.execute(deleteQuery, [appointmentId]);
 
-        // Respond with a success message
-        res.status(200).json({ message: 'Appointment deleted successfully' });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: 'An error occurred while deleting the appointment' });
-    }
+        db.query(deleteQuery, [appointmentId], (deleteErr) => {
+            if (deleteErr) {
+                console.error('Backend Error:', deleteErr);
+                return res.status(500).json({ error: 'An error occurred while deleting the appointment' });
+            }
+
+            // Respond with a success message
+            res.status(200).json({ message: 'Appointment deleted successfully' });
+        });
+    });
 });
 
-
 // Create a new marketing strategy application
-app.post('/api/marketing-strategy-applications', async (req, res) => {
-    try {
-        console.log(req.body);
+app.post('/api/marketing-strategy-applications', (req, res) => {
+    console.log(req.body);
 
-        // Extract the necessary fields from the request body
-        const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status} = req.body;
+    // Extract the necessary fields from the request body
+    const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status } = req.body;
 
-        // SQL query to insert a new application
-        const insertQuery = `
-            INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+    // SQL query to insert a new application
+    const insertQuery = `
+    INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-        // Execute the query to insert the new application into the database
-        const [result] = await db.execute(insertQuery, [`${clientID}`, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, `${createdAt}`]);
+    // Execute the query to insert the new application into the database
+    db.query(insertQuery, [clientID, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, createdAt], (err, result) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(400).json({ error: err.message });
+        }
 
         // Respond with a success message and the inserted application data
         res.status(201).json({
             message: 'Application submitted successfully',
             application: {
-                id: result.applicationId, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status
+                id: result.insertId, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status
             }
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(400).json({ error: error.message });
-    }
+    });
 });
 
-
 // Get all marketing strategy applications
-app.get('/api/marketing-strategy-applications', async (req, res) => {
-    try {
-        console.log('Getting all applications');
+app.get('/api/marketing-strategy-applications', (req, res) => {
+    console.log('Getting all applications');
 
-        // SQL query to get all applications from the database
-        const selectQuery = 'SELECT * FROM marketing_strategy';
+    // SQL query to get all applications from the database
+    const selectQuery = 'SELECT * FROM marketing_strategy';
 
-        // Execute the query to fetch the applications
-        const [applications] = await db.execute(selectQuery);
+    // Execute the query to fetch the applications
+    db.query(selectQuery, (err, applications) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(500).json({ error: err.message });
+        }
 
         // Respond with a success message and the list of applications
         res.status(200).json({
             message: 'Application(s) retrieved successfully',
             applications
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: error.message });
-    }
+    });
 });
 
-
 // Get a single marketing strategy application by ID
-app.get('/api/marketing-strategy-applications/:id', async (req, res) => {
-    try {
-        const applicationId = req.params.id;
+app.get('/api/marketing-strategy-applications/:id', (req, res) => {
+    const applicationId = req.params.id;
 
-        // SQL query to fetch the application by ID
-        const selectQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
+    // SQL query to fetch the application by ID
+    const selectQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
 
-        // Execute the query to get the application
-        const [application] = await db.execute(selectQuery, [applicationId]);
+    // Execute the query to get the application
+    db.query(selectQuery, [applicationId], (err, application) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(500).json({ error: err.message });
+        }
 
         // If no application found, return a 404 error
         if (application.length === 0) {
@@ -906,23 +881,23 @@ app.get('/api/marketing-strategy-applications/:id', async (req, res) => {
 
         // Respond with the application data
         res.status(200).json(application[0]);
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: error.message });
-    }
+    });
 });
 
 
-// Update a marketing strategy application by ID
-app.put('/api/marketing-strategy-applications/:id', async (req, res) => {
-    try {
-        const applicationId = req.params.id;
-        const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status } = req.body;
 
-        // SQL query to check if the application exists
-        const checkQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
-        const [existingApplication] = await db.execute(checkQuery, [applicationId]);
+// Update a marketing strategy application by ID
+app.put('/api/marketing-strategy-applications/:id', (req, res) => {
+    const applicationId = req.params.id;
+    const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status } = req.body;
+
+    // SQL query to check if the application exists
+    const checkQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
+    db.query(checkQuery, [applicationId], (err, existingApplication) => {
+        if (err) {
+            console.error('Backend Error: ', err);
+            return res.status(500).json({ error: err.message });
+        }
 
         // If the application does not exist, return 404
         if (existingApplication.length === 0) {
@@ -931,42 +906,39 @@ app.put('/api/marketing-strategy-applications/:id', async (req, res) => {
 
         // SQL query to update the application
         const updateQuery = `
-            UPDATE marketing_strategy_applications
-            SET applicationDate = ?, applicantFName = ?, applicantLName = ?, email = ?, phone = ?, occupation = ?, marketTriggers = ?, strategyGoal = ?, status = ?
-            WHERE applicationId = ?
-        `;
+      UPDATE marketing_strategy
+      SET applicationDate = ?, applicantFName = ?, applicantLName = ?, email = ?, phone = ?, occupation = ?, marketTriggers = ?, strategyGoal = ?, status = ?
+      WHERE applicationId = ?
+    `;
 
         // Execute the query to update the application
-        await db.execute(updateQuery, [
-            applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status
-        ]);
-
-        // Respond with a success message and the updated application data
-        res.status(200).json({
-            message: 'Application updated successfully',
-            application: {
-                id: applicationId,
-                applicationDate, applicantName, email, phone, occupation, marketTriggers, strategyGoal, status
+        db.query(updateQuery, [
+            applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status, applicationId
+        ], (err) => {
+            if (err) {
+                console.error('Backend Error: ', err);
+                return res.status(500).json({ error: err.message });
             }
+
+            // Respond with a success message and the updated application data
+            res.status(200).json({
+                message: 'Application updated successfully',
+                application: {
+                    applicationId,
+                    applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status
+                }
+            });
         });
-    } catch (error) {
-        // Handle errors
-        console.error('Backend Error: ', error);
-        res.status(500).json({ error: error.message });
-    }
+    });
 });
 
 
-/**
- * Send a welcome email to the client
- * @param {string} clientName - Name of the client
- * @param {string} clientEmail - Email of the client
- */
+
 async function sendWelcomeEmail(clientName, clientEmail) {
     const mailOptions = {
         from: `"Adconnect Team" <${process.env.EMAIL_USER}>`, // Sender email
         to: clientEmail, // Recipient email
-        subject: 'Welcome to Adconnect â€“ Your Partner in Real Estate Marketing Success ðŸŽ‰',
+        subject: 'Welcome to Adconnect – Your Partner in Real Estate Marketing Success 🎉',
         html: `
            <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
     <div style="
@@ -980,12 +952,12 @@ async function sendWelcomeEmail(clientName, clientEmail) {
             Hello <span style="font-weight: bold;">${clientName},</span> Misgina Fitwi Here,
         </p>
         <p style="line-height: 1.5;">
-            Welcome to <a href="www.adconnet.co.ke" style="color: #4abc4f;
+            Welcome to <a href="https://www.adconnect.co.ke" style="color: #4abc4f;
             font-weight: bold;
             font-size: large;
             transition: color 0.3s ease;
-            text-decoration: none;">Adconnect!</a> Weâ€™re
-            thrilled to have you on board ðŸŽ‰.
+            text-decoration: none;">Adconnect!</a> We’re
+            thrilled to have you on board 🎉.
         </p>
         <p style="line-height: 1.5;">
             Our mission is simple: to help real estate companies like yours succeed
@@ -995,23 +967,23 @@ async function sendWelcomeEmail(clientName, clientEmail) {
             font-size: large;
             transition: color 0.3s ease;
             text-decoration: none;">AdConnect</a>, we
-            know that your success is our success ðŸ’ª.
+            know that your success is our success ❤️.
         </p>
         <p style="line-height: 1.5;">Here's what you can expect:</p>
         <ul>
             <li>
-                âœ¨ Proven strategies to attract and convert leads through Facebook and
+                ✔️ Proven strategies to attract and convert leads through Facebook and
                 social media advertising.
             </li>
             <li>
-                ðŸ”§ Expert support from our experienced developers, content editors, and
+                🔧 Expert support from our experienced developers, content editors, and
                 marketing professionals.
             </li>
             <li>
-                ðŸ“ˆ Ongoing guidance to keep your digital marketing at the cutting edge.
+                💡 Ongoing guidance to keep your digital marketing at the cutting edge.
             </li>
         </ul>
-        <p style="line-height: 1.5;">Weâ€™re here to take the complexity out of digital marketing for you.</p>
+        <p style="line-height: 1.5;">We’re here to take the complexity out of digital marketing for you.</p>
         <p style="line-height: 1.5;">
             <a href="https://adconnect.co.ke/index.html?value-video-opt-in=true" style="display: inline-block;
             padding: 5px 30px;
@@ -1024,7 +996,7 @@ async function sendWelcomeEmail(clientName, clientEmail) {
             transition: background-color 0.3s ease;">
                 Book a Free Consultation Today
             </a>
-        </p style="line-height: 1.5;">
+        </p>
         <p style="line-height: 1.5;">Looking forward to helping you grow!</p>
         <p style="line-height: 1.5;">Warm regards,<br /></p>
         <p style="line-height: 1.5;">
@@ -1063,6 +1035,7 @@ async function sendWelcomeEmail(clientName, clientEmail) {
         throw error;
     }
 }
+
 /**
  * Send a welcome email to the client
  * @param {string} clientName - Name of the client
@@ -1487,7 +1460,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Load your OAuth2 credentials
+/// Load your OAuth2 credentials
 const credentialsPath = path.join(__dirname, 'credentials.json');
 const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
@@ -1508,7 +1481,7 @@ async function getAndStoreToken() {
     console.log('Authorize this app by visiting this URL:', authUrl);
 
     // After visiting the URL, paste the authorization code here
-    const rl = require('readline').createInterface({
+    const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
@@ -1532,10 +1505,27 @@ async function getAndStoreToken() {
 // Set credentials (load tokens from file)
 function setCredentials() {
     if (fs.existsSync(tokenPath)) {
-        const token = fs.readFileSync(tokenPath, 'utf8');
-        oAuth2Client.setCredentials(JSON.parse(token));
+        const token = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
+        oAuth2Client.setCredentials(token);
     } else {
         console.error('No token file found. Run `getAndStoreToken` to authorize the app.');
+    }
+}
+
+// Refresh token if expired
+async function refreshToken() {
+    const token = oAuth2Client.credentials;
+    if (token && token.refresh_token) {
+        try {
+            const { credentials } = await oAuth2Client.refreshAccessToken();
+            oAuth2Client.setCredentials(credentials);
+            fs.writeFileSync(tokenPath, JSON.stringify(credentials)); // Save refreshed token
+            console.log('Token refreshed');
+        } catch (error) {
+            console.error('Error refreshing token', error);
+        }
+    } else {
+        console.error('No refresh token available');
     }
 }
 
@@ -1558,7 +1548,7 @@ async function createMeetLink(summary, startDateTime, endDateTime) {
                 timeZone: 'Africa/Nairobi',
             },
             end: {
-                dateTime: convertToISO8601(endDateTime), //'2025-01-20T11:00:00-07:00' Replace with your time
+                dateTime: convertToISO8601(endDateTime), // Replace with your time
                 timeZone: 'Africa/Nairobi',
             },
             conferenceData: {
@@ -1616,12 +1606,24 @@ app.post('/api/create-meet-link', async (req, res) => {
 
 // Example usage
 (async () => {
-    if (!fs.existsSync(tokenPath)) {
-        await getAndStoreToken(); // Authorize the app and store the token
-    } else {
-        setCredentials(); // Load the token and set it in the OAuth2 client
-        const meetLink = await createMeetLink('Adconnect Online Consultation','2025-01-20 10:00:00', '2025-01-20 10:30:00');
-        console.log('Generated Google Meet link:', meetLink);
+    try {
+        if (!fs.existsSync(tokenPath)) {
+            await getAndStoreToken(); // Authorize the app and store the token
+        } else {
+            setCredentials(); // Load the token and set it in the OAuth2 client
+
+            // Check if the token is expired, and refresh it if necessary
+            const token = oAuth2Client.credentials;
+            if (token.expiry_date && token.expiry_date < Date.now()) {
+                console.log('Token expired, refreshing...');
+                await refreshToken(); // Refresh the token if expired
+            }
+
+            const meetLink = await createMeetLink('Adconnect Online Consultation', '2025-01-20 10:00:00', '2025-01-20 10:30:00');
+            console.log('Generated Google Meet link:', meetLink);
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
 })();
 
