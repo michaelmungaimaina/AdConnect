@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
-const moment = require("moment-timezone");
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -10,8 +9,12 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const config = require('./config');
 const readline = require('readline');
+const multer = require('multer');
+const ExcelJS = require("exceljs");
+const PDFDocument = require("pdfkit");
 
 const app = express();
+
 
 // Middleware
 app.use(bodyParser.json());
@@ -20,7 +23,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use(cors({
-    origin: ['http://127.0.0.1:3000', 'http://localhost:3000', 'https://adconnect.com'],
+    origin: ['http://127.0.0.1:3000', 'http://127.0.0.1:63342', 'http://localhost:63342', 'https://adconnect.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -55,17 +58,6 @@ console.log("DB Config:", {
 
 // MySQL Connection
 const db = mysql.createPool(config.db);
-/*db.connect((err) => {
-    if (err) {
-        console.error('Error Connecting to Database ', err);
-        return;
-    }
-    console.log('Connected to the MySQL database.');
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running on ${process.env.APP_API_URL || 'http://localhost'}:${PORT}`);
-    });
-});*/
 // Check database connection
 db.getConnection((err, connection) => {
     if (err) {
@@ -82,19 +74,19 @@ db.getConnection((err, connection) => {
     });
 });
 
-/*Start the server
-async function startServer() {
-    try {
-        await testConnection(); // Ensure database connection is successful
-        const PORT = process.env.PORT || 3000;
-        app.listen(PORT, () => {
-            console.log(`Server running on ${process.env.APP_API_URL}:${PORT}`);
-        });
-    } catch (err) {
-        console.error('Failed to start server:', err);
-    }
+// Multer Configuration for File Upload
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, `${clientID()}${path.extname(file.originalname)}`),
+});
+// Serve static files from the "uploads" directory
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
 }
-startServer();*/
+
 
 // Function to handle user creation (register a new user)
 app.post('/api/users', (req, res) => {
@@ -116,11 +108,11 @@ app.post('/api/users', (req, res) => {
         if (rows.length > 0) {
             return res.status(400).json({error: 'User Already Exists!'});
         }
-        
+
 
         // Insert the new user into the database
         const query = `INSERT INTO users (id, name, email, password, role, access_level, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        db.query(query, [clientID, name, email, password, role, access_level, createdAt], (err) => {
+        db.query(query, [clientID(), name, email, password, role, access_level, createdAt()], (err) => {
             if (err) {
                 console.error(err); // Log the error
                 return res.status(500).json({error: 'Database error'}); // Return a server error response
@@ -214,9 +206,34 @@ app.delete('/api/users/:id', (req, res) => {
 });
 
 // Format timestamp for EAT
-//const clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS") + Math.floor(1000 + Math.random() * 9000);
-let clientID = moment().tz("Africa/Nairobi").format("YYYYMMDDHHmmssSSS") + Math.floor(Math.random() * 1000);
-let createdAt = moment().tz("Africa/Nairobi").format("YYYY-MM-DD HH:mm:ss:SS");
+/**
+ * Function for getting the current date & time
+ * @returns dat-time (yyyyMMddHHmmss)
+ *
+ */
+const clientID = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+};
+const createdAt = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
 // Create a new client (lead)
 // Endpoint to add a new client
 app.post('/api/clients', (req, res) => {
@@ -234,7 +251,7 @@ app.post('/api/clients', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, createdAt], (err) => {
+    db.query(insertQuery, [clientID(), clientName, clientEmail, clientPhone, clientCompany, clientLocation, clientStreet, clientProvince, clientZipCode, clientSource, clientStatus, clientSubScription, createdAt()], (err) => {
         if (err) {
             console.error('Database Error:', err);
             return res.status(500).json({ error: 'Failed to Create Lead' });
@@ -260,6 +277,71 @@ app.post('/api/clients', (req, res) => {
             },
         });
     });
+});
+
+// Endpoint to generate and download Excel
+app.post("/api/download/excel", async (req, res) => {
+    try {
+        const leads = req.body.leads;
+        console.log("Received leads:", leads); // Log the received data
+
+        if (!leads || !Array.isArray(leads)) {
+            return res.status(400).send("Invalid leads data");
+        }
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Leads");
+
+        // Set Title
+        const titleRow = worksheet.addRow(["LEADS DATA"]);
+        titleRow.font = { size: 12, bold: true , color: { argb: "FFFFFFFF" },};
+        titleRow.alignment = { vertical: "middle", horizontal: "left" };
+
+        //worksheet.addRow([]); // Empty row for spacing
+
+        // Define Columns & Style Header
+        worksheet.columns = [
+            { header: "LEAD ID", key: "clientID", width: 15 },
+            { header: "NAME", key: "clientName", width: 25 },
+            { header: "EMAIL", key: "clientEmail", width: 30 },
+            { header: "PHONE", key: "clientPhone", width: 12 },
+            { header: "SOURCE", key: "clientSource", width: 10 },
+            { header: "STATUS", key: "clientStatus", width: 15 },
+            { header: "DATE CREATED", key: "created_at", width: 25 },
+        ];
+
+        // Style headers (bold + background color)
+        const headerRow = worksheet.getRow(1); // Header is at row 3
+        headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        headerRow.alignment = { horizontal: "left", vertical: "middle" };
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "F65730" }, // Background color
+            };
+        });
+
+        // Add Rows (Data)
+        leads.forEach((lead) => worksheet.addRow(lead));
+
+        // Write to buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        // Send response
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=${clientID()}_leads.xlsx`
+        );
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.send(buffer);
+    } catch (error) {
+        console.error("Error generating Excel file:", error);
+        res.status(500).send("Error generating Excel file");
+    }
 });
 
 // Endpoint to check if a client (lead) already exists
@@ -295,7 +377,7 @@ app.post('/api/lead-exists', (req, res) => {
             });
         }
 
-        // ✅ If no client found, return a success response indicating non-existence
+        // If no client found, return a success response indicating non-existence
         res.status(200).json({ exists: false, message: "Client does not exist" });
     });
 });
@@ -450,11 +532,11 @@ app.put('/api/clients/:id', (req, res) => {
 
         // Prepare update query and values
         const updateQuery = `
-      UPDATE clients
-      SET clientEmail = ?, clientPhone = ?, clientName = ?, company = ?, updated_at = CURRENT_TIMESTAMP
-      ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
-      WHERE id = ?
-    `;
+            UPDATE clients
+            SET clientEmail = ?, clientPhone = ?, clientName = ?, company = ?, updated_at = CURRENT_TIMESTAMP
+                ${Object.keys(otherFields).length > 0 ? `, ${Object.keys(otherFields).map(field => `${field} = ?`).join(', ')}` : ''}
+            WHERE id = ?
+        `;
         const updateValues = [clientEmail, clientPhone, clientName, company, ...Object.values(otherFields), id];
 
         // Execute the update query
@@ -531,11 +613,11 @@ app.post('/api/appointments', (req, res) => {
 
     // SQL query to insert a new appointment
     const insertQuery = `
-    INSERT INTO appointments (clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink,created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
-  `;
+        INSERT INTO appointments (clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink,created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+    `;
 
-    db.query(insertQuery, [clientID, clientName, clientEmail, clientPhone, clientLocation, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt], (err, result) => {
+    db.query(insertQuery, [clientID(), clientName, clientEmail, clientPhone, clientLocation, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt()], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'An error occurred while booking the appointment' });
@@ -652,14 +734,14 @@ app.put('/api/rescheduleMeeting', (req, res) => {
 
         // SQL query to update the appointment
         const updateQuery = `
-      UPDATE appointments 
-      SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?, 
-          appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
-      WHERE clientId = ?
-    `;
+            UPDATE appointments
+            SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?,
+                appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+            WHERE clientId = ?
+        `;
 
         // Execute the update query
-        db.query(updateQuery, [clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, new Date(), clientId], (updateErr) => {
+        db.query(updateQuery, [clientId, name, email, phone, location, appointmentDate, appointmentTime, appointmentType, appointmentStatus, appointmentNotes, meetingLink, createdAt(), clientId], (updateErr) => {
             if (updateErr) {
                 console.error('Backend Error:', updateErr);
                 return res.status(500).json({ error: 'An error occurred while updating the appointment' });
@@ -750,10 +832,10 @@ app.put('/api/appointments/:id', (req, res) => {
 
         // SQL query to update the appointment
         const updateQuery = `
-      UPDATE appointments 
-      SET appointmentStatus = ?
-      WHERE clientId = ?
-    `;
+            UPDATE appointments
+            SET appointmentStatus = ?
+            WHERE clientId = ?
+        `;
 
         // Execute the update query
         db.query(updateQuery, [status, appointmentId], (updateErr) => {
@@ -808,6 +890,496 @@ app.delete('/api/appointments/:id', (req, res) => {
     });
 });
 
+
+// Get all Video Data
+app.get('/api/video-data-active', (req, res) => {
+    // SQL query to fetch all about data
+    const query = 'SELECT * FROM video WHERE status = \'ACTIVE\'';
+    console.log('Executing video-data');
+    // Execute the query
+    db.query(query, (error, result) => {
+        if (error) {
+            console.error('Error fetching video data:', error);
+            return res.status(500).json({error: 'An error occurred while fetching about data'});
+        }
+
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+
+        // Modify the response to include full image URLs
+        result = result.map(item => ({
+            ...item,
+            video: item.video ? `${process.env.APP_API_URL}api/uploads/${path.basename(item.video)}` : null
+        }));
+        console.log(result);
+        // Respond with the list of about data
+        res.status(200).json(result);
+    });
+});
+
+// Get all Video Data
+app.get('/api/video-data', (req, res) => {
+    // SQL query to fetch all about data
+    const query = 'SELECT * FROM video';
+    console.log('Executing video-data');
+    // Execute the query
+    db.query(query, (error, result) => {
+        if (error) {
+            console.error('Error fetching video data:', error);
+            return res.status(500).json({error: 'An error occurred while fetching about data'});
+        }
+
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+
+        // Modify the response to include full image URLs
+        result = result.map(item => ({
+            ...item,
+            video: item.video ? `${process.env.APP_API_URL}api/uploads/${path.basename(item.video)}` : null
+        }));
+        console.log(result);
+        // Respond with the list of about data
+        res.status(200).json(result);
+    });
+});
+
+const upload = multer({ storage: storage });
+
+// Upload Video
+app.post('/api/video-data', upload.single('video'), (req, res) => {
+    console.log("Request Body:", JSON.stringify(req.body, null, 2));
+    console.log("Uploaded File Data:", JSON.stringify(req.file, null, 2));
+
+    const { title, created_by, status } = req.body;
+
+    // Validate input data (including the file)
+    if (!title || !created_by ||!status || !req.file) {
+        return res.status(400).json({ error: 'All fields are required, including the icon file.' });
+    }
+
+    const filePath = req.file ? req.file.path : null;
+    if (!filePath) {
+        return res.status(400).json({ error: 'File upload failed.' });
+    }
+
+    // Check if the title already exists in the database
+    const query1 = 'SELECT * FROM video WHERE title = ?';
+    db.query(query1, [title], (error, result) => {
+        if (error) {
+            console.error('Database Error:', error);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+
+        if (result.length > 0) {
+            return res.status(409).json({ error: 'Title Already Exists!' }); // 409 Conflict
+        }
+
+        // SQL query to insert the new about data into the database
+        const query = `
+            INSERT INTO video (id, title, created_by, video, status, created_on)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+
+        // Generate the correct URL for the image
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+        const imageUrl = `${serverUrl}api/uploads/${req.file.filename}`;
+
+        db.query(query, [clientID(),title, created_by, filePath, status,createdAt()], (error, result) => {
+            if (error) {
+                console.error('Database Error:', error);
+                return res.status(500).json({ error: 'An error occurred while creating the about info' });
+            }
+
+            res.status(201).json({
+                message: 'Video Uploaded successfully',
+                about: {
+                    id: result.insertId,
+                    title,
+                    created_by,
+                    createdAt,
+                    status,
+                    video: imageUrl //Returns the correct video URL
+                }
+            });
+        });
+    });
+});
+
+// Update Video Status By ID
+app.put('/api/video-data-update-status/:id', (req, res) => {
+    const { id } = req.params;
+    const {title,
+        created_by,
+        video,
+        status,
+        created_on } = req.body;
+    console.log(req.body);
+
+    // Check if required fields are present
+    if (!status || !created_by) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const query1 = 'SELECT * FROM video WHERE id = ?';
+    // Check if the data exists
+    db.query(query1, [id], (err, results) => {
+        if (err) {
+            console.error('Error querying database:', err);
+            return res.status(500).json({ error: 'Database query error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
+        //update all status
+        const updateQuery = 'UPDATE video SET status = \'INACTIVE\'';
+        db.query(updateQuery, (err, results) => {
+            if (err) {
+                console.error('Error updating database:', err);
+                return res.status(500).json({ error: 'Database query error' });
+            }
+            console.log('Updated all status');
+
+            // Update query
+            const query = `
+                UPDATE video
+                SET status = ?, created_on = ?
+                WHERE id = ?
+            `;
+
+            db.query(query, [status, createdAt(), id], (err, updateResults) => {
+                if (err) {
+                    console.error('Error updating info:', err);
+                    return res.status(500).json({ error: 'Error updating the about info' });
+                }
+
+                if (updateResults.affectedRows === 0) {
+                    return res.status(400).json({ error: 'No changes detected' });
+                }
+
+                // Respond with success message
+                res.status(200).json({
+                    message: 'Data updated successfully',
+                    about: {
+                        id,
+                        status,
+                        createdAt
+                    }
+                });
+            });
+        });
+    });
+});
+
+// Delete an Video Data by ID
+app.delete('/api/video-data/:id', (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log('Deleting user with ID:', id);
+
+        // Check if the info exists
+        db.query('SELECT * FROM video WHERE id = ?', [id], (err, results) => {
+            if (err) {
+                console.error('Error querying database:', err);
+                return res.status(500).json({ error: 'Database query error' });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Info not found' });
+            }
+
+            // SQL query to delete the info
+            const query = 'DELETE FROM video WHERE id = ?';
+            console.log('SQL Query:', query, 'Params:', [id]);
+
+            db.query(query, [id], (err, deleteResults) => {
+                if (err) {
+                    console.error('Error deleting info:', err);
+                    return res.status(500).json({ error: 'Error deleting the About Info' });
+                }
+
+                // Respond with a success message
+                res.status(200).json({ message: 'Info deleted successfully' });
+            });
+        });
+    } catch (error) {
+        // Handle errors
+        console.error('Unexpected error:', error);
+        res.status(500).json({ error: 'An unexpected error occurred' });
+    }
+});
+
+// Get all About Data - Active
+app.get('/api/about-data-active', (req, res) => {
+    // SQL query to fetch all about data
+    const query = 'SELECT * FROM about where status = "ACTIVE"';
+    console.log('Executing about-data');
+    // Execute the query
+    db.query(query, (error, about) => {
+        if (error) {
+            console.error('Error fetching about data:', error);
+            return res.status(500).json({error: 'An error occurred while fetching about data'});
+        }
+
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+        // Modify the response to include full image URLs
+        about = about.map(item => ({
+            ...item,
+            icon: item.icon ? `${process.env.APP_API_URL}api/uploads/${path.basename(item.icon)}` : null
+        }));
+        console.log(about);
+        // Respond with the list of about data
+        res.status(200).json(about);
+    });
+});
+
+// Get all About Data
+app.get('/api/about-data', (req, res) => {
+    // SQL query to fetch all about data
+    const query = 'SELECT * FROM about';
+    console.log('Executing about-data');
+    // Execute the query
+    db.query(query, (error, about) => {
+        if (error) {
+            console.error('Error fetching about data:', error);
+            return res.status(500).json({error: 'An error occurred while fetching about data'});
+        }
+
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+        // Modify the response to include full image URLs
+        about = about.map(item => ({
+            ...item,
+            icon: item.icon ? `${process.env.APP_API_URL}api/uploads/${path.basename(item.icon)}` : null
+        }));
+        console.log(about);
+        // Respond with the list of about data
+        res.status(200).json(about);
+    });
+});
+
+app.post('/api/about-data', upload.single('icon'), (req, res) => {
+    console.log("Request Body:", JSON.stringify(req.body, null, 2));
+    console.log("Uploaded File Data:", JSON.stringify(req.file, null, 2));
+
+    const { title, introduction, experience, mission, status } = req.body;
+
+    // Validate input data (including the file)
+    if (!title || !introduction || !experience || !mission || !status || !req.file) {
+        return res.status(400).json({ error: 'All fields are required, including the icon file.' });
+    }
+
+    const filePath = req.file ? req.file.path : null;
+    if (!filePath) {
+        return res.status(400).json({ error: 'File upload failed.' });
+    }
+
+    // Check if the title already exists in the database
+    const query1 = 'SELECT * FROM about WHERE title = ?';
+    db.query(query1, [title], (error, result) => {
+        if (error) {
+            console.error('Database Error:', error);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+
+        if (result.length > 0) {
+            return res.status(409).json({ error: 'Title Already Exists!' }); // 409 Conflict
+        }
+
+        // Define createdAt timestamp
+        const createdAt = new Date();
+
+        // SQL query to insert the new about data into the database
+        const query = `
+            INSERT INTO about (id, title, introduction, experience, mission, status, icon, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        // Generate the correct URL for the image
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+        const imageUrl = `${process.env.APP_API_URL}api/uploads/${req.file.filename}`;
+
+        db.query(query, [clientID(),title, introduction, experience, mission, status, filePath, createdAt], (error, result) => {
+            if (error) {
+                console.error('Database Error:', error);
+                return res.status(500).json({ error: 'An error occurred while creating the about info' });
+            }
+
+            res.status(201).json({
+                message: 'About data created successfully',
+                about: {
+                    id: result.insertId,
+                    title,
+                    introduction,
+                    experience,
+                    mission,
+                    status,
+                    icon: imageUrl //Returns the correct image URL
+                }
+            });
+        });
+    });
+});
+
+
+// Update about by ID
+app.put('/api/about-data/:id', (req, res) => {
+    const {id, title, introduction, experience, mission, status, icon } = req.body;
+    console.log(req.body);
+
+    // Check if required fields are present
+    if (!title || !introduction || !experience || !mission || !status) {
+        return res.status(400).json({ error: 'All fields except icon are required' });
+    }
+
+    // Check if the data exists
+    db.query('SELECT * FROM about WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            console.error('Error querying database:', err);
+            return res.status(500).json({ error: 'Database query error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
+        // Update query
+        const query = `
+            UPDATE about
+            SET title = ?, introduction = ?, experience = ?, mission = ?, status = ?, icon = ?, updated_at = ?
+            WHERE id = ?
+        `;
+
+        db.query(query, [title, introduction, experience, mission, status, icon || results[0].icon, createdAt(), id], (err, updateResults) => {
+            if (err) {
+                console.error('Error updating info:', err);
+                return res.status(500).json({ error: 'Error updating the about info' });
+            }
+
+            if (updateResults.affectedRows === 0) {
+                return res.status(400).json({ error: 'No changes detected' });
+            }
+
+            // Respond with success message
+            res.status(200).json({
+                message: 'Data updated successfully',
+                about: {
+                    id,
+                    title,
+                    introduction,
+                    experience,
+                    mission,
+                    status,
+                    icon: icon || results[0].icon, // Keep old icon if not provided
+                    createdAt
+                }
+            });
+        });
+    });
+});
+
+// Update about by ID
+app.put('/api/about-data-update-status/:id', (req, res) => {
+    const {id, title, introduction, experience, mission, status, icon } = req.body;
+    console.log(req.body);
+
+    // Check if required fields are present
+    if (!title || !introduction || !experience || !mission || !status) {
+        return res.status(400).json({ error: 'All fields except icon are required' });
+    }
+
+    // Check if the data exists
+    db.query('SELECT * FROM about WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            console.error('Error querying database:', err);
+            return res.status(500).json({ error: 'Database query error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Data not found' });
+        }
+
+        //update all status
+        const updateQuery = 'UPDATE about SET status = \'INACTIVE\'';
+        db.query(updateQuery, (err, results) => {
+            if (err) {
+                console.error('Error updating database:', err);
+                return res.status(500).json({ error: 'Database query error' });
+            }
+            console.log('Updated all status');
+
+            // Update query
+            const query = `
+                UPDATE about
+                SET title = ?, introduction = ?, experience = ?, mission = ?, status = ?, icon = ?, updated_at = ?
+                WHERE id = ?
+            `;
+
+            db.query(query, [title, introduction, experience, mission, status, icon || results[0].icon, createdAt(), id], (err, updateResults) => {
+                if (err) {
+                    console.error('Error updating info:', err);
+                    return res.status(500).json({ error: 'Error updating the about info' });
+                }
+
+                if (updateResults.affectedRows === 0) {
+                    return res.status(400).json({ error: 'No changes detected' });
+                }
+
+                // Respond with success message
+                res.status(200).json({
+                    message: 'Data updated successfully',
+                    about: {
+                        id,
+                        title,
+                        introduction,
+                        experience,
+                        mission,
+                        status,
+                        icon: icon || results[0].icon, // Keep old icon if not provided
+                        createdAt
+                    }
+                });
+            });
+        });
+    });
+});
+
+// Delete an About Data by ID
+app.delete('/api/about-data/:id', (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log('Deleting user with ID:', id);
+
+        // Check if the info exists
+        db.query('SELECT * FROM about WHERE id = ?', [id], (err, results) => {
+            if (err) {
+                console.error('Error querying database:', err);
+                return res.status(500).json({ error: 'Database query error' });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Info not found' });
+            }
+
+            // SQL query to delete the info
+            const query = 'DELETE FROM about WHERE id = ?';
+            console.log('SQL Query:', query, 'Params:', [id]);
+
+            db.query(query, [id], (err, deleteResults) => {
+                if (err) {
+                    console.error('Error deleting info:', err);
+                    return res.status(500).json({ error: 'Error deleting the About Info' });
+                }
+
+                // Respond with a success message
+                res.status(200).json({ message: 'Info deleted successfully' });
+            });
+        });
+    } catch (error) {
+        // Handle errors
+        console.error('Unexpected error:', error);
+        res.status(500).json({ error: 'An unexpected error occurred' });
+    }
+});
+
 // Create a new marketing strategy application
 app.post('/api/marketing-strategy-applications', (req, res) => {
     console.log(req.body);
@@ -817,12 +1389,12 @@ app.post('/api/marketing-strategy-applications', (req, res) => {
 
     // SQL query to insert a new application
     const insertQuery = `
-    INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+        INSERT INTO marketing_strategy (applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     // Execute the query to insert the new application into the database
-    db.query(insertQuery, [clientID, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, createdAt], (err, result) => {
+    db.query(insertQuery, [clientID(), applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, strategyInvestment, status, createdAt()], (err, result) => {
         if (err) {
             console.error('Backend Error: ', err);
             return res.status(400).json({ error: err.message });
@@ -906,10 +1478,10 @@ app.put('/api/marketing-strategy-applications/:id', (req, res) => {
 
         // SQL query to update the application
         const updateQuery = `
-      UPDATE marketing_strategy
-      SET applicationDate = ?, applicantFName = ?, applicantLName = ?, email = ?, phone = ?, occupation = ?, marketTriggers = ?, strategyGoal = ?, status = ?
-      WHERE applicationId = ?
-    `;
+            UPDATE marketing_strategy
+            SET applicationDate = ?, applicantFName = ?, applicantLName = ?, email = ?, phone = ?, occupation = ?, marketTriggers = ?, strategyGoal = ?, status = ?
+            WHERE applicationId = ?
+        `;
 
         // Execute the query to update the application
         db.query(updateQuery, [
@@ -1644,3 +2216,149 @@ app.use((req, res) => {
 
 // Export the app for testing
 module.exports = app;
+
+/**
+
+
+ async function sendEmails() {
+ try {
+ const connection = await pool.getConnection();
+
+ // Get clients who need emails
+ const [clients] = await connection.query(`
+ SELECT clientEmail, clientName, clientStatus
+ FROM clients
+ WHERE clientStatus IN ('1ST CONTACT', '2ND CONTACT', '3RD CONTACT')
+ `);
+
+ for (let client of clients) {
+ let subject, message;
+
+ if (client.clientStatus === '1ST CONTACT') {
+ subject = "Welcome!";
+ message = "Thank you for reaching out. Let's connect!";
+ } else if (client.clientStatus === '2ND CONTACT') {
+ subject = "Follow-up";
+ message = "Just checking in to see how we can assist you.";
+ } else if (client.clientStatus === '3RD CONTACT') {
+ subject = "Final Reminder";
+ message = "This is your last chance to connect with us!";
+ }
+
+ // Send email
+ await transporter.sendMail({
+ from: '"Your Company" <your_email@gmail.com>',
+ to: client.clientEmail,
+ subject: subject,
+ text: `Hello ${client.clientName},\n\n${message}`
+ });
+
+ console.log(`Email sent to ${client.clientEmail}`);
+ }
+
+ connection.release();
+ } catch (error) {
+ console.error("Error sending emails:", error);
+ }
+ }
+
+ // Run the function
+ sendEmails();
+
+
+
+ DELIMITER $$
+
+ CREATE EVENT update_client_status
+ ON SCHEDULE EVERY 2 DAY
+ DO
+ BEGIN
+ -- Update to '2ND CONTACT' if it's currently '1ST CONTACT'
+ UPDATE clients
+ SET clientStatus = '2ND CONTACT'
+ WHERE clientStatus = '1ST CONTACT';
+
+ -- Update to '3RD CONTACT' if it's currently '2ND CONTACT'
+ UPDATE clients
+ SET clientStatus = '3RD CONTACT'
+ WHERE clientStatus = '2ND CONTACT';
+
+ -- Add more updates as needed
+ END $$
+
+ DELIMITER ;
+
+ async function sendEmails() {
+ try {
+ const connection = await pool.getConnection();
+
+ // Get clients who need emails
+ const [clients] = await connection.query(`
+ SELECT clientEmail, clientName, clientStatus
+ FROM clients
+ WHERE clientStatus IN ('1ST CONTACT', '2ND CONTACT', '3RD CONTACT', 'FINAL CONTACT')
+ `);
+
+ for (let client of clients) {
+ let subject, message;
+
+ switch (client.clientStatus) {
+ case '1ST CONTACT':
+ subject = "Welcome!";
+ message = "Thank you for reaching out. Let's connect!";
+ break;
+ case '2ND CONTACT':
+ subject = "Follow-up";
+ message = "Just checking in to see how we can assist you.";
+ break;
+ case '3RD CONTACT':
+ subject = "Reminder";
+ message = "We'd love to hear back from you soon!";
+ break;
+ case 'FINAL CONTACT':
+ subject = "Final Notice";
+ message = "This is your last chance to connect with us!";
+ break;
+ }
+
+ // Send email
+ await transporter.sendMail({
+ from: '"Your Company" <your_email@gmail.com>',
+ to: client.clientEmail,
+ subject: subject,
+ text: `Hello ${client.clientName},\n\n${message}`
+ });
+
+ console.log(`Email sent to ${client.clientEmail}`);
+ }
+
+ connection.release();
+ } catch (error) {
+ console.error("Error sending emails:", error);
+ }
+ }
+
+
+ DELIMITER $$
+
+ CREATE EVENT update_client_status
+ ON SCHEDULE EVERY 2 DAY
+ DO
+ BEGIN
+ UPDATE clients
+ SET clientStatus =
+ CASE
+ WHEN clientStatus = '1ST CONTACT' THEN '2ND CONTACT'
+ WHEN clientStatus = '2ND CONTACT' THEN '3RD CONTACT'
+ WHEN clientStatus = '3RD CONTACT' THEN 'FINAL CONTACT'
+ ELSE clientStatus
+ END
+ WHERE clientStatus IN ('1ST CONTACT', '2ND CONTACT', '3RD CONTACT');
+ END $$
+
+ DELIMITER ;
+
+
+
+ SET GLOBAL event_scheduler = ON;
+ */

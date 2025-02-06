@@ -32,17 +32,19 @@ db.connect((err) => {
       experience TEXT NOT NULL,
       mission TEXT NOT NULL,
       status VARCHAR(10) NOT NULL DEFAULT 'N/ACTIVE',
-      icon byte NOT NULL,
-      updated_at VARCHAR(24) NOT NULL,
+      icon varchar(255) NOT NULL,
+      updated_at VARCHAR(24) NOT NULL
     );
   `; 
   
   const createTableVideo = `
     CREATE TABLE IF NOT EXISTS video (
       id varchar(24) PRIMARY KEY ,
-      video byte NOT NULL,
-      status VARCHAR(10) NOT NULL DEFAULT 'N/ACTIVE',
-      updated_at VARCHAR(24) NOT NULL,
+      title varchar(150) NOT NULL,
+      created_by varchar(150) NOT NULL,
+      video varchar(255) NOT NULL,
+      status VARCHAR(10) NOT NULL DEFAULT 'INACTIVE',
+      created_on VARCHAR(24) NOT NULL
     );
   `; 
   const createTableUsers = `

@@ -373,7 +373,7 @@ body main .page-sec {
     width: fit-content block;
     border-radius: 5px;
     border: 1.5px solid #7D8489;
-    box-shadow: #F65730;
+    box-shadow: #0077ff;
 }
 
 .hidden{
@@ -485,4 +485,8 @@ body main .page-sec {
     100% {
         transform: translateX(0); /* End at the normal position */
     }
+}
+.star{
+    height: 8px;
+    width: 8px;
 }
