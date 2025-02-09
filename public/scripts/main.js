@@ -163,7 +163,6 @@ async function fetchVideo() {
     }
 }
 
-fetchVideo()
 
 /**
  * Function for getting the current date & time
@@ -369,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLeftApplicationForm.addEventListener('click', goToPreviousStep);
         btnRightApplicationForm.addEventListener('click', goToNextStep);
         btnCloseAppointmentApplication.addEventListener('click', closeAppointmentView);
-        btnSubmitAppointment.addEventListener('click', submitAppointMent);
+        btnSubmitAppointment.addEventListener('click', submitAppointment);
         btnCloseFAQs.addEventListener('click', closeFAQs);
         showFAQsForm.addEventListener('click', openFAQsForm);
         submitFAQsFormButton.addEventListener('click', submitFAQsForm);
@@ -386,7 +385,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTestimonials();
 
         // Set Value Video
-        fetchVideo();
+        fetchVideo().then(() => {
+            console.log('Videos fetched successfully');
+        })
+            .catch((error) => {
+                console.error('Error in fetching videos:', error);
+            });
+        valueVideoView.src = videoList[0].video;
         getSource();
         console.log('Source: ', clickSource);
     }
@@ -396,17 +401,23 @@ document.addEventListener('DOMContentLoaded', () => {
         sidePanelCloseBtn.addEventListener('click', closeNav);
         btnCloseSearch.addEventListener('click', closeSearch);
         btnSubmitContactUsData.addEventListener('click', () => actionSubmitContactUsData);
-
-        textAboutExperience.value = aboutList[0].experience;
-        textAboutMission.value = aboutList[0].mission;
-        textAboutIntroduction.value = aboutList[0].introduction;
-        textAboutHeader.value = aboutList[0].title;
-        imageAboutIcon.src = aboutList[0].icon;
-
     }
     if (pageId === 'aboutUsPage') {
         navbarTogler.addEventListener('click', openNav);
         sidePanelCloseBtn.addEventListener('click', closeNav);
+
+        fetchAbout().then(() => {
+            console.log('About fetched successfully');
+        })
+            .catch((error) => {
+                console.error('Error in fetching About:', error);
+            });
+
+        textAboutExperience.textContent = aboutList[0].experience;
+        textAboutMission.textContent = aboutList[0].mission;
+        textAboutIntroduction.textContent = aboutList[0].introduction;
+        textAboutHeader.textContent = aboutList[0].title;
+        imageAboutIcon.src = aboutList[0].icon;
     }
     if (pageId === 'ourServicePage') {
         navbarTogler.addEventListener('click', openNav);
@@ -537,10 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching About Info:', error);
         }
     }
-    fetchAbout();
 
-
-    valueVideoView.src = videoList[0].video;
     // Track the initial page load
     sendPageView();
 

@@ -3,7 +3,6 @@ console.log('Admin js Loaded');
 
 //<i class="fa fa-user-md" aria-hidden="true"></i>
 
-
 let DOMAIN_NAME = 'https://adconnect.co.ke/';
 //let DOMAIN_NAME = 'http://127.0.0.1:3000/';
 let API_PATH = 'api/';
@@ -17,6 +16,7 @@ const inputUserPassword = document.getElementById('password');
 const inputUserSearch = document.getElementById('searchUserInput');
 const inputLeadSearch = document.getElementById('searchLeadsInput');
 const inputAppointmentSearch = document.getElementById('searchAppointmentInput');
+const inputApplicationSearch = document.getElementById('searchApplicationInput');
 const inputAppointmentEdit = document.getElementById('appointmentInput');
 const inputTitle1 = document.getElementById('inputTitle1');
 const inputIntroduction = document.getElementById('inputIntroduction');
@@ -30,6 +30,8 @@ const textUsernameSession = document.getElementById('usernameSession');
 const textUserPopupHeader = document.getElementById('popupHeaderText');
 const textUserPopupHeaderAppt = document.getElementById('popupHeaderTextAppt');
 const textAboutPopupHeader = document.getElementById('popupHeaderTextAbout');
+const textApplicationPopupHeader = document.getElementById('popupHeaderTextApplication');
+const textApplicationContent = document.getElementById('titleTextApplication');
 const textErrorContainer = document.getElementById('errorMessage');
 const textErrorContainerV = document.getElementById('errorMessage2');
 const textLoaderText = document.getElementById('loadingText');
@@ -58,6 +60,7 @@ const sectionWorkflowsManagement = document.getElementById('workflowsContentMgt'
 const sectionCommunicationManagement = document.getElementById('communicationContentMgt');
 const sectionDocumentManagement = document.getElementById('documentContentMgt');
 const sectionAppointmentManagement = document.getElementById('appointmentContentMgt');
+const sectionApplicationManagement = document.getElementById('applictionContentMgt');
 
 const userMgt = document.getElementById('userMgt');
 const contentMgt = document.getElementById('contentMgt');
@@ -71,6 +74,7 @@ const settingMgt = document.getElementById('settingMgt');
 const workflowMgt = document.getElementById('workflowMgt');
 const commMgt = document.getElementById('commMgt');
 const docsMgt = document.getElementById('docsMgt');
+const applicationMgt = document.getElementById('applicationMgt');
 
 const popupUserMgt = document.getElementById('userPopUp');
 const popupAppointment = document.getElementById('appointmentPopup');
@@ -80,6 +84,7 @@ const aboutRegisterPopup = document.getElementById('aboutRegisterPopup');
 const videoRegisterPopup = document.getElementById('videoRegisterPopup');
 const aboutPhotoPopup = document.getElementById('aboutPhotoPopup');
 const aboutVideoPopup = document.getElementById('aboutVideoPopup');
+const applicationPopup = document.getElementById('applicationPopup');
 const aboutPhotoViewArea = document.getElementById('photoViewArea');
 const aboutVideoViewArea = document.getElementById('popupVideo');
 
@@ -98,12 +103,17 @@ let isTitle = false;
 let isIntro = false;
 let isMission = false;
 let isExperience = false;
+let isGoal = false;
+let isTrigger = false;
+let isOccupation = false;
+let isInvestment = false;
 
 let userList = [];
 let leadList = [];
 let appointmentList = [];
 let aboutList = [];
 let videoList = [];
+let applicationList = [];
 let aboutIndex = null;
 
 let errorMessages = '';
@@ -170,6 +180,7 @@ function userManagement(){
     sectionCommunicationManagement.style.display = 'none';
     sectionDocumentManagement.style.display = 'none';
     sectionAppointmentManagement.style.display = 'none';
+    sectionApplicationManagement.style.display = 'none';
 
     userMgt.classList.add('activ');
     contentMgt.classList.remove('activ');
@@ -183,6 +194,7 @@ function userManagement(){
     workflowMgt.classList.remove('activ');
     commMgt.classList.remove('activ');
     docsMgt.classList.remove('activ');
+    applicationMgt.classList.remove('activ');
     //Manage Lists
     fetchUsers();
 }
@@ -197,6 +209,7 @@ function contentManagement(){
     sectionCommunicationManagement.style.display = 'none';
     sectionDocumentManagement.style.display = 'none';
     sectionAppointmentManagement.style.display = 'none';
+    sectionApplicationManagement.style.display = 'none';
 
     userMgt.classList.remove('activ');
     contentMgt.classList.add('activ');
@@ -210,6 +223,7 @@ function contentManagement(){
     workflowMgt.classList.remove('activ');
     commMgt.classList.remove('activ');
     docsMgt.classList.remove('activ');
+    applicationMgt.classList.remove('activ');
 
     fetchAbout();
 }
@@ -223,6 +237,7 @@ function leadsManagement(){
     sectionCommunicationManagement.style.display = 'none';
     sectionDocumentManagement.style.display = 'none';
     sectionAppointmentManagement.style.display = 'none';
+    sectionApplicationManagement.style.display = 'none';
 
     userMgt.classList.remove('activ');
     contentMgt.classList.remove('activ');
@@ -236,6 +251,7 @@ function leadsManagement(){
     workflowMgt.classList.remove('activ');
     commMgt.classList.remove('activ');
     docsMgt.classList.remove('activ');
+    applicationMgt.classList.remove('activ');
 
     fetchLeads();
 }
@@ -248,6 +264,7 @@ function appointmentManagement(){
     sectionWorkflowsManagement.style.display = 'none';
     sectionCommunicationManagement.style.display = 'none';
     sectionDocumentManagement.style.display = 'none';
+    sectionApplicationManagement.style.display = 'none';
     sectionAppointmentManagement.style.display = 'flex';
 
     userMgt.classList.remove('activ');
@@ -262,8 +279,38 @@ function appointmentManagement(){
     workflowMgt.classList.remove('activ');
     commMgt.classList.remove('activ');
     docsMgt.classList.remove('activ');
+    applicationMgt.classList.remove('activ');
 
     fetchAppointments();
+}
+
+function applicationManagement(){
+    sectionUserManagement.style.display = 'none';
+    sectionVideoManagement.style.display = 'none';
+    sectionLeadsManagement.style.display = 'none';
+    sectionReportsManagement.style.display = 'none';
+    sectionSettingsManagement.style.display = 'none';
+    sectionWorkflowsManagement.style.display = 'none';
+    sectionCommunicationManagement.style.display = 'none';
+    sectionDocumentManagement.style.display = 'none';
+    sectionApplicationManagement.style.display = 'flex';
+    sectionAppointmentManagement.style.display = 'none';
+
+    userMgt.classList.remove('activ');
+    contentMgt.classList.remove('activ');
+    aboutMgt.classList.remove('activ');
+    videoMgt.classList.remove('activ');
+    leadMgt.classList.remove('activ');
+    apptMgt.classList.remove('activ');
+    crmMgt.classList.remove('activ');
+    reportMgt.classList.remove('activ');
+    settingMgt.classList.remove('activ');
+    workflowMgt.classList.remove('activ');
+    commMgt.classList.remove('activ');
+    docsMgt.classList.remove('activ');
+    applicationMgt.classList.add('activ');
+
+    fetchApplications();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -288,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('contentMgt').addEventListener('click', contentManagement);
     document.getElementById('leadMgt').addEventListener('click', leadsManagement);
     document.getElementById('apptMgt').addEventListener('click', appointmentManagement);
+    document.getElementById('applicationMgt').addEventListener('click', applicationManagement);
     btnSubmitUserData.addEventListener('click', userRegistrationOrUpdate);
     btnDownload.addEventListener('click', downloadExcel);
 });
@@ -307,6 +355,11 @@ function activeClass(nav) {
 function refreshUserTable(){
     userList = [];
     fetchUsers();
+}
+
+function refreshApplicationTable(){
+    applicationList = [];
+    fetchApplications();
 }
 
 function refreshAbout(){
@@ -490,6 +543,30 @@ async function fetchAppointments() {
     }
 }
 
+async function fetchApplications() {
+    showLoader();
+    textLoaderText.textContent = 'Fetching Aplications. Please Wait!';
+    try {
+        const response = await fetch('/api/marketing-strategy-applications');
+        if (!response.ok) {
+            throw new Error('Failed to fetch applications');
+        }
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (data.applications && Array.isArray(data.applications)) {
+            applicationList = data.applications;
+            populateApplications();
+        } else {
+            console.error("Expected an array but got:", data.applications);
+        }
+    } catch (error) {
+        console.error("Error fetching applications:", error);
+    } finally {
+        hideLoader();
+    }
+}
+
 async function fetchLeads() {
     showLoader();
     textLoaderText.textContent = 'Fetching Leads. Please Wait!';
@@ -594,13 +671,125 @@ function populateVideo() {
         <p class="item-about-introduction" style="cursor: pointer;" >${item.created_by}</p>
         <p class="item-about-introduction" style="cursor: pointer;" >${item.created_on}</p>
         <p class="item-about-status" style="cursor: pointer;" onclick="updateVideoStatus(${index})">${item.status}</p>
-        <p class="item-about-image" onclick="previewVideo(${index})"></p>
+        <p class="item-about-image" style="cursor: pointer;" onclick="previewVideo(${index})"></p>
         <i id="leadDeleteBtn" class="fa fa-trash" onclick="deleteVideo(${index})" aria-hidden="true"></i>
     `;
         // Append the list item to the container
         dataList.appendChild(listItem);
     });
 }
+
+function populateApplications() {
+    const dataList = document.getElementById('applicationList');
+    dataList.innerHTML = ''; // Clear existing content
+
+    // Check if applicationList is an array
+    if (!Array.isArray(applicationList)) {
+        console.error("applicationList is not an array:", applicationList);
+        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">Error: Invalid data format!</p>';
+        return;
+    }
+    if (applicationList.length === 0) {
+        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Applications Data Available!</p>';
+        return;
+    }
+
+    applicationList.forEach((item, index) => {
+        const listItem = document.createElement('div');
+        listItem.classList.add('h-layout', 'item-content');
+        listItem.style.marginTop = '3px';
+        listItem.innerHTML = `
+        <p class="item-user-id">${item.applicationDate}</p>
+        <p class="item-user-name" style="cursor: pointer;" >${item.applicantFName} ${item.applicantLName}</p>
+        <p class="item-user-email" style="cursor: pointer;" >${item.email}</p>
+        <p class="item-appointment-phone" style="cursor: pointer;" >${item.phone}</p>
+        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewOccupation(${index})">${item.occupation}</p>
+        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewTrigger(${index})">${item.marketTriggers}</p>
+        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewGoal(${index})">${item.strategyGoal}</p>
+        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewInvestment(${index})">${item.strategyInvestment}</p>
+        <p class="item-appointment-status" style="cursor: pointer;" onclick="updateApplicationStatus(${index})">${item.status}</p>
+        <i id="leadDeleteBtn" class="fa fa-trash" onclick="deleteApplication(${index})" aria-hidden="true"></i>
+    `;
+        // Append the list item to the container
+        dataList.appendChild(listItem);
+    });
+}
+
+function previewOccupation(index){
+    textApplicationPopupHeader.textContent = `OCCUPATION`;
+    textApplicationContent.textContent = `${applicationList[index].occupation}`;
+    openApplicationPopup();
+}
+function previewTrigger(index){
+    textApplicationPopupHeader.textContent = `MARKET TRIGGER(S)`;
+    textApplicationContent.textContent = `${applicationList[index].marketTriggers}`;
+    openApplicationPopup();
+}
+function previewGoal(index){
+    textApplicationPopupHeader.textContent = `CLIENT GOAL`;
+    textApplicationContent.textContent = `${applicationList[index].strategyGoal}`;
+    openApplicationPopup();
+}
+function previewInvestment(index){
+    textApplicationPopupHeader.textContent = `INVESTMENT`;
+    textApplicationContent.textContent = `${applicationList[index].strategyInvestment}`;
+    openApplicationPopup();
+}
+async function updateApplicationStatus(index) {
+    try {
+        textLoaderText.textContent = 'Updating Application Status. Please Wait!';
+        showLoader();
+        const response = await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[index].applicationDate}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ status: 'RESOLVED'}),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            textErrorContainer.style.color = 'white';
+            textErrorContainer.style.backgroundColor = '#4abc5061';
+            handleErrorMessage('Status Updated Successfully!', textErrorContainer);
+            textErrorContainer.style.color = 'rgb(236, 2, 2)';
+            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+            applicationList[index].status = 'RESOLVED';
+            populateApplications();
+        } else {
+            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
+        }
+    } catch (error) {
+        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
+    } finally {
+        hideLoader();
+    }
+}
+
+async function deleteApplication(index) {
+    if (confirm('Are you sure you want to delete this Application?')) {
+        try {
+            showLoader();
+            const response = await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[index].applicationDate}`, {method: 'DELETE'});
+            if (!response.ok) throw new Error('Failed to delete Application');
+            errorMessages = 'Application deleted successfully';
+            textErrorContainer.style.color = 'white';
+            textErrorContainer.style.backgroundColor = '#4abc5061';
+            handleErrorMessage(errorMessages, textErrorContainer);
+            textErrorContainer.style.color = 'rgb(236, 2, 2)';
+            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
+            applicationList.splice(index, 1);
+            populateApplications();
+        } catch (error) {
+            console.error('Error deleting Application:', error);
+
+            errorMessages = 'Failed to delete Application. Please try again.';
+            handleErrorMessage(errorMessages, textErrorContainer);
+        } finally {
+            hideLoader();
+        }
+    }
+}
+
 
 function populateLeads() {
     const dataList = document.getElementById('leadList');
@@ -1868,6 +2057,22 @@ inputAppointmentSearch.addEventListener('input', function (event) {
         }
     });
 });
+/**
+ * Filter Applications
+ */
+inputApplicationSearch.addEventListener('input', function (event) {
+    const filter = event.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#applicationList .item-content');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
 
 /**
  * Opens the user popup
@@ -1893,6 +2098,9 @@ function openPhotoPreviewPopup(){
 function openVideoRegisterPopup(){
     videoRegisterPopup.style.height ='100%';
 }
+function openApplicationPopup(){
+    applicationPopup.style.height ='100%';
+}
 /**
  * Close Popups
  */
@@ -1904,6 +2112,7 @@ function closePopup(){
     aboutPhotoPopup.style.height ='0%';
     aboutVideoPopup.style.height ='0%';
     videoRegisterPopup.style.height ='0%';
+    applicationPopup.style.height ='0%';
 }
 
 /**

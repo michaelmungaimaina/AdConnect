@@ -354,7 +354,7 @@
                     <p class="title-appointment-notes">TRIGGER</p>
                     <p class="title-appointment-notes">GOAL</p>
                     <p class="title-appointment-notes">INVESTMENT</p>
-                    <p class="title-appointment-status">STATUS</p>
+                    <p class="title-appointment-notes">STATUS</p>
                     <p class="title-user-action">ACTIONS</p>
                 </div>
             </div>
@@ -369,7 +369,7 @@
                     <p class="item-appointment-notes">I have to</p>
                     <p class="item-appointment-notes">My goal is to have a </p>
                     <p class="item-appointment-notes">75,000 - 110,000</p>
-                    <p class="item-appointment-status">UNRESOLVED</p>
+                    <p class="item-appointment-notes">UNRESOLVED</p>
                     <button id="userDeleteBtn">DELETE</button>
                 </div>
             </div>
@@ -577,33 +577,6 @@
                       class="input-field" placeholder="Content Goes Here"></textarea>
             <button id="btnUpdateAbout" onclick="updateAboutSection()"
                     style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px; ">UPDATE</button>
-        </div>
-    </div>
-</section>
-
-<!-- Application Popup -->
-<section id="applicationPopup" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div id="errorMessage"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextApplication" class="header-text" style="font-size: 16px;">ABOUT - MISSION</p>
-            <div class="slash-rect"></div>
-        </div>
-        <div class="v-layout" style="margin: 0 10px 0 30px;">
-            <p id="titleTextApplication"
-               style="height: 150px; width: 400px; background-color: grey; color: azure; border-radius: 5px; padding: 10px; font-size: 12px; font-family: 'DM Sans';">
-                Content Here</p>
-            <p id="subtitleText"
-               style="font-size: 13px; visibility: collapse; font-family: 'DM Sans'; margin: 10px 0; color: azure;">
-                Reschedule appointment date and time to:</p>
-            <button id="btnUpdateAbout"
-                    style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px;visibility: collapse ">UPDATE</button>
         </div>
     </div>
 </section>

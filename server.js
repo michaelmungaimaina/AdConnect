@@ -1437,7 +1437,7 @@ app.get('/api/marketing-strategy-applications/:id', (req, res) => {
     const applicationId = req.params.id;
 
     // SQL query to fetch the application by ID
-    const selectQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
+    const selectQuery = 'SELECT * FROM marketing_strategy WHERE applicationDate = ?';
 
     // Execute the query to get the application
     db.query(selectQuery, [applicationId], (err, application) => {
@@ -1461,10 +1461,10 @@ app.get('/api/marketing-strategy-applications/:id', (req, res) => {
 // Update a marketing strategy application by ID
 app.put('/api/marketing-strategy-applications/:id', (req, res) => {
     const applicationId = req.params.id;
-    const { applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status } = req.body;
-
+    const { status } = req.body;
+    console.log(status);
     // SQL query to check if the application exists
-    const checkQuery = 'SELECT * FROM marketing_strategy WHERE applicationId = ?';
+    const checkQuery = 'SELECT * FROM marketing_strategy WHERE applicationDate = ?';
     db.query(checkQuery, [applicationId], (err, existingApplication) => {
         if (err) {
             console.error('Backend Error: ', err);
@@ -1479,14 +1479,12 @@ app.put('/api/marketing-strategy-applications/:id', (req, res) => {
         // SQL query to update the application
         const updateQuery = `
             UPDATE marketing_strategy
-            SET applicationDate = ?, applicantFName = ?, applicantLName = ?, email = ?, phone = ?, occupation = ?, marketTriggers = ?, strategyGoal = ?, status = ?
-            WHERE applicationId = ?
+            SET status = ?
+            WHERE applicationDate = ?
         `;
 
         // Execute the query to update the application
-        db.query(updateQuery, [
-            applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status, applicationId
-        ], (err) => {
+        db.query(updateQuery, [status, applicationId], (err) => {
             if (err) {
                 console.error('Backend Error: ', err);
                 return res.status(500).json({ error: err.message });
@@ -1497,11 +1495,49 @@ app.put('/api/marketing-strategy-applications/:id', (req, res) => {
                 message: 'Application updated successfully',
                 application: {
                     applicationId,
-                    applicationDate, applicantFName, applicantLName, email, phone, occupation, marketTriggers, strategyGoal, status
+                    status
                 }
             });
         });
     });
+});
+
+// Delete an Application Data by ID
+app.delete('/api/marketing-strategy-applications/:id', (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log('Deleting application with ID:', id);
+
+        // Check if the info exists
+        db.query('SELECT * FROM marketing_strategy WHERE applicationDate = ?', [id], (err, results) => {
+            if (err) {
+                console.error('Error querying database:', err);
+                return res.status(500).json({ error: 'Database query error' });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Application not found' });
+            }
+
+            // SQL query to delete the info
+            const query = 'DELETE FROM marketing_strategy WHERE applicationDate = ?';
+            console.log('SQL Query:', query, 'Params:', [id]);
+
+            db.query(query, [id], (err, deleteResults) => {
+                if (err) {
+                    console.error('Error deleting application:', err);
+                    return res.status(500).json({ error: 'Error deleting the application' });
+                }
+
+                // Respond with a success message
+                res.status(200).json({ message: 'Application deleted successfully' });
+            });
+        });
+    } catch (error) {
+        // Handle errors
+        console.error('Unexpected error:', error);
+        res.status(500).json({ error: 'An unexpected error occurred' });
+    }
 });
 
 

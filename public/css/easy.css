@@ -370,7 +370,7 @@ body main .page-sec {
 }
 
 .grey-bordered{
-    width: fit-content block;
+    width: fit-content;
     border-radius: 5px;
     border: 1.5px solid #7D8489;
     box-shadow: #0077ff;
