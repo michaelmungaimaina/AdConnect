@@ -1,2134 +1,1196 @@
-
-console.log('Admin js Loaded');
-
-//<i class="fa fa-user-md" aria-hidden="true"></i>
-
-let DOMAIN_NAME = 'https://adconnect.co.ke/';
-//let DOMAIN_NAME = 'http://127.0.0.1:3000/';
-let API_PATH = 'api/';
-const DOMAIN = `${DOMAIN_NAME}${API_PATH}`;
-
-const inputUserName = document.getElementById('name');
-const inputUserEmail = document.getElementById('email');
-const inputUserRole = document.getElementById('role');
-const inputUserAccess = document.getElementById('access');
-const inputUserPassword = document.getElementById('password');
-const inputUserSearch = document.getElementById('searchUserInput');
-const inputLeadSearch = document.getElementById('searchLeadsInput');
-const inputAppointmentSearch = document.getElementById('searchAppointmentInput');
-const inputApplicationSearch = document.getElementById('searchApplicationInput');
-const inputAppointmentEdit = document.getElementById('appointmentInput');
-const inputTitle1 = document.getElementById('inputTitle1');
-const inputIntroduction = document.getElementById('inputIntroduction');
-const inputExperience = document.getElementById('inputExperience');
-const inputMission = document.getElementById('inputMission');
-const inputIcon = document.getElementById('inputIcon');
-const inputVideoTitle = document.getElementById('inputTitle2');
-const inputVideoFile = document.getElementById('inputVideo');
-
-const textUsernameSession = document.getElementById('usernameSession');
-const textUserPopupHeader = document.getElementById('popupHeaderText');
-const textUserPopupHeaderAppt = document.getElementById('popupHeaderTextAppt');
-const textAboutPopupHeader = document.getElementById('popupHeaderTextAbout');
-const textApplicationPopupHeader = document.getElementById('popupHeaderTextApplication');
-const textApplicationContent = document.getElementById('titleTextApplication');
-const textErrorContainer = document.getElementById('errorMessage');
-const textErrorContainerV = document.getElementById('errorMessage2');
-const textLoaderText = document.getElementById('loadingText');
-const textTitle = document.getElementById('titleText');
-const textSubTitle = document.getElementById('subtitleText');
-const textFooter = document.getElementById('footerText');
-
-const textAreaAboutContent = document.getElementById('aboutInput');
-
-const loader = document.getElementById('loader');
-
-const btnClosePopup = document.getElementById('btnClosePopup');
-const btnSubmitUserData = document.getElementById('submitButton');
-const btnCreateUser = document.getElementById('createUserButton');
-const btnReschedule = document.getElementById('btnReschedule');
-const btnUpdateAbout = document.getElementById('btnUpdateAbout');
-const btnRegisterAbout = document.getElementById('btnRegisterAbout');
-const btnDownload = document.getElementById('downloadButton');
-
-const sectionUserManagement = document.getElementById('userContentMgt');
-const sectionVideoManagement = document.getElementById('videoContentMgt');
-const sectionLeadsManagement = document.getElementById('leadsContentMgt');
-const sectionReportsManagement = document.getElementById('reportsContentMgt');
-const sectionSettingsManagement = document.getElementById('settingsContentMgt');
-const sectionWorkflowsManagement = document.getElementById('workflowsContentMgt');
-const sectionCommunicationManagement = document.getElementById('communicationContentMgt');
-const sectionDocumentManagement = document.getElementById('documentContentMgt');
-const sectionAppointmentManagement = document.getElementById('appointmentContentMgt');
-const sectionApplicationManagement = document.getElementById('applictionContentMgt');
-
-const userMgt = document.getElementById('userMgt');
-const contentMgt = document.getElementById('contentMgt');
-const aboutMgt = document.getElementById('aboutMgt');
-const videoMgt = document.getElementById('videoMgt');
-const leadMgt = document.getElementById('leadMgt');
-const apptMgt = document.getElementById('apptMgt');
-const crmMgt = document.getElementById('crmMgt');
-const reportMgt = document.getElementById('reportMgt');
-const settingMgt = document.getElementById('settingMgt');
-const workflowMgt = document.getElementById('workflowMgt');
-const commMgt = document.getElementById('commMgt');
-const docsMgt = document.getElementById('docsMgt');
-const applicationMgt = document.getElementById('applicationMgt');
-
-const popupUserMgt = document.getElementById('userPopUp');
-const popupAppointment = document.getElementById('appointmentPopup');
-const popupAbout = document.getElementById('aboutPopup');
-const popupLoader = document.getElementById('loaderPopup');
-const aboutRegisterPopup = document.getElementById('aboutRegisterPopup');
-const videoRegisterPopup = document.getElementById('videoRegisterPopup');
-const aboutPhotoPopup = document.getElementById('aboutPhotoPopup');
-const aboutVideoPopup = document.getElementById('aboutVideoPopup');
-const applicationPopup = document.getElementById('applicationPopup');
-const aboutPhotoViewArea = document.getElementById('photoViewArea');
-const aboutVideoViewArea = document.getElementById('popupVideo');
-
-const formLogin = document.getElementById('login-form');
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const twoWordsPattern = /^\S+\s+\S+/;
-const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-const dateTimePattern = /^\d{4}-\d{2}-\d{2}, \d{2}\.\d{2} (AM|PM) - \d{2}\.\d{2} (AM|PM)$/;
-
-let isUpdate = false;
-let isLogIn = false;
-let userIndex = null; // To store the index for updating a user
-let appointmentIndex = null; // To store the index for updating an appointment
-let isTitle = false;
-let isIntro = false;
-let isMission = false;
-let isExperience = false;
-let isGoal = false;
-let isTrigger = false;
-let isOccupation = false;
-let isInvestment = false;
-
-let userList = [];
-let leadList = [];
-let appointmentList = [];
-let aboutList = [];
-let videoList = [];
-let applicationList = [];
-let aboutIndex = null;
-
-let errorMessages = '';
-
 /**
- * Method for displaying error messages to the user
- * @param {the error text to be displayed} errorMessage
- * @param {the container for displaying the error text} errorMessageElement
- * @returns a view if true
+ * AdConnect Admin Panel — admin.js
+ * Role-based access: SUPER_ADMIN | ADMIN | EDITOR | GEN_USER
  */
-function handleErrorMessage(errorMessage, errorMessageElement) {
-    if (errorMessage && errorMessage.trim() !== '') {
-        errorMessageElement.style.display = 'block';
-        errorMessageElement.innerHTML = errorMessage;
 
-        setTimeout(() => {
-            errorMessageElement.style.display = 'none';
-        }, 4000);
+'use strict';
 
-        return false;
-    } else {
-        errorMessageElement.style.display = 'none';
-        return true;
-    }
-}
+// ── Config ────────────────────────────────────────────────────
+const DOMAIN = 'https://adconnect.co.ke/api/';
+// const DOMAIN = 'http://127.0.0.1:3000/api/';
 
-const getCurrentYear = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-
-    return `${year}`;
+// ── Role Permissions ──────────────────────────────────────────
+const ROLE_PERMISSIONS = {
+  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials'],
+  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials'],
+  EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials'],
+  GEN_USER:    ['dashboard'],
 };
 
-textFooter.textContent = `© ${getCurrentYear()} AdConnect | All rights reserved.`;
+// ── State ─────────────────────────────────────────────────────
+let session = { user: null, role: null };
+let userList = [], leadList = [], appointmentList = [], aboutList = [],
+    videoList = [], applicationList = [], blogList = [], projectList = [];
+let currentPanel = 'dashboard';
+let editIndex = null, aboutIndex = null, appointmentIndex = null;
+let editFlags = { isTitle:false, isIntro:false, isMission:false, isExperience:false };
+let charts = {};
 
-async function fetchUsers() {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Users. Please Wait!';
-    try {
-        const response = await fetch(`${DOMAIN}users`);
+// ── DOM Refs ──────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  $('dashboardDate').textContent = new Date().toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  $('footerText').textContent = `© ${new Date().getFullYear()} AdConnect · Admin Panel`;
 
-        userList = await response.json();
+  // Wire sidebar search inputs
+  wireSearch('searchUserInput',       '#panel-users .data-table tbody tr');
+  wireSearch('searchLeadsInput',      '#panel-leads .data-table tbody tr');
+  wireSearch('searchAppointmentInput','#panel-appointments .data-table tbody tr');
+  wireSearch('searchApplicationInput','#panel-applications .data-table tbody tr');
+  wireSearch('searchBlogInput',       '#panel-blog .data-table tbody tr');
 
-        populateUsers();
-        clearInput();
-    } catch (error) {
-        console.error('Error fetching users messages:', error);
-    } finally{
-        hideLoader();
-    }
-}
-
-function userManagement(){
-    sectionUserManagement.style.display = 'flex';
-    sectionVideoManagement.style.display = 'none';
-    sectionLeadsManagement.style.display = 'none';
-    sectionReportsManagement.style.display = 'none';
-    sectionSettingsManagement.style.display = 'none';
-    sectionWorkflowsManagement.style.display = 'none';
-    sectionCommunicationManagement.style.display = 'none';
-    sectionDocumentManagement.style.display = 'none';
-    sectionAppointmentManagement.style.display = 'none';
-    sectionApplicationManagement.style.display = 'none';
-
-    userMgt.classList.add('activ');
-    contentMgt.classList.remove('activ');
-    aboutMgt.classList.remove('activ');
-    videoMgt.classList.remove('activ');
-    leadMgt.classList.remove('activ');
-    apptMgt.classList.remove('activ');
-    crmMgt.classList.remove('activ');
-    reportMgt.classList.remove('activ');
-    settingMgt.classList.remove('activ');
-    workflowMgt.classList.remove('activ');
-    commMgt.classList.remove('activ');
-    docsMgt.classList.remove('activ');
-    applicationMgt.classList.remove('activ');
-    //Manage Lists
-    fetchUsers();
-}
-
-function contentManagement(){
-    sectionUserManagement.style.display = 'none';
-    sectionVideoManagement.style.display = 'flex';
-    sectionLeadsManagement.style.display = 'none';
-    sectionReportsManagement.style.display = 'none';
-    sectionSettingsManagement.style.display = 'none';
-    sectionWorkflowsManagement.style.display = 'none';
-    sectionCommunicationManagement.style.display = 'none';
-    sectionDocumentManagement.style.display = 'none';
-    sectionAppointmentManagement.style.display = 'none';
-    sectionApplicationManagement.style.display = 'none';
-
-    userMgt.classList.remove('activ');
-    contentMgt.classList.add('activ');
-    aboutMgt.classList.add('activ');
-    videoMgt.classList.add('activ');
-    leadMgt.classList.remove('activ');
-    apptMgt.classList.remove('activ');
-    crmMgt.classList.remove('activ');
-    reportMgt.classList.remove('activ');
-    settingMgt.classList.remove('activ');
-    workflowMgt.classList.remove('activ');
-    commMgt.classList.remove('activ');
-    docsMgt.classList.remove('activ');
-    applicationMgt.classList.remove('activ');
-
-    fetchAbout();
-}
-function leadsManagement(){
-    sectionUserManagement.style.display = 'none';
-    sectionVideoManagement.style.display = 'none';
-    sectionLeadsManagement.style.display = 'flex';
-    sectionReportsManagement.style.display = 'none';
-    sectionSettingsManagement.style.display = 'none';
-    sectionWorkflowsManagement.style.display = 'none';
-    sectionCommunicationManagement.style.display = 'none';
-    sectionDocumentManagement.style.display = 'none';
-    sectionAppointmentManagement.style.display = 'none';
-    sectionApplicationManagement.style.display = 'none';
-
-    userMgt.classList.remove('activ');
-    contentMgt.classList.remove('activ');
-    aboutMgt.classList.remove('activ');
-    videoMgt.classList.remove('activ');
-    leadMgt.classList.add('activ');
-    apptMgt.classList.remove('activ');
-    crmMgt.classList.remove('activ');
-    reportMgt.classList.remove('activ');
-    settingMgt.classList.remove('activ');
-    workflowMgt.classList.remove('activ');
-    commMgt.classList.remove('activ');
-    docsMgt.classList.remove('activ');
-    applicationMgt.classList.remove('activ');
-
-    fetchLeads();
-}
-function appointmentManagement(){
-    sectionUserManagement.style.display = 'none';
-    sectionVideoManagement.style.display = 'none';
-    sectionLeadsManagement.style.display = 'none';
-    sectionReportsManagement.style.display = 'none';
-    sectionSettingsManagement.style.display = 'none';
-    sectionWorkflowsManagement.style.display = 'none';
-    sectionCommunicationManagement.style.display = 'none';
-    sectionDocumentManagement.style.display = 'none';
-    sectionApplicationManagement.style.display = 'none';
-    sectionAppointmentManagement.style.display = 'flex';
-
-    userMgt.classList.remove('activ');
-    contentMgt.classList.remove('activ');
-    aboutMgt.classList.remove('activ');
-    videoMgt.classList.remove('activ');
-    leadMgt.classList.remove('activ');
-    apptMgt.classList.add('activ');
-    crmMgt.classList.remove('activ');
-    reportMgt.classList.remove('activ');
-    settingMgt.classList.remove('activ');
-    workflowMgt.classList.remove('activ');
-    commMgt.classList.remove('activ');
-    docsMgt.classList.remove('activ');
-    applicationMgt.classList.remove('activ');
-
-    fetchAppointments();
-}
-
-function applicationManagement(){
-    sectionUserManagement.style.display = 'none';
-    sectionVideoManagement.style.display = 'none';
-    sectionLeadsManagement.style.display = 'none';
-    sectionReportsManagement.style.display = 'none';
-    sectionSettingsManagement.style.display = 'none';
-    sectionWorkflowsManagement.style.display = 'none';
-    sectionCommunicationManagement.style.display = 'none';
-    sectionDocumentManagement.style.display = 'none';
-    sectionApplicationManagement.style.display = 'flex';
-    sectionAppointmentManagement.style.display = 'none';
-
-    userMgt.classList.remove('activ');
-    contentMgt.classList.remove('activ');
-    aboutMgt.classList.remove('activ');
-    videoMgt.classList.remove('activ');
-    leadMgt.classList.remove('activ');
-    apptMgt.classList.remove('activ');
-    crmMgt.classList.remove('activ');
-    reportMgt.classList.remove('activ');
-    settingMgt.classList.remove('activ');
-    workflowMgt.classList.remove('activ');
-    commMgt.classList.remove('activ');
-    docsMgt.classList.remove('activ');
-    applicationMgt.classList.add('activ');
-
-    fetchApplications();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-
-    // Fetch when the page loads
-    document.getElementById('adminHero').style.display = 'block';
-    if (window.innerWidth < 1024) {
-        document.querySelectorAll("body > *:not(.mobile-warning)").forEach(el => el.style.display = "none");
-        document.getElementById('adminHero').style.display = 'none';
-        document.getElementById('admin-footer').style.display = 'flex';
-        document.getElementById('admin-header').style.display = 'block';
-        document.querySelector(".mobile-warning").style.display = "block";
-    }
-    //if (isLogIn) userManagement();
-    //fetchLeads();
-    //fetchAbout();
-    //fetchAppointments();
-    //contentManagement();
-    userManagement();
-    document.getElementById('userMgt').addEventListener('click', userManagement);
-    document.getElementById('contentMgt').addEventListener('click', contentManagement);
-    document.getElementById('leadMgt').addEventListener('click', leadsManagement);
-    document.getElementById('apptMgt').addEventListener('click', appointmentManagement);
-    document.getElementById('applicationMgt').addEventListener('click', applicationManagement);
-    btnSubmitUserData.addEventListener('click', userRegistrationOrUpdate);
-    btnDownload.addEventListener('click', downloadExcel);
+  // Mobile guard
+  if (window.innerWidth < 1024) {
+    document.querySelectorAll('.admin-only-desktop').forEach(el => el.style.display = 'none');
+  }
 });
 
-function navigateTo(section) {
-    document.querySelectorAll('#content').forEach(sec => sec.classList.add('.hidden'));
-    section.classList.remove('.hidden');
-}
-function activeClass(nav) {
-    document.querySelectorAll('.admin-sidebar ul').forEach(sec => sec.classList.remove('activ'));
-    nav.classList.add('activ');
-}
+// ── Utilities ─────────────────────────────────────────────────
+const showLoader = msg => {
+  $('loaderPopup').style.height = '100%';
+  if (msg) $('loadingText').textContent = msg;
+};
+const hideLoader = () => {
+  $('loaderPopup').style.height = '0%';
+  $('loadingText').textContent = '';
+};
 
-/**
- * Refreshes the user table
- */
-function refreshUserTable(){
-    userList = [];
-    fetchUsers();
-}
+const toast = (msg, type = 'success') => {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+};
 
-function refreshApplicationTable(){
-    applicationList = [];
-    fetchApplications();
-}
+const confirm_action = msg => window.confirm(msg);
 
-function refreshAbout(){
-    aboutList = [];
-    fetchAbout();
-}
-function refreshVideos(){
-    videoList = [];
-    fetchAbout();
-}
-
-function refreshLeadsTable(){
-    leadList = [];
-    fetchLeads();
+function wireSearch(inputId, rowSelector) {
+  const el = $(inputId);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    const q = el.value.toLowerCase();
+    document.querySelectorAll(rowSelector).forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
 }
 
-function refreshAppointmentTable(){
-    appointmentList = [];
-    fetchAppointments();
+function openModal(id) { $(id).style.height = '100%'; }
+function closeModal(id) { $(id).style.height = '0%'; }
+
+function closeAllModals() {
+  ['userPopUp','appointmentPopup','aboutPopup','applicationPopup',
+   'aboutRegisterPopup','videoRegisterPopup','blogPopup','projectPopup',
+   'aboutPhotoPopup','aboutVideoPopup'].forEach(closeModal);
 }
 
-async function handleLogin() {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessageContainer = document.getElementById('errorMessage');
+// legacy
+function closePopup() { closeAllModals(); }
 
-    if(email === ''){
-        handleErrorMessage('Please Input Email', errorMessageContainer);
-        document.getElementById('email').focus();
-        return;
-    }
-    if(!emailPattern.test(email)){
-        handleErrorMessage('Enter a valid email!', errorMessageContainer);
-        document.getElementById('email').focus();
-        return;
-    }
-    if(password === ''){
-        handleErrorMessage('Please Input password', errorMessageContainer);
-        document.getElementById('email').focus();
-        return;
-    }
-    if(!passwordPattern.test(password)){
-        handleErrorMessage('Enter a valid password!', errorMessageContainer);
-        document.getElementById('password').focus();
-        return;
-    }
+// ── Auth ──────────────────────────────────────────────────────
+async function handleLogin(e) {
+  if (e) e.preventDefault();
+  const email = $('email').value.trim();
+  const pass  = $('password').value.trim();
+  const errEl = $('login-error');
 
-    auth = { email, password };
+  if (!email || !pass) { showErr('All fields required', errEl); return; }
 
-    showLoader();
-    try {
-        // Perform the fetch call
-        const response = await fetch(`${DOMAIN}auth`, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-        });
+  showLoader('Authenticating…');
+  try {
+    const res  = await fetch(`${DOMAIN}auth`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pass}) });
+    const data = await res.json();
+    if (!res.ok) { showErr(data.error || 'Invalid credentials', errEl); return; }
 
-        // Check if the response is OK
-        if (!response.ok) {
-            // Handle server-side errors (e.g., 401, 400)
-            const errorData = await response.json();
-            console.error('Error:', errorData);
-            alert(errorData.error || 'Invalid email or password.');
-            return;
-        }
-        hideLoader();
-        // Parse JSON response
-        const data = await response.json();
-        console.log('Response Data:', data);
+    session.user = data.username;
+    session.role = data.role || 'GEN_USER';
 
-        // If login is successful
-        alert('Login Successful!');
-        document.getElementById('adminHero').style.display = 'block';
-        document.getElementById('login-page').style.display = 'none';
+    // Update UI
+    $('usernameSession').textContent = data.username;
+    $('userRoleDisplay').textContent = session.role.replace('_',' ');
+    $('userAvatar').textContent = data.username.charAt(0).toUpperCase();
 
-        // Update Username
-        if (textUsernameSession) {
-            textUsernameSession.textContent = data.username; // Use the `username` from the server response
-        }
+    // Apply role-based visibility
+    applyRolePermissions(session.role);
 
-        // Open Session with users loaded
-        isLogIn = true;
-        userManagement();
-        populateUsers();
-    } catch (error) {
-        // Handle network errors
-        console.error('Network Error:', error);
-        alert('An error occurred while logging in. Please try again.');
-    }
+    // Show admin
+    $('login-page').style.display = 'none';
+    $('adminHero').style.display  = 'block';
+    navigate('dashboard');
+    toast(`Welcome back, ${data.username}!`);
+  } catch (err) {
+    showErr('Network error — please try again', errEl);
+  } finally { hideLoader(); }
 }
 
-// Function to show the loader
-function showLoader() {
-    loader.classList.remove('hidden');
-    popupLoader.style.height ='100%';
+function handleLogout() {
+  if (!confirm_action('Sign out?')) return;
+  session = { user:null, role:null };
+  $('login-page').style.display = 'flex';
+  $('adminHero').style.display  = 'none';
+  $('email').value = '';
+  $('password').value = '';
 }
 
-// Function to hide the loader
-function hideLoader() {
-    loader.classList.add('hidden');
-    popupLoader.style.height ='0%';
-    textLoaderText.textContent = '';
+function applyRolePermissions(role) {
+  const allowed = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS.GEN_USER;
+
+  // Hide/show CRM nav
+  const crmSections = ['nav-leads','nav-appointments','nav-applications'];
+  crmSections.forEach(id => {
+    const el = $(id);
+    if (el) el.style.display = allowed.includes(id.replace('nav-','')) ? '' : 'none';
+  });
+
+  // Hide users nav for non-admins
+  const usersNav = $('nav-users');
+  if (usersNav) usersNav.style.display = allowed.includes('users') ? '' : 'none';
+  if (!allowed.includes('users')) {
+    $('admin-section-label').style.display = 'none';
+  }
+
+  // Editor: hide leads/appts/applications labels
+  if (role === 'EDITOR') {
+    ['crm-section-label','admin-section-label'].forEach(id => {
+      if ($(id)) $(id).style.display = 'none';
+    });
+  }
 }
 
-async function fetchData(url, populateCallback) {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Data. Please Wait!';
-    try {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        populateCallback(data);
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    } finally {
-        hideLoader();
-    }
+function canAccess(panel) {
+  const allowed = ROLE_PERMISSIONS[session.role] || [];
+  return allowed.includes(panel);
 }
 
-async function fetchAbout() {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Data. Please Wait!';
-    try {
-        const response = await fetch(`${DOMAIN}about-data`);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        aboutList = await response.json();
-
-        populateAbout();
-    } catch (error) {
-        console.error('Error fetching Appointments messages:', error);
-    }
-    try {
-        const response = await fetch(`${DOMAIN}video-data`);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        videoList = await response.json();
-
-        populateVideo();
-    } catch (error) {
-        console.error('Error fetching Appointments messages:', error);
-    }
-    hideLoader();
+function showErr(msg, container) {
+  if (!container) return toast(msg, 'error');
+  container.textContent = msg;
+  container.style.display = 'block';
+  setTimeout(() => { container.style.display = 'none'; }, 4000);
 }
 
+// ── Navigation ────────────────────────────────────────────────
+function navigate(panel) {
+  if (!canAccess(panel)) { showActivePanel('access-denied'); return; }
 
-async function fetchAppointments() {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Appointments. Please Wait!';
-    try {
-        const response = await fetch(`${DOMAIN}appointments`);
+  currentPanel = panel;
+  showActivePanel(panel);
+  updateSidebarActive(panel);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        appointmentList = await response.json();
-
-        populateAppointments();
-    } catch (error) {
-        console.error('Error fetching Appointments messages:', error);
-    } finally{
-        hideLoader();
-    }
+  // Load data for panel
+  const loaders = {
+    dashboard:    loadDashboard,
+    analytics:    loadAnalytics,
+    content:      fetchAbout,
+    blog:         fetchBlogPosts,
+    portfolio:    fetchProjects,
+    leads:        fetchLeads,
+    appointments: fetchAppointments,
+    applications: fetchApplications,
+    homepage:    () => { loadHomepageSettings(); },
+    testimonials: fetchTestimonials,
+    users:        fetchUsers,
+    settings:     () => {},
+  };
+  if (loaders[panel]) loaders[panel]();
 }
 
-async function fetchApplications() {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Aplications. Please Wait!';
-    try {
-        const response = await fetch('/api/marketing-strategy-applications');
-        if (!response.ok) {
-            throw new Error('Failed to fetch applications');
-        }
-        const data = await response.json();
-        console.log("API Response:", data);
-
-        if (data.applications && Array.isArray(data.applications)) {
-            applicationList = data.applications;
-            populateApplications();
-        } else {
-            console.error("Expected an array but got:", data.applications);
-        }
-    } catch (error) {
-        console.error("Error fetching applications:", error);
-    } finally {
-        hideLoader();
-    }
+function showActivePanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+  const el = $(`panel-${name}`);
+  if (el) el.style.display = 'flex';
 }
 
-async function fetchLeads() {
-    showLoader();
-    textLoaderText.textContent = 'Fetching Leads. Please Wait!';
-    try {
-        const response = await fetch(`${DOMAIN}clients`);
+function updateSidebarActive(panel) {
+  document.querySelectorAll('.admin-sidebar li').forEach(li => li.classList.remove('activ'));
+  const navEl = $(`nav-${panel}`);
+  if (navEl) navEl.classList.add('activ');
+}
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+// ── Dashboard ─────────────────────────────────────────────────
+async function loadDashboard() {
+  showLoader('Loading dashboard…');
+  try {
+    const [leads, appts, apps, blogs] = await Promise.allSettled([
+      fetch(`${DOMAIN}clients`).then(r=>r.json()),
+      fetch(`${DOMAIN}appointments`).then(r=>r.json()),
+      fetch(`${DOMAIN}marketing-strategy-applications`).then(r=>r.json()),
+      fetch(`${DOMAIN}blog-posts`).then(r=>r.json()).catch(()=>[]),
+    ]);
 
-        leadList = await response.json();
+    const leadsData = leads.value || [];
+    const apptsData = appts.value || [];
+    const appsData  = (apps.value?.applications) || [];
+    const blogsData = Array.isArray(blogs.value) ? blogs.value : [];
 
-        populateLeads();
-    } catch (error) {
-        console.error('Error fetching Leads messages:', error);
-    } finally{
-        hideLoader();
-        textLoaderText.textContent = '';
-    }
+    $('statLeads').textContent = leadsData.length;
+    $('statAppts').textContent = apptsData.length;
+    $('statApps').textContent  = appsData.length;
+    $('statBlogs').textContent = blogsData.length;
+
+    // recent leads
+    renderRecentLeads(leadsData.slice(-5).reverse());
+
+    // Charts
+    buildLeadsChart(leadsData);
+    buildSourceChart(leadsData);
+  } catch (e) { console.error(e); }
+  finally { hideLoader(); }
+}
+
+function renderRecentLeads(list) {
+  const tbody = $('recentLeadsTbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:var(--space-5);color:var(--clr-text-muted);">No leads yet</td></tr>'; return; }
+  tbody.innerHTML = list.map(l => `
+    <tr>
+      <td><strong>${esc(l.clientName)}</strong></td>
+      <td>${esc(l.clientEmail)}</td>
+      <td><span class="badge badge-default">${esc(l.clientSource||'—')}</span></td>
+      <td>${statusBadge(l.clientStatus)}</td>
+      <td style="color:var(--clr-text-muted);">${formatDate(l.created_at)}</td>
+    </tr>`).join('');
+}
+
+function buildLeadsChart(leads) {
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    return d.toISOString().slice(0,10);
+  }).reverse();
+
+  const counts = days.map(day => leads.filter(l => (l.created_at||'').startsWith(day)).length);
+
+  if (charts.leads) charts.leads.destroy();
+  const ctx = document.getElementById('leadsChart')?.getContext('2d');
+  if (!ctx) return;
+  charts.leads = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days.map(d => new Date(d).toLocaleDateString('en-KE',{weekday:'short',day:'numeric'})),
+      datasets: [{
+        label: 'Leads',
+        data: counts,
+        borderColor: '#F65730',
+        backgroundColor: 'rgba(246,87,48,.12)',
+        fill: true,
+        tension: .4,
+        pointBackgroundColor: '#F65730',
+        pointRadius: 4,
+      }]
+    },
+    options: { plugins:{legend:{display:false}}, scales:{ x:{grid:{color:'rgba(255,255,255,.06)'}}, y:{grid:{color:'rgba(255,255,255,.06)'},beginAtZero:true,ticks:{stepSize:1}} } }
+  });
+}
+
+function buildSourceChart(leads) {
+  const sources = {};
+  leads.forEach(l => { const s = l.clientSource||'Direct'; sources[s] = (sources[s]||0)+1; });
+  const keys = Object.keys(sources), vals = Object.values(sources);
+
+  if (charts.source) charts.source.destroy();
+  const ctx = document.getElementById('sourceChart')?.getContext('2d');
+  if (!ctx) return;
+  const colors = ['#F65730','#4ABC4F','#3498DB','#F5A623','#9B59B6','#1ABC9C'];
+  charts.source = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: keys, datasets: [{ data: vals, backgroundColor: colors, borderColor: '#252320', borderWidth: 2 }] },
+    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0', font:{size:11} } } }, cutout:'65%' }
+  });
+}
+
+// ── Analytics ─────────────────────────────────────────────────
+async function loadAnalytics() {
+  showLoader('Loading analytics…');
+  try {
+    const [leads, appts, apps] = await Promise.allSettled([
+      fetch(`${DOMAIN}clients`).then(r=>r.json()),
+      fetch(`${DOMAIN}appointments`).then(r=>r.json()),
+      fetch(`${DOMAIN}marketing-strategy-applications`).then(r=>r.json()),
+    ]);
+    const L = leads.value||[], A = appts.value||[], P = (apps.value?.applications)||[];
+
+    // Stats
+    const subscribed = L.filter(l=>l.clientSubScription==='SUBSCRIBED').length;
+    const resolved   = P.filter(p=>p.status==='RESOLVED').length;
+
+    $('analyticsStats').innerHTML = `
+      <div class="stat-card" style="--accent-color:var(--clr-primary);">
+        <i class="fa fa-users stat-icon"></i>
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-value">${L.length}</div>
+        <div class="stat-change up">All time</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-accent);">
+        <i class="fa fa-envelope stat-icon"></i>
+        <div class="stat-label">Subscribed</div>
+        <div class="stat-value">${subscribed}</div>
+        <div class="stat-change up">${L.length ? Math.round(subscribed/L.length*100) : 0}% rate</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-info);">
+        <i class="fa fa-calendar stat-icon"></i>
+        <div class="stat-label">Appointments</div>
+        <div class="stat-value">${A.length}</div>
+        <div class="stat-change">${A.filter(a=>a.appointmentStatus==='DONE').length} completed</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-warning);">
+        <i class="fa fa-check-circle stat-icon"></i>
+        <div class="stat-label">Resolved Apps</div>
+        <div class="stat-value">${resolved}</div>
+        <div class="stat-change up">${P.length ? Math.round(resolved/P.length*100) : 0}% resolution</div>
+      </div>`;
+
+    buildMonthlyChart(L, A);
+    buildStatusChart(P);
+    buildSubChart(L);
+    buildSourceList(L);
+  } catch(e) { console.error(e); }
+  finally { hideLoader(); }
+}
+
+function buildMonthlyChart(leads, appts) {
+  const months = Array.from({length:6}, (_,i) => {
+    const d = new Date(); d.setMonth(d.getMonth()-i);
+    return { key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('en-KE',{month:'short'}) };
+  }).reverse();
+
+  if (charts.monthly) charts.monthly.destroy();
+  const ctx = document.getElementById('monthlyChart')?.getContext('2d');
+  if (!ctx) return;
+  charts.monthly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: months.map(m=>m.label),
+      datasets: [
+        { label:'Leads', data: months.map(m => leads.filter(l=>(l.created_at||'').startsWith(m.key)).length), backgroundColor:'rgba(246,87,48,.7)', borderRadius:4 },
+        { label:'Appts', data: months.map(m => appts.filter(a=>(a.created_at||'').startsWith(m.key)).length), backgroundColor:'rgba(74,188,79,.7)', borderRadius:4 },
+      ]
+    },
+    options: { plugins:{legend:{labels:{color:'#B8B4B0'}}}, scales:{ x:{grid:{color:'rgba(255,255,255,.06)'}}, y:{grid:{color:'rgba(255,255,255,.06)'},beginAtZero:true} } }
+  });
+}
+
+function buildStatusChart(apps) {
+  const resolved = apps.filter(a=>a.status==='RESOLVED').length;
+  const pending  = apps.length - resolved;
+  if (charts.status) charts.status.destroy();
+  const ctx = document.getElementById('statusChart')?.getContext('2d');
+  if (!ctx) return;
+  charts.status = new Chart(ctx, {
+    type: 'pie',
+    data: { labels:['Resolved','Pending'], datasets:[{ data:[resolved,pending], backgroundColor:['#4ABC4F','#F65730'], borderColor:'#252320', borderWidth:2 }] },
+    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0' } } } }
+  });
+}
+
+function buildSubChart(leads) {
+  const subbed = leads.filter(l=>l.clientSubScription==='SUBSCRIBED').length;
+  const unsub  = leads.length - subbed;
+  if (charts.sub) charts.sub.destroy();
+  const ctx = document.getElementById('subChart')?.getContext('2d');
+  if (!ctx) return;
+  charts.sub = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels:['Subscribed','Unsubscribed'], datasets:[{ data:[subbed,unsub], backgroundColor:['#3498DB','#7a7874'], borderColor:'#252320', borderWidth:2 }] },
+    options: { cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0' } } } }
+  });
+}
+
+function buildSourceList(leads) {
+  const sources = {};
+  leads.forEach(l => { const s = l.clientSource||'Direct'; sources[s]=(sources[s]||0)+1; });
+  const sorted = Object.entries(sources).sort((a,b)=>b[1]-a[1]);
+  const max    = sorted[0]?.[1] || 1;
+  const el     = $('sourceList');
+  if (!el) return;
+  el.innerHTML = sorted.map(([src,cnt]) => `
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:.82rem;">${esc(src)}</span>
+        <span style="font-size:.82rem;color:var(--clr-primary);font-weight:700;">${cnt}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>
+    </div>`).join('');
+}
+
+// ── Users ─────────────────────────────────────────────────────
+async function fetchUsers() {
+  showLoader('Fetching users…');
+  try {
+    const res = await fetch(`${DOMAIN}users`);
+    userList  = await res.json();
+    populateUsers();
+  } finally { hideLoader(); }
 }
 
 function populateUsers() {
-    const dataList = document.getElementById('userList');
-    dataList.innerHTML = ''; // Clear existing content
-
-    if (userList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Registered Users Available!</p>';
-        return;
-    }
-
-    userList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.innerHTML = `
-        <p class="item-user-id">${item.id}</p>
-        <p class="item-user-name">${item.name}</p>
-        <p class="item-user-email">${item.email}</p>
-        <p class="item-user-roles">${item.role}</p>
-        <p class="item-user-access">${item.access_level}</p>
-        <button id="userUpdateBtn" onclick="openUpdateUser(${index})">UPDATE</button>
-        <button id="userDeleteBtn" onclick="deleteUser(${index})">DELETE</button>
-      `;
-        dataList.appendChild(listItem);
-    });
+  const tbody = document.querySelector('#panel-users .data-table tbody');
+  if (!tbody) return;
+  if (!userList.length) { tbody.innerHTML = emptyRow(6,'No users found'); return; }
+  tbody.innerHTML = userList.map((u,i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.78rem;">${esc(u.id)}</td>
+      <td><strong>${esc(u.name)}</strong></td>
+      <td>${esc(u.email)}</td>
+      <td>${roleBadge(u.role)}</td>
+      <td><span class="badge badge-default" style="font-family:var(--font-mono);">${esc(u.access_level)}</span></td>
+      <td class="actions-cell">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="openUpdateUser(${i})" title="Edit"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteUser(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
-function populateAbout() {
-    const dataList = document.getElementById('aboutList');
-    dataList.innerHTML = ''; // Clear existing content
+function refreshUserTable() { userList=[]; fetchUsers(); }
 
-    if (aboutList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No About Data Available!</p>';
-        return;
-    }
-
-    aboutList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.style.marginTop = '3px';
-        listItem.innerHTML = `
-        <p class="item-about-id">${item.id}</p>
-        <p class="item-about-title" style="cursor: pointer;" onclick="previewTitle(${index})">${item.title}</p>
-        <p class="item-about-introduction" style="cursor: pointer;" onclick="previewIntroduction(${index})">${item.introduction}</p>
-        <p class="item-about-experience" style="cursor: pointer;" onclick="previewExperience(${index})">${item.experience}</p>
-        <p class="item-about-mission" style="cursor: pointer;" onclick="previewMission(${index})">${item.mission}</p>
-        <p class="item-about-status" style="cursor: pointer;" onclick="updateStatus(${index})">${item.status}</p>
-        <p class="item-about-image" onclick="previewImage(${index})"></p>
-        <i id="leadDeleteBtn" class="fa fa-trash" onclick="deleteAbout(${index})" aria-hidden="true"></i>
-    `;
-
-        // Select the image div inside the newly created listItem
-        const iconImageBg = listItem.querySelector('.item-about-image');
-
-        // Set the background image property
-        if (iconImageBg && item.icon) {
-            iconImageBg.style.backgroundImage = `url(${item.icon})`;
-            iconImageBg.style.marginTop = '8px';
-            iconImageBg.style.marginBottom = '8px';
-        }
-
-        // Append the list item to the container
-        dataList.appendChild(listItem);
-    });
+function openCreateUserModal() {
+  $('userModalTitle').textContent = 'Create New User';
+  ['name','userEmail','userPassword'].forEach(id => { if($(id)) $(id).value=''; });
+  editIndex = null;
+  openModal('userPopUp');
 }
 
-function populateVideo() {
-    const dataList = document.getElementById('videoList');
-    dataList.innerHTML = ''; // Clear existing content
-
-    if (videoList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Video Data Available!</p>';
-        return;
-    }
-
-    videoList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.style.marginTop = '3px';
-        listItem.innerHTML = `
-        <p class="item-about-id">${item.id}</p>
-        <p class="item-about-title" style="cursor: pointer;" >${item.title}</p>
-        <p class="item-about-introduction" style="cursor: pointer;" >${item.created_by}</p>
-        <p class="item-about-introduction" style="cursor: pointer;" >${item.created_on}</p>
-        <p class="item-about-status" style="cursor: pointer;" onclick="updateVideoStatus(${index})">${item.status}</p>
-        <p class="item-about-image" style="cursor: pointer;" onclick="previewVideo(${index})"></p>
-        <i id="leadDeleteBtn" class="fa fa-trash" onclick="deleteVideo(${index})" aria-hidden="true"></i>
-    `;
-        // Append the list item to the container
-        dataList.appendChild(listItem);
-    });
+function openUpdateUser(i) {
+  $('userModalTitle').textContent = 'Update User';
+  const u = userList[i];
+  $('name').value = u.name; $('userEmail').value = u.email;
+  $('role').value = u.role; $('access').value = u.access_level;
+  editIndex = i;
+  openModal('userPopUp');
 }
 
-function populateApplications() {
-    const dataList = document.getElementById('applicationList');
-    dataList.innerHTML = ''; // Clear existing content
-
-    // Check if applicationList is an array
-    if (!Array.isArray(applicationList)) {
-        console.error("applicationList is not an array:", applicationList);
-        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">Error: Invalid data format!</p>';
-        return;
-    }
-    if (applicationList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 100px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Applications Data Available!</p>';
-        return;
-    }
-
-    applicationList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.style.marginTop = '3px';
-        listItem.innerHTML = `
-        <p class="item-user-id">${item.applicationDate}</p>
-        <p class="item-user-name" style="cursor: pointer;" >${item.applicantFName} ${item.applicantLName}</p>
-        <p class="item-user-email" style="cursor: pointer;" >${item.email}</p>
-        <p class="item-appointment-phone" style="cursor: pointer;" >${item.phone}</p>
-        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewOccupation(${index})">${item.occupation}</p>
-        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewTrigger(${index})">${item.marketTriggers}</p>
-        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewGoal(${index})">${item.strategyGoal}</p>
-        <p class="item-appointment-notes" style="cursor: pointer;" onclick="previewInvestment(${index})">${item.strategyInvestment}</p>
-        <p class="item-appointment-status" style="cursor: pointer;" onclick="updateApplicationStatus(${index})">${item.status}</p>
-        <i id="leadDeleteBtn" class="fa fa-trash" onclick="deleteApplication(${index})" aria-hidden="true"></i>
-    `;
-        // Append the list item to the container
-        dataList.appendChild(listItem);
-    });
+async function userRegistrationOrUpdate(e) {
+  e.preventDefault();
+  if (editIndex !== null) { await updateUser(editIndex); }
+  else { await registerUser(); }
 }
 
-function previewOccupation(index){
-    textApplicationPopupHeader.textContent = `OCCUPATION`;
-    textApplicationContent.textContent = `${applicationList[index].occupation}`;
-    openApplicationPopup();
-}
-function previewTrigger(index){
-    textApplicationPopupHeader.textContent = `MARKET TRIGGER(S)`;
-    textApplicationContent.textContent = `${applicationList[index].marketTriggers}`;
-    openApplicationPopup();
-}
-function previewGoal(index){
-    textApplicationPopupHeader.textContent = `CLIENT GOAL`;
-    textApplicationContent.textContent = `${applicationList[index].strategyGoal}`;
-    openApplicationPopup();
-}
-function previewInvestment(index){
-    textApplicationPopupHeader.textContent = `INVESTMENT`;
-    textApplicationContent.textContent = `${applicationList[index].strategyInvestment}`;
-    openApplicationPopup();
-}
-async function updateApplicationStatus(index) {
-    try {
-        textLoaderText.textContent = 'Updating Application Status. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[index].applicationDate}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ status: 'RESOLVED'}),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Status Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            applicationList[index].status = 'RESOLVED';
-            populateApplications();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally {
-        hideLoader();
-    }
+async function registerUser() {
+  const errEl = $('userModalError');
+  const body = { name:$('name').value.trim(), email:$('userEmail').value.trim(), password:$('userPassword').value.trim(), role:$('role').value, access_level:$('access').value };
+  if (!body.name||!body.email||!body.password||!body.role||!body.access_level) { showErr('All fields required',errEl); return; }
+  showLoader('Creating user…');
+  try {
+    const res = await fetch(`${DOMAIN}users`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    const d = await res.json();
+    if (res.ok) { toast('User created!'); closeModal('userPopUp'); fetchUsers(); }
+    else showErr(d.error, errEl);
+  } finally { hideLoader(); }
 }
 
-async function deleteApplication(index) {
-    if (confirm('Are you sure you want to delete this Application?')) {
-        try {
-            showLoader();
-            const response = await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[index].applicationDate}`, {method: 'DELETE'});
-            if (!response.ok) throw new Error('Failed to delete Application');
-            errorMessages = 'Application deleted successfully';
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            applicationList.splice(index, 1);
-            populateApplications();
-        } catch (error) {
-            console.error('Error deleting Application:', error);
-
-            errorMessages = 'Failed to delete Application. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally {
-            hideLoader();
-        }
-    }
+async function updateUser(i) {
+  const errEl = $('userModalError');
+  const body = { name:$('name').value.trim(), email:$('userEmail').value.trim(), password:$('userPassword').value.trim(), role:$('role').value, access_level:$('access').value };
+  showLoader('Updating user…');
+  try {
+    const res = await fetch(`${DOMAIN}users/${userList[i].id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) { toast('User updated!'); closeModal('userPopUp'); fetchUsers(); }
+    else { const d=await res.json(); showErr(d.error, errEl); }
+  } finally { hideLoader(); editIndex=null; }
 }
 
+async function deleteUser(i) {
+  if (!confirm_action('Delete this user?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}users/${userList[i].id}`, {method:'DELETE'});
+    toast('User deleted'); userList.splice(i,1); populateUsers();
+  } finally { hideLoader(); }
+}
+
+// ── Leads ─────────────────────────────────────────────────────
+async function fetchLeads() {
+  showLoader('Fetching leads…');
+  try {
+    const res  = await fetch(`${DOMAIN}clients`);
+    leadList   = await res.json();
+    populateLeads();
+  } finally { hideLoader(); }
+}
 
 function populateLeads() {
-    const dataList = document.getElementById('leadList');
-    dataList.innerHTML = ''; // Clear existing content
-
-    if (leadList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Captured Leads Available!</p>';
-        return;
-    }
-
-    leadList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.innerHTML = `
-      <div class="h-layout item-content" onclick="clicked(${index})">
-        <p class="item-lead-id">${item.clientID}</p>
-        <p class="item-lead-name">${item.clientName}</p>
-        <p class="item-lead-email">${item.clientEmail}</p>
-        <p class="item-lead-phone">${item.clientPhone}</p>
-        <p class="item-lead-source">${item.clientSource}</p>
-        <p class="item-lead-status">${item.clientStatus}</p>
-        <p class="item-lead-subscription">${item.clientSubScription}</p>
-        <p class="item-lead-date">${item.created_at}</p>
-        <i id="leadPreviewMailBtn" onclick="previewEmailTemplate(${index})" class="fa fa-envelope-open" aria-hidden="true"></i>
-        <i id="leadSendMailBtn" onclick="sendSubsequentEmail(${index})" class="fa fa-envelope" aria-hidden="true"></i>
-        <i id="leadUnsubscribeBtn" onclick="unsubscribeFromLead(${index})" class="fa fa-sign-out" aria-hidden="true"></i>
-        <i id="leadDeleteBtn" onclick="deleteLead(${index})" class="fa fa-trash" aria-hidden="true"></i>
-        </div>
-      `;
-        dataList.appendChild(listItem);
-    });
+  const tbody = document.querySelector('#panel-leads .data-table tbody');
+  if (!tbody) return;
+  if (!leadList.length) { tbody.innerHTML = emptyRow(9,'No leads captured yet'); return; }
+  tbody.innerHTML = leadList.map((l,i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.72rem;">${esc(l.clientID)}</td>
+      <td><strong>${esc(l.clientName)}</strong></td>
+      <td>${esc(l.clientEmail)}</td>
+      <td>${esc(l.clientPhone)}</td>
+      <td><span class="badge badge-default">${esc(l.clientSource||'—')}</span></td>
+      <td>${statusBadge(l.clientStatus)}</td>
+      <td>${subBadge(l.clientSubScription)}</td>
+      <td style="color:var(--clr-text-muted);font-size:.78rem;">${formatDate(l.created_at)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="previewEmailTemplate(${i})" title="Preview email"><i class="fa fa-envelope-open action-icon"></i></button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="sendSubsequentEmail(${i})" title="Send follow-up"><i class="fa fa-envelope action-icon"></i></button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="unsubscribeFromLead(${i})" title="Unsubscribe"><i class="fa fa-sign-out action-icon"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteLead(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
-function extractListData() {
-    const leadList = document.getElementById("leadList"); // Get the parent div
-    if (!leadList) {
-        console.error("Lead list container not found!");
-        return [];
-    }
+function refreshLeadsTable() { leadList=[]; fetchLeads(); }
 
-    const items = leadList.querySelectorAll(".item-content"); // Select child items
-    let leadsList = [];
-
-    items.forEach((item) => {
-        const clientID = item.querySelector(".item-lead-id")?.textContent.trim() || "";
-        const clientName = item.querySelector(".item-lead-name")?.textContent.trim() || "";
-        const clientEmail = item.querySelector(".item-lead-email")?.textContent.trim() || "";
-        const clientPhone = item.querySelector(".item-lead-phone")?.textContent.trim() || "";
-        const clientSource = item.querySelector(".item-lead-source")?.textContent.trim() || "";
-        const clientStatus = item.querySelector(".item-lead-status")?.textContent.trim() || "";
-        const created_at = item.querySelector(".item-lead-date")?.textContent.trim() || "";
-
-        // Check if the lead already exists in the list
-        const isDuplicate = leadsList.some((lead) => lead.clientID === clientID);
-
-        if (!isDuplicate) {
-            leadsList.push({
-                clientID,
-                clientName,
-                clientEmail,
-                clientPhone,
-                clientSource,
-                clientStatus,
-                created_at,
-            });
-        }
-    });
-
-    console.log("Unique Leads List:", leadsList); // Log the deduplicated data
-    return leadsList;
+async function deleteLead(i) {
+  if (!confirm_action('Delete this lead?')) return;
+  showLoader('Deleting lead…');
+  try {
+    await fetch(`${DOMAIN}clients/${leadList[i].clientID}`, {method:'DELETE'});
+    toast('Lead deleted'); leadList.splice(i,1); populateLeads();
+  } finally { hideLoader(); }
 }
 
-/**
- * Function for getting the current date & time
- * @returns dat-time (yyyyMMddHHmmss)
- *
- */
-const currentTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+async function unsubscribeFromLead(i) {
+  showLoader('Unsubscribing…');
+  try {
+    const res = await fetch(`${DOMAIN}unsubscribeLead`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientID:leadList[i].clientID}) });
+    if (res.ok) { toast('Lead unsubscribed'); leadList[i].clientSubScription='UNSUBSCRIBED'; populateLeads(); }
+  } finally { hideLoader(); }
+}
 
-    return `${year}${month}${day}${hours}${minutes}${seconds}`;
-};
+async function sendSubsequentEmail(i) {
+  showLoader('Sending follow-up…');
+  try {
+    const res = await fetch(`${DOMAIN}sendSubsequentEmail`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientID:leadList[i].clientID}) });
+    const d = await res.json();
+    if (res.ok) toast(d.message); else toast(d.error,'error');
+  } finally { hideLoader(); }
+}
 
-// Function to send data and download Excel
-// Function to send data and download Excel
+async function previewEmailTemplate(i) {
+  showLoader('Loading template…');
+  const res = await fetch(`${DOMAIN}emailTemplate?status=${leadList[i].clientStatus}`);
+  const tpl = await res.json();
+  hideLoader();
+  if (tpl) { const w = window.open('','_blank'); w.document.write(tpl.body); }
+}
+
 function downloadExcel() {
-    textLoaderText.textContent = "Downloading Leads. Please Wait!";
-    showLoader();
-
-    const leadsList = extractListData();
-    console.log("Leads List:", leadsList); // Log the data being sent
-
-    fetch(`${DOMAIN}download/excel`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leads: leadsList }),
+  showLoader('Preparing export…');
+  const leads = leadList.map(l => ({
+    clientID: l.clientID, clientName: l.clientName, clientEmail: l.clientEmail,
+    clientPhone: l.clientPhone, clientSource: l.clientSource, clientStatus: l.clientStatus, created_at: l.created_at
+  }));
+  fetch(`${DOMAIN}download/excel`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({leads}) })
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a'); a.href=url; a.download=`leads_${Date.now()}.xlsx`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.blob();
-        })
-        .then((blob) => {
-            console.log("Blob size:", blob.size); // Log blob size
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${currentTime()}_leads.xlsx`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url); // Clean up the URL object
-        })
-        .catch((error) => {
-            console.error("Error downloading Excel:", error);
-        })
-        .finally(() => {
-            hideLoader();
-        });
+    .catch(e => toast('Export failed','error'))
+    .finally(() => hideLoader());
+}
+
+// ── Appointments ──────────────────────────────────────────────
+async function fetchAppointments() {
+  showLoader('Fetching appointments…');
+  try {
+    const res       = await fetch(`${DOMAIN}appointments`);
+    appointmentList = await res.json();
+    populateAppointments();
+  } finally { hideLoader(); }
 }
 
 function populateAppointments() {
-    const dataList = document.getElementById('appointmentList');
-    dataList.innerHTML = ''; // Clear existing content
+  const tbody = document.querySelector('#panel-appointments .data-table tbody');
+  if (!tbody) return;
+  if (!appointmentList.length) { tbody.innerHTML = emptyRow(8,'No appointments booked'); return; }
+  tbody.innerHTML = appointmentList.map((a,i) => `
+    <tr>
+      <td><strong>${esc(a.name)}</strong></td>
+      <td>${esc(a.email)}</td>
+      <td>${esc(a.phone)}</td>
+      <td>${formatDate(a.appointmentDate)}</td>
+      <td style="font-size:.8rem;">${esc(a.appointmentTime||'—')}</td>
+      <td><span class="badge badge-default">${esc(a.appointmentType||'—')}</span></td>
+      <td>${apptStatusBadge(a.appointmentStatus)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReschedule(${i})" title="Reschedule"><i class="fa fa-calendar action-icon"></i></button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReminder(${i})" title="Remind"><i class="fa fa-clock action-icon"></i></button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentStartMeeting(${i})" title="Join meeting"><i class="fa fa-video-camera action-icon"></i></button>
+        <button class="btn btn-accent btn-sm btn-icon" onclick="appointmentUpdateStatus(${i})" title="Mark done"><i class="fa fa-check-circle"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAppointment(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
 
-    if (appointmentList.length === 0) {
-        dataList.innerHTML = '<p style="margin: 200px; color: white; font-size: 30px; font-weight: 700; cursor: pointer; transition: all 0.5s ease;">No Captured Appointments Available!</p>';
-        return;
-    }
+function refreshAppointmentTable() { appointmentList=[]; fetchAppointments(); }
 
-    console.log(appointmentList);
-    appointmentList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.classList.add('h-layout', 'item-content');
-        listItem.innerHTML = `
-      <div class="h-layout item-content" onclick="clicked(${index})">
-        <p class="item-appointment-id">${item.clientId}</p>
-        <p class="item-appointment-name">${item.name}</p>
-        <p class="item-appointment-email">${item.email}</p>
-        <p class="item-appointment-phone">${item.phone}</p>
-        <p class="item-appointment-location">${item.location}</p>
-        <p class="item-appointment-date">${item.appointmentDate}</p>
-        <p class="item-appointment-time">${item.appointmentTime}</p>
-        <p class="item-appointment-type">${item.appointmentType}</p>
-        <p class="item-appointment-status">${item.appointmentStatus}</p>
-        <p class="item-appointment-notes" style="cursor: pointer" onclick="previewNotes(${index})">${item.appointmentNotes}</p>
-        <i id="apptReschedule" onclick="appointmentReschedule(${index})" class="fa fa-calendar" aria-hidden="true"></i>
-        <i id="apptReschedule" onclick="appointmentReminder(${index})" class="fa fa-clock" aria-hidden="true"></i>
-        <i id="leadSendMailBtn" onclick="appointmentStartMeeting(${index})" class="fa fa-video-camera" aria-hidden="true"></i>
-        <i id="leadUnsubscribeBtn" onclick="appointmentUpdateStatus(${index})" class="fa fa-check-circle" aria-hidden="true"></i>
-        <i id="leadDeleteBtn" onclick="deleteAppointment(${index})" class="fa fa-trash" aria-hidden="true"></i>
-        </div>
-      `;
-        dataList.appendChild(listItem);
+function appointmentReschedule(i) {
+  $('popupHeaderTextAppt').textContent = `Reschedule — ${appointmentList[i].name?.split(' ')[0]}`;
+  $('titleText').style.display = 'none';
+  $('rescheduleForm').style.display = 'block';
+  $('appointmentInput').value = appointmentList[i].appointmentTime||'';
+  appointmentIndex = i;
+  openModal('appointmentPopup');
+}
+
+async function appointmentReminder(i) {
+  showLoader('Sending reminder…');
+  try {
+    const res = await fetch(`${DOMAIN}reminder-email`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(appointmentList[i]) });
+    const d   = await res.json();
+    if (res.ok) toast(d.message); else toast(d.error,'error');
+  } finally { hideLoader(); }
+}
+
+function appointmentStartMeeting(i) { window.open(appointmentList[i].meetingLink,'_blank'); }
+
+async function appointmentUpdateStatus(i) {
+  showLoader('Updating…');
+  try {
+    await fetch(`${DOMAIN}appointments/${appointmentList[i].clientId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'DONE'}) });
+    toast('Marked as Done'); appointmentList[i].appointmentStatus='DONE'; populateAppointments();
+  } finally { hideLoader(); }
+}
+
+async function deleteAppointment(i) {
+  if (!confirm_action('Delete this appointment?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}appointments/${appointmentList[i].clientId}`, {method:'DELETE'});
+    toast('Deleted'); appointmentList.splice(i,1); populateAppointments();
+  } finally { hideLoader(); }
+}
+
+async function rescheduleMeeting() {
+  const input = $('appointmentInput').value.trim();
+  if (!input) { toast('Enter new date/time','error'); return; }
+  showLoader('Rescheduling…');
+  try {
+    const res = await fetch(`${DOMAIN}rescheduleMeeting`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(appointmentList[appointmentIndex]) });
+    const d   = await res.json();
+    if (res.ok) { toast(d.message); closeModal('appointmentPopup'); fetchAppointments(); }
+    else toast(d.error,'error');
+  } finally { hideLoader(); }
+}
+
+// ── Applications ──────────────────────────────────────────────
+async function fetchApplications() {
+  showLoader('Fetching applications…');
+  try {
+    const res   = await fetch(`${DOMAIN}marketing-strategy-applications`);
+    const data  = await res.json();
+    applicationList = data.applications || [];
+    populateApplications();
+  } finally { hideLoader(); }
+}
+
+function populateApplications() {
+  const tbody = document.querySelector('#panel-applications .data-table tbody');
+  if (!tbody) return;
+  if (!applicationList.length) { tbody.innerHTML = emptyRow(8,'No applications yet'); return; }
+  tbody.innerHTML = applicationList.map((a,i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.72rem;">${esc(a.applicationDate)}</td>
+      <td><strong>${esc(a.applicantFName)} ${esc(a.applicantLName)}</strong></td>
+      <td>${esc(a.email)}</td>
+      <td>${esc(a.phone)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="previewOccupation(${i})">${truncate(a.occupation,20)}</button></td>
+      <td>${esc(a.strategyInvestment||'—')}</td>
+      <td>${appStatusBadge(a.status)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="previewGoal(${i})" title="Goal"><i class="fa fa-eye"></i></button>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="previewTrigger(${i})" title="Triggers"><i class="fa fa-bolt"></i></button>
+        <button class="btn btn-accent btn-sm btn-icon" onclick="updateApplicationStatus(${i})" title="Resolve"><i class="fa fa-check"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteApplication(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function refreshApplicationTable() { applicationList=[]; fetchApplications(); }
+
+function previewOccupation(i) { openPreviewModal('Occupation', applicationList[i].occupation); }
+function previewTrigger(i)    { openPreviewModal('Market Triggers', applicationList[i].marketTriggers); }
+function previewGoal(i)       { openPreviewModal('Strategy Goal', applicationList[i].strategyGoal); }
+function previewInvestment(i) { openPreviewModal('Investment Budget', applicationList[i].strategyInvestment); }
+
+function openPreviewModal(title, content) {
+  $('popupHeaderTextApplication').textContent = title;
+  $('titleTextApplication').textContent = content || '—';
+  openModal('applicationPopup');
+}
+
+async function updateApplicationStatus(i) {
+  showLoader('Resolving…');
+  try {
+    const res = await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[i].applicationDate}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'RESOLVED'}) });
+    if (res.ok) { toast('Marked resolved'); applicationList[i].status='RESOLVED'; populateApplications(); }
+    else toast('Update failed','error');
+  } finally { hideLoader(); }
+}
+
+async function deleteApplication(i) {
+  if (!confirm_action('Delete application?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}marketing-strategy-applications/${applicationList[i].applicationDate}`, {method:'DELETE'});
+    toast('Deleted'); applicationList.splice(i,1); populateApplications();
+  } finally { hideLoader(); }
+}
+
+// ── About / Content ───────────────────────────────────────────
+async function fetchAbout() {
+  showLoader('Fetching content…');
+  try {
+    const [aboutRes, videoRes] = await Promise.all([
+      fetch(`${DOMAIN}about-data`),
+      fetch(`${DOMAIN}video-data`)
+    ]);
+    aboutList = await aboutRes.json();
+    videoList = await videoRes.json();
+    populateAbout();
+    populateVideo();
+  } finally { hideLoader(); }
+}
+
+function populateAbout() {
+  const tbody = $('aboutList');
+  if (!tbody) return;
+  if (!aboutList.length) { tbody.innerHTML = emptyRow(6,'No profiles added'); return; }
+  tbody.innerHTML = aboutList.map((a,i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.72rem;">${esc(a.id)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="previewTitle(${i})">${truncate(a.title,30)}</button></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="previewIntroduction(${i})">${truncate(a.introduction,30)}</button></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="updateStatus(${i})" title="Click to activate">${statusBadge(a.status)}</button></td>
+      <td>
+        ${a.icon ? `<div onclick="previewImage(${i})" style="width:40px;height:40px;border-radius:var(--radius-md);background:url(${a.icon}) center/cover;cursor:pointer;border:2px solid var(--clr-border);"></div>` : '—'}
+      </td>
+      <td class="actions-cell">
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAbout(${i})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function populateVideo() {
+  const tbody = $('videoList');
+  if (!tbody) return;
+  if (!videoList.length) { tbody.innerHTML = emptyRow(6,'No videos uploaded'); return; }
+  tbody.innerHTML = videoList.map((v,i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.72rem;">${esc(v.id)}</td>
+      <td>${esc(v.title)}</td>
+      <td>${esc(v.created_by||'—')}</td>
+      <td style="font-size:.78rem;color:var(--clr-text-muted);">${formatDate(v.created_on)}</td>
+      <td><button onclick="updateVideoStatus(${i})" class="btn btn-ghost btn-sm">${statusBadge(v.status)}</button></td>
+      <td class="actions-cell">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="previewVideo(${i})"><i class="fa fa-play"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteVideo(${i})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function refreshAbout() { aboutList=[]; videoList=[]; fetchAbout(); }
+function refreshVideos() { refreshAbout(); }
+
+function openAboutRegisterPopup() { openModal('aboutRegisterPopup'); }
+function openVideoRegisterPopup() { openModal('videoRegisterPopup'); }
+
+function previewTitle(i)        { openAboutEdit('About - Title', aboutList[i].title, i, {isTitle:true}); }
+function previewIntroduction(i) { openAboutEdit('About - Introduction', aboutList[i].introduction, i, {isIntro:true}); }
+function previewExperience(i)   { openAboutEdit('About - Experience', aboutList[i].experience, i, {isExperience:true}); }
+function previewMission(i)      { openAboutEdit('About - Mission', aboutList[i].mission, i, {isMission:true}); }
+
+function openAboutEdit(title, val, i, flags) {
+  $('popupHeaderTextAbout').textContent = title;
+  $('aboutInput').value = val || '';
+  aboutIndex = i;
+  editFlags = {isTitle:false,isIntro:false,isMission:false,isExperience:false, ...flags};
+  openModal('aboutPopup');
+}
+
+function updateAboutSection() {
+  if (editFlags.isExperience) updateExperience(aboutIndex);
+  else if (editFlags.isIntro) updateIntroduction(aboutIndex);
+  else if (editFlags.isTitle) updateTitle(aboutIndex);
+  else if (editFlags.isMission) updateMission(aboutIndex);
+}
+
+async function patchAbout(i, patch) {
+  const payload = { ...aboutList[i], ...patch };
+  showLoader('Saving…');
+  try {
+    const res = await fetch(`${DOMAIN}about-data/${aboutList[i].id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    if (res.ok) { toast('Updated!'); Object.assign(aboutList[i], patch); populateAbout(); closeModal('aboutPopup'); }
+    else toast('Update failed','error');
+  } finally { hideLoader(); }
+}
+async function updateExperience(i) { await patchAbout(i,{experience:$('aboutInput').value}); }
+async function updateIntroduction(i) { await patchAbout(i,{introduction:$('aboutInput').value}); }
+async function updateTitle(i) { await patchAbout(i,{title:$('aboutInput').value}); }
+async function updateMission(i) { await patchAbout(i,{mission:$('aboutInput').value}); }
+
+async function updateStatus(i) {
+  aboutList[i].status = 'ACTIVE';
+  showLoader('Activating profile…');
+  try {
+    const res = await fetch(`${DOMAIN}about-data-update-status/${aboutList[i].id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(aboutList[i]) });
+    if (res.ok) { toast('Profile activated!'); await fetchAbout(); }
+    else toast('Failed','error');
+  } finally { hideLoader(); }
+}
+
+async function updateVideoStatus(i) {
+  videoList[i].status = 'ACTIVE';
+  showLoader('Activating video…');
+  try {
+    const res = await fetch(`${DOMAIN}video-data-update-status/${videoList[i].id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(videoList[i]) });
+    if (res.ok) { toast('Video activated!'); fetchAbout(); }
+    else toast('Failed','error');
+  } finally { hideLoader(); }
+}
+
+function previewImage(i) {
+  $('photoViewArea').style.backgroundImage = `url(${aboutList[i].icon})`;
+  openModal('aboutPhotoPopup');
+}
+function previewVideo(i) {
+  $('popupVideo').src = videoList[i].video;
+  openModal('aboutVideoPopup');
+}
+
+async function registerAboutSection() {
+  const err = $('aboutRegError');
+  const title = $('inputTitle1').value.trim(), intro=$('inputIntroduction').value.trim(), exp=$('inputExperience').value.trim(), mission=$('inputMission').value.trim(), icon=$('inputIcon').files[0];
+  if (!title||!intro||!exp||!mission||!icon) { showErr('All fields required',err); return; }
+  const form = new FormData();
+  form.append('title',title); form.append('introduction',intro); form.append('experience',exp); form.append('mission',mission); form.append('status','INACTIVE'); form.append('icon',icon);
+  showLoader('Submitting profile…');
+  try {
+    const res = await fetch(`${DOMAIN}about-data`, { method:'POST', body:form });
+    if (res.ok) { toast('Profile added!'); closeModal('aboutRegisterPopup'); fetchAbout(); }
+    else { const d=await res.json(); showErr(d.error,err); }
+  } finally { hideLoader(); }
+}
+
+async function deleteAbout(i) {
+  if (!confirm_action('Delete this profile?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}about-data/${aboutList[i].id}`, {method:'DELETE'});
+    toast('Deleted'); aboutList.splice(i,1); populateAbout();
+  } finally { hideLoader(); }
+}
+
+async function registerVideoSection() {
+  const err = $('videoRegError');
+  const title=$('inputTitle2').value.trim(), file=$('inputVideo').files[0];
+  if (!title||!file) { showErr('All fields required',err); return; }
+  const form = new FormData();
+  form.append('title',title); form.append('created_by',$('usernameSession').textContent||'Admin'); form.append('status','INACTIVE'); form.append('video',file);
+  showLoader('Uploading video…');
+  try {
+    const res = await fetch(`${DOMAIN}video-data`, { method:'POST', body:form });
+    if (res.ok) { toast('Video uploaded!'); closeModal('videoRegisterPopup'); fetchAbout(); }
+    else { const d=await res.json(); showErr(d.error,err); }
+  } finally { hideLoader(); }
+}
+
+async function deleteVideo(i) {
+  if (!confirm_action('Delete this video?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}video-data/${videoList[i].id}`, {method:'DELETE'});
+    toast('Deleted'); videoList.splice(i,1); populateVideo();
+  } finally { hideLoader(); }
+}
+
+// ── Blog Posts ────────────────────────────────────────────────
+async function fetchBlogPosts() {
+  showLoader('Fetching blog posts…');
+  try {
+    const res  = await fetch(`${DOMAIN}blog-posts`);
+    blogList   = res.ok ? await res.json() : [];
+    populateBlogPosts();
+  } finally { hideLoader(); }
+}
+
+function populateBlogPosts() {
+  const tbody = $('blogList');
+  if (!tbody) return;
+  const filter = $('blogStatusFilter')?.value || '';
+  const q = $('searchBlogInput')?.value.toLowerCase() || '';
+  const items = blogList.filter(b => (!filter||b.status===filter) && (!q||b.title.toLowerCase().includes(q)));
+  if (!items.length) { tbody.innerHTML = emptyRow(6,'No blog posts yet'); return; }
+  tbody.innerHTML = items.map((b,i) => `
+    <tr>
+      <td><strong>${esc(b.title)}</strong></td>
+      <td><span class="badge badge-default">${esc(b.category||'—')}</span></td>
+      <td>${esc(b.author||'—')}</td>
+      <td>${blogStatusBadge(b.status)}</td>
+      <td style="font-size:.78rem;color:var(--clr-text-muted);">${formatDate(b.created_at)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editBlogPost(${i})" title="Edit"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBlogPost(${i})" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterBlogPosts() { populateBlogPosts(); }
+
+function openBlogForm(i = null) {
+  $('blogModalTitle').textContent = i === null ? 'New Blog Post' : 'Edit Post';
+  if (i !== null) {
+    const b = blogList[i];
+    $('blogTitle').value=b.title; $('blogCategory').value=b.category; $('blogStatus').value=b.status;
+    $('blogExcerpt').value=b.excerpt; $('blogContent').value=b.content;
+  } else {
+    ['blogTitle','blogExcerpt','blogContent'].forEach(id=>$(id)&&($(id).value=''));
+  }
+  editIndex = i;
+  openModal('blogPopup');
+}
+
+function editBlogPost(i) { openBlogForm(i); }
+
+async function saveBlogPost(status) {
+  const errEl = $('blogFormError');
+  const body = {
+    title: $('blogTitle').value.trim(), category: $('blogCategory').value,
+    status, excerpt: $('blogExcerpt').value.trim(), content: $('blogContent').value.trim(),
+    author: $('usernameSession').textContent,
+  };
+  if (!body.title||!body.excerpt||!body.content) { showErr('Title, excerpt and content required',errEl); return; }
+  showLoader('Saving post…');
+  try {
+    const isEdit = editIndex !== null;
+    const url    = isEdit ? `${DOMAIN}blog-posts/${blogList[editIndex].id}` : `${DOMAIN}blog-posts`;
+    const method = isEdit ? 'PUT' : 'POST';
+    const res    = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) { toast(isEdit?'Post updated!':'Post created!'); closeModal('blogPopup'); fetchBlogPosts(); }
+    else { const d=await res.json(); showErr(d.error,errEl); }
+  } finally { hideLoader(); editIndex=null; }
+}
+
+async function deleteBlogPost(i) {
+  if (!confirm_action('Delete this blog post?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}blog-posts/${blogList[i].id}`, {method:'DELETE'});
+    toast('Post deleted'); blogList.splice(i,1); populateBlogPosts();
+  } finally { hideLoader(); }
+}
+
+// ── Portfolio Projects ────────────────────────────────────────
+async function fetchProjects() {
+  showLoader('Fetching projects…');
+  try {
+    const res   = await fetch(`${DOMAIN}projects`);
+    projectList = res.ok ? await res.json() : [];
+    populateProjects();
+  } finally { hideLoader(); }
+}
+
+function populateProjects() {
+  const tbody = $('projectList');
+  if (!tbody) return;
+  if (!projectList.length) { tbody.innerHTML = emptyRow(6,'No projects added yet'); return; }
+  tbody.innerHTML = projectList.map((p,i) => `
+    <tr>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td><span class="badge badge-info">${esc(p.type)}</span></td>
+      <td style="font-size:.78rem;">${(p.tags||[]).map(t=>`<span class="badge badge-default" style="margin:1px;">${esc(t)}</span>`).join('')}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td style="font-size:.78rem;color:var(--clr-text-muted);">${formatDate(p.created_at)}</td>
+      <td class="actions-cell">
+        ${p.url?`<a href="${p.url}" target="_blank" class="btn btn-ghost btn-sm btn-icon" title="Live"><i class="fa fa-external-link"></i></a>`:''}
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editProject(${i})"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteProject(${i})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function openProjectForm() { editIndex=null; openModal('projectPopup'); }
+function editProject(i) {
+  const p = projectList[i];
+  $('projectName').value=p.name; $('projectType').value=p.type; $('projectDesc').value=p.description;
+  $('projectTags').value=(p.tags||[]).join(', '); $('projectUrl').value=p.url||''; $('projectStatus').value=p.status;
+  editIndex=i; openModal('projectPopup');
+}
+
+async function saveProject() {
+  const body = {
+    name:$('projectName').value.trim(), type:$('projectType').value, description:$('projectDesc').value.trim(),
+    tags:$('projectTags').value.split(',').map(t=>t.trim()).filter(Boolean), url:$('projectUrl').value.trim(), status:$('projectStatus').value
+  };
+  if (!body.name||!body.description) { toast('Name and description required','error'); return; }
+  showLoader('Saving project…');
+  try {
+    const isEdit = editIndex!==null;
+    const url    = isEdit ? `${DOMAIN}projects/${projectList[editIndex].id}` : `${DOMAIN}projects`;
+    const res    = await fetch(url, { method:isEdit?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) { toast(isEdit?'Project updated!':'Project added!'); closeModal('projectPopup'); fetchProjects(); }
+    else toast('Save failed','error');
+  } finally { hideLoader(); editIndex=null; }
+}
+
+async function deleteProject(i) {
+  if (!confirm_action('Delete this project?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}projects/${projectList[i].id}`, {method:'DELETE'});
+    toast('Deleted'); projectList.splice(i,1); populateProjects();
+  } finally { hideLoader(); }
+}
+
+// ── Homepage CMS ──────────────────────────────────────────
+async function loadHomepageSettings() {
+  showLoader('Loading settings…');
+  try {
+    const res  = await fetch(`${DOMAIN}site-settings/homepage`);
+    const data = await res.json();
+    Object.entries(data).forEach(([key, val]) => {
+      const el = document.getElementById(`cms-${key}`);
+      if (el) el.value = val;
     });
+  } finally { hideLoader(); }
 }
 
-function clicked(index){
-    console.log(`Item at position ${index} clicked.`);
+async function saveHomepageSettings() {
+  showLoader('Saving settings…');
+  const keys = [
+    'hero_eyebrow','hero_headline','hero_subheadline',
+    'hero_cta_primary','hero_cta_secondary',
+    'stat_clients','stat_roi',
+    'result_1','result_1_label','result_2','result_2_label',
+    'result_3','result_3_label','result_4','result_4_label',
+    'video_headline','video_subheadline',
+  ];
+  const body = {};
+  keys.forEach(k => {
+    const el = document.getElementById(`cms-${k}`);
+    if (el) body[k] = el.value;
+  });
+  try {
+    const res = await fetch(`${DOMAIN}site-settings/homepage`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) toast('Homepage settings saved!');
+    else toast('Save failed','error');
+  } finally { hideLoader(); }
 }
 
-function previewMission(index){
-    textAboutPopupHeader.textContent = `ABOUT - MISSION`;
-    textAreaAboutContent.value = `${aboutList[index].mission}`;
-    aboutIndex = index;
-    isTitle = false;
-    isIntro = false;
-    isMission = true;
-    isExperience = false;
-    openAboutPopup();
-}
-function previewExperience(index){
-    textAboutPopupHeader.textContent = `ABOUT - EXPERIENCE`;
-    textAreaAboutContent.value = `${aboutList[index].mission}`;
-    aboutIndex = index;
-    isTitle = false;
-    isIntro = false;
-    isMission = false;
-    isExperience = true;
-    openAboutPopup();
-}
-function previewImage(index){
-    aboutPhotoViewArea.style.backgroundImage = `url(${aboutList[index].icon})`;
-    openPhotoPreviewPopup()
+// ── Testimonials ──────────────────────────────────────────
+let testimonialsData = [];
+let editTestimonialIndex = null;
+
+async function fetchTestimonials() {
+  showLoader('Fetching testimonials…');
+  try {
+    const res      = await fetch(`${DOMAIN}testimonials`);
+    testimonialsData = res.ok ? await res.json() : [];
+    populateTestimonials();
+  } finally { hideLoader(); }
 }
 
-function previewVideo(index){
-    aboutVideoViewArea.src = videoList[index].video;
-    openVideoPreviewPopup()
-}
-function previewIntroduction(index){
-    textAboutPopupHeader.textContent = `ABOUT - INTRODUCTION`;
-    textAreaAboutContent.value = `${aboutList[index].introduction}`;
-    aboutIndex = index;
-    isTitle = false;
-    isIntro = true;
-    isMission = false;
-    isExperience = false;
-    openAboutPopup();
-}
-function previewTitle(index){
-    textAboutPopupHeader.textContent = `ABOUT - TITLE`;
-    textAreaAboutContent.value = `${aboutList[index].introduction}`;
-    aboutIndex = index;
-    isTitle = true;
-    isIntro = false;
-    isMission = false;
-    isExperience = false;
-    openAboutPopup();
+function populateTestimonials() {
+  const tbody = document.getElementById('testimonialsList');
+  if (!tbody) return;
+  if (!testimonialsData.length) { tbody.innerHTML = emptyRow(7,'No testimonials yet'); return; }
+  tbody.innerHTML = testimonialsData.map((t,i) => `
+    <tr>
+      <td>
+        ${t.photo ? `<div style="width:40px;height:40px;border-radius:50%;background:url(${t.photo}) center/cover;border:2px solid var(--clr-primary);"></div>` : '—'}
+      </td>
+      <td><strong>${esc(t.name)}</strong></td>
+      <td>${esc(t.company||'—')}</td>
+      <td>${'★'.repeat(t.stars||5)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td>${t.display_order||0}</td>
+      <td class="actions-cell">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editTestimonial(${i})"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteTestimonial(${i})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
 }
 
-function updateAboutSection(){
-    if(isExperience){
-        updateExperience(aboutIndex);
-    }
-    if (isIntro){
-        updateIntroduction(aboutIndex);
-    }
-    if (isTitle){
-        updateTitle(aboutIndex);
-    }
-    if (isMission){
-        updateMission(aboutIndex);
-    }
+function openTestimonialForm(i = null) {
+  document.getElementById('testimonialModalTitle').textContent = i === null ? 'Add Testimonial' : 'Edit Testimonial';
+  if (i !== null) {
+    const t = testimonialsData[i];
+    setValue('tName', t.name); setValue('tCompany', t.company||''); setValue('tText', t.text);
+    document.getElementById('tStars').value  = t.stars||5;
+    document.getElementById('tStatus').value = t.status||'ACTIVE';
+    setValue('tOrder', t.display_order||0);
+  } else {
+    ['tName','tCompany','tText','tOrder'].forEach(id => setValue(id,''));
+  }
+  editTestimonialIndex = i;
+  openModal('testimonialPopup');
 }
 
-async function updateExperience(index){
-    if (textAreaAboutContent.value === ''){
-        handleErrorMessage('Please Enter Experience!', textErrorContainer);
-        textAreaAboutContent.focus();
-        return;
-    }
+function editTestimonial(i) { openTestimonialForm(i); }
 
-    aboutList[index].experience = textAreaAboutContent.value;
+async function saveTestimonial() {
+  const name = getValue('tName'), text = getValue('tText');
+  if (!name || !text) { toast('Name and text are required','error'); return; }
 
-    try {
-        textLoaderText.textContent = 'Updating Experience Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(aboutList[index]),
-        });
+  const form = new FormData();
+  form.append('name', name);
+  form.append('company', getValue('tCompany'));
+  form.append('text', text);
+  form.append('stars', document.getElementById('tStars').value);
+  form.append('status', document.getElementById('tStatus').value);
+  form.append('display_order', getValue('tOrder')||0);
+  const photo = document.getElementById('tPhoto')?.files[0];
+  if (photo) form.append('photo', photo);
 
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Experience Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList[index].experience = textAreaAboutContent.value;
-            populateAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-
-async function updateIntroduction(index){
-    if (textAreaAboutContent.value === ''){
-        handleErrorMessage('Please Enter Introduction!', textErrorContainer);
-        textAreaAboutContent.focus();
-        return;
-    }
-
-    aboutList[index].introduction = textAreaAboutContent.value;
-
-    try {
-        textLoaderText.textContent = 'Updating Intro Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(aboutList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Intro Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList[index].introduction = textAreaAboutContent.value;
-            populateAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-async function updateTitle(index){
-    if (textAreaAboutContent.value === ''){
-        handleErrorMessage('Please Enter Introduction!', textErrorContainer);
-        textAreaAboutContent.focus();
-        return;
-    }
-
-    aboutList[index].title = textAreaAboutContent.value;
-
-    try {
-        textLoaderText.textContent = 'Updating Title Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(aboutList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Title Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList[index].title = textAreaAboutContent.value;
-            populateAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-async function updateMission(index){
-    if (textAreaAboutContent.value === ''){
-        handleErrorMessage('Please Enter Mission Info!', textErrorContainer);
-        textAreaAboutContent.focus();
-        return;
-    }
-
-    aboutList[index].mission = textAreaAboutContent.value;
-
-    try {
-        textLoaderText.textContent = 'Updating Mission Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(aboutList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Mission Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList[index].mission = textAreaAboutContent.value;
-            populateAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-
-async function updateStatus(index){
-    aboutList[index].status = 'ACTIVE';
-
-    try {
-        textLoaderText.textContent = 'Updating Status Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}about-data-update-status/${aboutList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(aboutList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Status Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList[index].mission = textAreaAboutContent.value;
-            await fetchAbout();
-            populateAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-
-async function updateVideoStatus(index){
-    videoList[index].status = 'ACTIVE';
-
-    try {
-        textLoaderText.textContent = 'Updating Status Info. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}video-data-update-status/${videoList[index].id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(videoList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage('Status Updated Successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            videoList[index].status = 'ACTIVE';
-            fetchAbout();
-        } else {
-            handleErrorMessage(`Error: ${result.error}`, textErrorContainer);
-        }
-    } catch (error) {
-        handleErrorMessage('Failed to Update Status. Please try again.', textErrorContainer);
-    } finally{
-        hideLoader();
-    }
-}
-
-function previewNotes(index){
-    textSubTitle.style.visibility = 'collapse';
-    inputAppointmentEdit.style.visibility = 'collapse';
-    btnReschedule.style.visibility = 'collapse';
-    textUserPopupHeaderAppt.style.visibility = 'visible';
-    textTitle.style.visibility = 'visible';
-
-    let name = (appointmentList[index].name).split(' ');
-    textUserPopupHeaderAppt.textContent = `Message From ${name[0]}`;
-    textTitle.textContent = appointmentList[index].appointmentNotes;
-
-    openAppointmentPopup();
-}
-
-function appointmentReschedule(index){
-    textSubTitle.style.visibility = 'visible';
-    inputAppointmentEdit.style.visibility = 'visible';
-    btnReschedule.style.visibility = 'visible';
-    textUserPopupHeaderAppt.style.visibility = 'visible';
-    textTitle.style.visibility = 'collapse';
-
-    textUserPopupHeaderAppt.textContent = `Reschedule Meeting for ${appointmentList[index].name.split(' ')[0]}`;
-    inputAppointmentEdit.value = appointmentList[index].appointmentTime;
-
-    appointmentIndex = index;
-    openAppointmentPopup();
-}
-
-async function rescheduleMeeting(){
-    const errorContainer = document.getElementById('errorMessage');
-    if (inputAppointmentEdit.value === ''){
-        handleErrorMessage('Input Date and Time', errorContainer);
-        inputAppointmentEdit.focus();
-        return;
-    }
-    if(!dateTimePattern.test(inputAppointmentEdit.value.trim)){
-        handleErrorMessage('Format Date to \'2025-01-20, 01.30 PM - 02.00 PM\'', errorContainer);
-        inputAppointmentEdit.focus();
-        return;
-    }
-
-    try {
-        textLoaderText.textContent = 'Rescheduling Meeting. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}rescheduleMeeting`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(appointmentList[appointmentIndex]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message);
-            appointmentList[index].appointmentDate = result.appointment.appointmentDate;
-            appointmentList[index].appointmentTime = result.appointment.appointmentTime;
-            populateAppointments();
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to Reschedule Meeting. Please try again.');
-    } finally{
-        hideLoader();
-    }
-}
-
-async function appointmentReminder(index){
-    try {
-        textLoaderText.textContent = 'Sending Reminder. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}reminder-email`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(appointmentList[index]),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message);
-            populateAppointments();
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to send reminder. Please try again.');
-    } finally{
-        hideLoader();
-    }
-}
-
-function appointmentStartMeeting(index){
-    window.open(appointmentList[index].meetingLink);
-}
-
-async function appointmentUpdateStatus(index){
-    try {
-        textLoaderText.textContent = 'Updating Meeting Status. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}appointments/${appointmentList[index].clientId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({status:'DONE'}),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message);
-            appointmentList[index].appointmentStatus = 'DONE';
-            populateAppointments();
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to Update Status. Please try again.');
-    } finally{
-        hideLoader();
-    }
-}
-
-async function deleteAppointment(index){
-    if (confirm('Are you sure you want to delete this Appointment?')) {
-        try {
-            textLoaderText.textContent = 'Deleting Appointment. Please Wait...';
-            showLoader();
-            const response = await fetch(`${DOMAIN}appointments/${appointmentList[index].clientId}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete Appointment');
-            errorMessages = 'Appointment deleted successfully';
-
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            appointmentList.splice(index, 1);
-            populateAppointments();
-        } catch (error) {
-            console.error('Error deleting Appointment:', error);
-            errorMessages = 'Failed to delete the Appointment. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally{
-            hideLoader();
-        }
-    }
-}
-
-async function previewEmailTemplate(index) {
-    textLoaderText.textContent = 'Preparing Email for Preview. Please Wait!';
-    showLoader();
-    const response = await fetch(`${DOMAIN}emailTemplate?status=${leadList[index].clientStatus}`);
-    const template = await response.json();
-
-    if (template) {
-        const previewWindow = window.open('', '_blank');
-        previewWindow.document.write(template.body);
+  showLoader('Saving…');
+  try {
+    const isEdit = editTestimonialIndex !== null;
+    const url    = isEdit ? `${DOMAIN}testimonials/${testimonialsData[editTestimonialIndex].id}` : `${DOMAIN}testimonials`;
+    const method = isEdit ? 'PUT' : 'POST';
+    // For PUT, send JSON (no file); POST can use FormData
+    let res;
+    if (isEdit) {
+      const body = { name, company:getValue('tCompany'), text, stars:parseInt(document.getElementById('tStars').value), status:document.getElementById('tStatus').value, display_order:parseInt(getValue('tOrder')||0) };
+      res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     } else {
-        alert('Template not found for the specified status.');
+      res = await fetch(url, { method, body: form });
     }
-    textLoaderText.textContent = '';
-    hideLoader();
+    if (res.ok) { toast('Testimonial saved!'); closeModal('testimonialPopup'); fetchTestimonials(); }
+    else toast('Save failed','error');
+  } finally { hideLoader(); editTestimonialIndex=null; }
 }
 
-async function unsubscribeFromLead(index) {
-    let clientID = leadList[index].clientID;
-    try {
-        textLoaderText.textContent = 'Unsubscribing. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}unsubscribeLead`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientID }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message);
-            leadList[index].clientSubScription = 'UNSUBSCRIBED';
-            populateLeads();
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed unsubscribe. Please try again.');
-    } finally{
-        textLoaderText.textContent = '';
-        hideLoader();
-    }
+async function deleteTestimonial(i) {
+  if (!confirm('Delete this testimonial?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}testimonials/${testimonialsData[i].id}`, {method:'DELETE'});
+    toast('Deleted'); testimonialsData.splice(i,1); populateTestimonials();
+  } finally { hideLoader(); }
 }
 
-// Send subsequent emails
-async function sendSubsequentEmail(index) {
-    let clientID = leadList[index].clientID;
-    try {
-        textLoaderText.textContent = 'Sending Follow-up Email. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}sendSubsequentEmail`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientID }),
-        });
+// ── Helper Renderers ──────────────────────────────────────────
+const esc = v => (v||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const truncate = (s,n) => s && s.length>n ? s.slice(0,n)+'…' : (s||'—');
+const formatDate = d => d ? new Date(d).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'}) : '—';
+const emptyRow = (cols,msg) => `<tr><td colspan="${cols}" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">${msg}</td></tr>`;
 
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message);
-            fetchLeads();
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to send email. Please try again.');
-    } finally{
-        textLoaderText.textContent = '';
-        hideLoader();
-    }
-}
-
-/**
- * Delete lead
- * @param {*} index postion of the lead to be deleted
- */
-async function deleteLead(index){
-    if (confirm('Are you sure you want to delete this Lead?')) {
-        try {
-            textLoaderText.textContent = 'Deleting Lead. Please Wait...';
-            showLoader();
-            const response = await fetch(`${DOMAIN}clients/${leadList[index].clientID}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete lead');
-            errorMessages = 'Lead deleted successfully';
-
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            leadList.splice(index, 1);
-            populateLeads();
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            errorMessages = 'Failed to delete the Lead. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally{
-            hideLoader();
-        }
-    }
-}
-
-function openUpdateUser(index){
-    textUserPopupHeader.textContent = 'Update User';
-    isUpdate = true;
-    userIndex = index; // Save the index for use during submission
-
-    // Retrieve the user object from the list
-    const user = userList[index];
-
-    inputUserName.value = user.name;
-    inputUserEmail.value = user.email;
-    inputUserRole.value = user.role;
-    inputUserPassword.value = user.password;
-    inputUserAccess.value = user.access_level;
-
-    openUserPopup(); // Open the user form popup
-}
-
-btnCreateUser.addEventListener('click', function (event) {
-    textUserPopupHeader.textContent = 'Create New User';
-    isUpdate = false;
-    userIndex = null; //not an update
-    openUserPopup();
-});
-
-/**
- * Submit action
- */
-async function userRegistrationOrUpdate(){
-    event.preventDefault();
-
-    if (isUpdate) {
-        // Use the stored `userIndex` for the update
-        updateUser(userIndex);
-    } else {
-        await registerUser(); // Handle creating a new user
-    }
-}
-
-// Update user function
-async function updateUser(index) {
-    validateUserInput();
-
-    const user = {
-        id:userList[index].id,
-        name: inputUserName.value.toUpperCase(),
-        email: inputUserEmail.value,
-        password: inputUserPassword.value,
-        role: inputUserRole.value,
-        access_level: inputUserAccess.value,
-    };
-
-    try {
-        textLoaderText.textContent = 'Fetching Users. Please Wait!';
-        showLoader();
-        const response = await fetch(`${DOMAIN}users/${userList[index].id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user),
-        });
-
-        textLoaderText.textContent = '';
-        textLoaderText.textContent = 'Users Fetched. Loading';
-        if (response.ok) {
-            const result = await response.json();
-            errorMessages = 'User updated successfully!';
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            userList[index] = user;
-            populateUsers();
-            clearInput();
-            closePopup();
-            console.log('Updated user:', result.user);
-        } else {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.error}`);
-        }
-    } catch (error) {
-        console.error('Error updating user:', error);
-        errorMessages = 'An error occurred while updating the user.';
-        handleErrorMessage(errorMessages, textErrorContainer);
-    } finally{
-        hideLoader();
-        textLoaderText.textContent = '';
-        isUpdate = false;
-    }
-}
-
-
-/**
- *
- * @returns
- */
-async function registerUser() {
-    // Validate user input fields
-    if (inputUserName.value.trim() === '') {
-        inputUserName.focus();
-        handleErrorMessage('Full Name is required!', textErrorContainer);
-        return;
-    }
-    if (!twoWordsPattern.test(inputUserName.value.trim())) {
-        inputUserName.focus();
-        handleErrorMessage('A full name must contain two or more words!', textErrorContainer);
-        return;
-    }
-    if (inputUserEmail.value.trim() === '') {
-        inputUserEmail.focus();
-        handleErrorMessage('Email is required!', textErrorContainer);
-        return;
-    }
-    if (!emailPattern.test(inputUserEmail.value)) {
-        inputUserEmail.focus();
-        handleErrorMessage('Please enter a valid email address!', textErrorContainer);
-        return;
-    }
-    if (inputUserPassword.value.trim() === '') {
-        inputUserPassword.focus();
-        handleErrorMessage('Password is required!', textErrorContainer);
-        return;
-    }
-    if (!passwordPattern.test(inputUserPassword.value)) {
-        inputUserPassword.focus();
-        handleErrorMessage('Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, and one number!', textErrorContainer);
-        return;
-    }
-    if (!inputUserRole.value.trim() || inputUserRole.value === 'Select User Role') {
-        inputUserRole.focus();
-        handleErrorMessage('User Role is required!', textErrorContainer);
-        return;
-    }
-    if (!inputUserAccess.value.trim() || inputUserAccess.value === 'Select User Access') {
-        inputUserAccess.focus();
-        handleErrorMessage('User Access is required!', textErrorContainer);
-        return;
-    }
-
-    // Prepare the user object for submission
-    const user = {
-        name: inputUserName.value.trim().toUpperCase(),
-        email: inputUserEmail.value.trim(),
-        password: inputUserPassword.value.trim(),
-        role: inputUserRole.value.trim().toUpperCase(),
-        access_level: inputUserAccess.value.trim().toUpperCase(),
-    };
-
-    try {
-        textLoaderText.textContent = 'Registering User. Please Wait!';
-        // Show loader before the request
-        showLoader();
-
-        // Make API call
-        const response = await fetch(`${DOMAIN}users`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user),
-        });
-
-        // Handle response
-        if (response.ok) {
-            let result;
-            try {
-                result = await response.json(); // Attempt to parse JSON
-            } catch {
-                result = { message: 'User created successfully!' }; // Fallback if response isn't JSON
-            }
-            console.log('Response:', result);
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(result.message || 'User created successfully!', textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            fetchUsers(); // refresh list
-            clearInput();
-        } else {
-            const errorData = await response.json();
-            const errorMessage = errorData.error || 'An unknown error occurred';
-            handleErrorMessage(`Error: ${errorMessage}`, textErrorContainer);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        handleErrorMessage('Failed to create user. Please try again later.', textErrorContainer);
-    } finally {
-        // Hide loader after the request
-        hideLoader();
-        isUpdate = false;
-        textLoaderText.textContent = '';
-    }
-}
-
-/*btnRegisterAbout.addEventListener('click', async function(event) {
-
-});*/
-async function registerAboutSection(){
-    validateAboutInput();
-
-    // Prepare the user object for submission
-    const about = new FormData();
-    about.append('title', inputTitle1.value);
-    about.append('introduction', inputIntroduction.value);
-    about.append('experience', inputExperience.value);
-    about.append('mission', inputMission.value);
-    about.append('status', 'INACTIVE');
-    about.append('icon', inputIcon.files[0]);
-
-    try {
-        textLoaderText.textContent = 'Submitting About Info. Please Wait!';
-        showLoader(); // Show loader before request
-
-        const response = await fetch(`${DOMAIN}about-data`, {
-            method: 'POST',
-            body: about,  // Send FormData as the body (not JSON)
-        });
-
-        let result;
-        const contentType = response.headers.get('content-type');
-
-        if (response.ok) {
-            try {
-                if (contentType && contentType.includes('application/json')) {
-                    result = await response.json(); // Attempt JSON parsing
-                } else {
-                    result = { message: await response.text() || 'About info created successfully!' }; // Handle non-JSON responses
-                }
-            } catch (error) {
-                console.warn('JSON Parse Error:', error);
-                result = { message: 'About info created successfully!' }; // Fallback
-            }
-
-            console.log('Response:', result);
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(result.message || 'Info created successfully!', textErrorContainer);
-            clearInput();
-            fetchAbout(); // Refresh list
-        } else {
-            let errorMessage = 'An unknown error occurred';
-
-            try {
-                if (contentType && contentType.includes('application/json')) {
-                    const errorData = await response.json();
-                    errorMessage = errorData.error || errorMessage;
-                } else {
-                    errorMessage = await response.text();
-                }
-            } catch (error) {
-                console.warn('Error Parsing Response:', error);
-            }
-
-            handleErrorMessage(`Error: ${errorMessage}`, textErrorContainer);
-        }
-    } catch (error) {
-        console.error('Fetch Error:', error);
-        handleErrorMessage('Failed to submit about info. Please try again later.', textErrorContainer);
-    } finally {
-        hideLoader(); // Hide loader after request
-    }
-
-}
-
-function validateAboutInput(){
-    const errorMessage1 = document.getElementById('errorMessage1');
-    if (inputTitle1.value.trim() === ''){
-        handleErrorMessage('Input Title!', errorMessage1);
-        inputTitle1.focus();
-        return;
-    }
-    if (inputIntroduction.value.trim() === ''){
-        handleErrorMessage('Input Introduction!', errorMessage1);
-        inputIntroduction.focus();
-        return;
-    }
-    if (inputExperience.value.trim() === ''){
-        handleErrorMessage('Input Experience!', errorMessage1);
-        inputExperience.focus();
-        return;
-    }
-    if (inputMission.value.trim() === ''){
-        handleErrorMessage('Input Mission Statement!', errorMessage1);
-        inputMission.focus();
-        return;
-    }
-    if (!(inputIcon.files[0].size > 0)) {
-        handleErrorMessage('Please Select Image!', errorMessage1);
-        inputIcon.focus();
-        return true;
-    }
-}
-
-async function registerVideoSection(){
-    if (inputVideoTitle.value.trim() === ''){
-        handleErrorMessage('Input Title!', textErrorContainerV);
-        inputVideoTitle.focus();
-        return;
-    }
-    if (!(inputVideoFile.files[0].size > 0)) {
-        handleErrorMessage('Please Select Video!', textErrorContainerV);
-        inputVideoFile.focus();
-        return true;
-    }
-    // Prepare the user object for submission
-    const video = new FormData();
-    video.append('title', inputVideoTitle.value);
-    video.append('created_by', textUsernameSession.value || 'MISGINA FITWI');
-    video.append('status', 'INACTIVE');
-
-    if (inputVideoFile.files[0]) {
-        console.log(inputVideoFile.files[0]); // Debugging
-        video.append('video', inputVideoFile.files[0]);
-    } else {
-        handleErrorMessage('No video file selected!', textErrorContainerV);
-    }
-    //video.append('video', inputVideoFile.files[0]);
-
-    try {
-        textLoaderText.textContent = 'Uploading Video. Please Wait!';
-        showLoader(); // Show loader before request
-
-        const response = await fetch(`${DOMAIN}video-data`, {
-            method: 'POST',
-            body: video,  // Send FormData as the body (not JSON)
-        });
-
-        let result;
-        const contentType = response.headers.get('content-type');
-
-        if (response.ok) {
-            try {
-                if (contentType && contentType.includes('application/json')) {
-                    result = await response.json(); // Attempt JSON parsing
-                } else {
-                    result = { message: await response.text() || 'Video uploaded successfully!' }; // Handle non-JSON responses
-                }
-            } catch (error) {
-                console.warn('JSON Parse Error:', error);
-                result = { message: 'Video uploaded successfully!' }; // Fallback
-            }
-
-            console.log('Response:', result);
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(result.message || 'Video Uploaded Successfully!', textErrorContainerV);
-            clearInput();
-            fetchAbout();
-        } else {
-            let errorMessage = 'An unknown error occurred';
-
-            try {
-                if (contentType && contentType.includes('application/json')) {
-                    const errorData = await response.json();
-                    errorMessage = errorData.error || errorMessage;
-                } else {
-                    errorMessage = await response.text();
-                }
-            } catch (error) {
-                console.warn('Error Parsing Response:', error);
-            }
-
-            handleErrorMessage(`Error: ${errorMessage}`, textErrorContainerV);
-        }
-    } catch (error) {
-        console.error('Fetch Error:', error);
-        handleErrorMessage('Failed to upload video. Please try again later.', textErrorContainerV);
-    } finally {
-        hideLoader(); // Hide loader after request
-    }
-
-}
-
-async function deleteUser(index){
-    if (confirm('Are you sure you want to delete this user?')) {
-        try {
-            showLoader();
-            const response = await fetch(`${DOMAIN}users/${userList[index].id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete user');
-            errorMessages = 'User deleted successfully';
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            userList.splice(index, 1);
-            populateUsers();
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            errorMessages = 'Failed to delete the User. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally{
-            hideLoader();
-        }
-    }
-}
-async function deleteAbout(index){
-    if (confirm('Are you sure you want to delete this info?')) {
-        try {
-            showLoader();
-            const response = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete About Info');
-            errorMessages = 'Info deleted successfully';
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            aboutList.splice(index, 1);
-            populateAbout();
-        } catch (error) {
-            console.error('Error deleting About Info:', error);
-
-            errorMessages = 'Failed to delete the about info. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally{
-            hideLoader();
-        }
-    }
-}
-
-async function deleteVideo(index){
-    if (confirm('Are you sure you want to delete this video?')) {
-        try {
-            showLoader();
-            const response = await fetch(`${DOMAIN}video-data/${videoList[index].id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete Video');
-            errorMessages = 'Video deleted successfully';
-            textErrorContainer.style.color = 'white';
-            textErrorContainer.style.backgroundColor = '#4abc5061';
-            handleErrorMessage(errorMessages, textErrorContainer);
-            textErrorContainer.style.color = 'rgb(236, 2, 2)';
-            textErrorContainer.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-            videoList.splice(index, 1);
-            populateVideo();
-        } catch (error) {
-            console.error('Error deleting Video:', error);
-
-            errorMessages = 'Failed to delete Video. Please try again.';
-            handleErrorMessage(errorMessages, textErrorContainer);
-        } finally{
-            hideLoader();
-        }
-    }
-}
-
-function validateUserInput(){
-    if (inputUserName.value.trim() === '') {
-        inputUserName.focus();
-        errorMessages = 'Full Name is required!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (!twoWordsPattern.test(inputUserName.value.trim())) {
-        inputUserName.focus();
-        errorMessages = 'A full Name has two or more words!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (inputUserEmail.value.trim() === '') {
-        inputUserEmail.focus();
-        errorMessages = 'Email is required!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (!emailPattern.test(inputUserEmail.value)) {
-        inputUserEmail.focus();
-        errorMessages = 'Please enter a valid email address!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (inputUserPassword.value.trim() === '') {
-        inputUserPassword.focus();
-        errorMessages = 'Password is required!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (!passwordPattern.test(inputUserPassword.value)) {
-        inputUserPassword.focus();
-        errorMessages = 'Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, and one number!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (inputUserRole.value.trim() === 'Select User Role' || '') {
-        inputUserRole.focus();
-        errorMessages = 'User Role is required!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-    if (inputUserAccess.value.trim() === 'Select User Access' || '') {
-        inputUserAccess.focus();
-        errorMessages = 'User Access is required!';
-        handleErrorMessage(errorMessages, textErrorContainer);
-        return true;
-    }
-
-}
-
-function clearInput(){
-    inputUserName.value = '';
-    inputUserEmail.value = '';
-    inputUserPassword.value = '';
-    inputUserRole.value = '';
-    inputUserAccess.value = '';
-    textAreaAboutContent.value = '';
-    inputTitle1.value = '';
-    inputIntroduction.value = '';
-    inputExperience.value = '';
-    inputMission.value = '';
-    // Clear the file input
-    inputIcon.value = '';
-}
-
-/**
- * Filter search
- */
-inputUserSearch.addEventListener('input', function (event) {
-    const filter = event.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#userList .item-content');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
-
-/**
- * Filter leads
- */
-inputLeadSearch.addEventListener('input', function (event) {
-    const filter = event.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#leadList .item-content');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
-
-/**
- * Filter leads
- */
-inputAppointmentSearch.addEventListener('input', function (event) {
-    const filter = event.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#appointmentList .item-content');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
-/**
- * Filter Applications
- */
-inputApplicationSearch.addEventListener('input', function (event) {
-    const filter = event.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#applicationList .item-content');
-
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
-
-/**
- * Opens the user popup
- */
-function openUserPopup(){
-    popupUserMgt.style.height ='100%';
-}
-function openAppointmentPopup(){
-    popupAppointment.style.height ='100%';
-}
-function openaboutRegisterPopup(){
-    aboutRegisterPopup.style.height ='100%';
-}
-function openAboutPopup(){
-    popupAbout.style.height ='100%';
-}
-function openVideoPreviewPopup(){
-    aboutVideoPopup.style.height ='100%';
-}
-function openPhotoPreviewPopup(){
-    aboutPhotoPopup.style.height ='100%';
-}
-function openVideoRegisterPopup(){
-    videoRegisterPopup.style.height ='100%';
-}
-function openApplicationPopup(){
-    applicationPopup.style.height ='100%';
-}
-/**
- * Close Popups
- */
-function closePopup(){
-    popupUserMgt.style.height ='0%';
-    popupAppointment.style.height ='0%';
-    popupAbout.style.height ='0%';
-    aboutRegisterPopup.style.height ='0%';
-    aboutPhotoPopup.style.height ='0%';
-    aboutVideoPopup.style.height ='0%';
-    videoRegisterPopup.style.height ='0%';
-    applicationPopup.style.height ='0%';
-}
-
-/**
- *  Set the color of the display to green
- * @param {the error display container} container
- */
-function setSuccessColor(container){
-    container.style.color = 'white';
-    container.style.backgroundColor = '#4abc5061';
-}
-
-/**
- * Set the color of the display to red
- * @param {the error display container} container
- */
-function setErrorColor(container){
-    container.style.color = 'rgb(236, 2, 2)';
-    container.style.backgroundColor = 'rgba(251, 128, 128, 0.533)';
-}
+const statusBadge = s => {
+  const map = { ACTIVE:'badge-success', INACTIVE:'badge-warning', PUBLISHED:'badge-success', DRAFT:'badge-warning' };
+  return `<span class="badge ${map[s]||'badge-default'}">${esc(s||'—')}</span>`;
+};
+const roleBadge = r => {
+  const map = { SUPER_ADMIN:'badge-error', ADMIN:'badge-warning', EDITOR:'badge-info', GEN_USER:'badge-default' };
+  return `<span class="badge ${map[r]||'badge-default'}">${esc(r||'—')}</span>`;
+};
+const subBadge = s => {
+  return s==='SUBSCRIBED' ? `<span class="badge badge-success">Subscribed</span>` : `<span class="badge badge-default">Unsubscribed</span>`;
+};
+const apptStatusBadge = s => {
+  const map = { DONE:'badge-success', UPCOMING:'badge-info', PENDING:'badge-warning', CANCELLED:'badge-error' };
+  return `<span class="badge ${map[s]||'badge-default'}">${esc(s||'—')}</span>`;
+};
+const appStatusBadge = s => {
+  return s==='RESOLVED' ? `<span class="badge badge-success">Resolved</span>` : `<span class="badge badge-warning">Pending</span>`;
+};
+const blogStatusBadge = s => {
+  return s==='PUBLISHED' ? `<span class="badge badge-success">Published</span>` : `<span class="badge badge-warning">Draft</span>`;
+};
+const getValue = id => document.getElementById(id)?.value?.trim() || '';
+const setValue = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };

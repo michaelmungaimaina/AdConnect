@@ -2,3 +2,4 @@ node_modules
 credentials.txt
 credentials.json
 token.json
+.env

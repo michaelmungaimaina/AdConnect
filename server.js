@@ -12,8 +12,11 @@ const readline = require('readline');
 const multer = require('multer');
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
+const rateLimit = require('express-rate-limit'); // npm install express-rate-limit
+const helmet    = require('helmet');  
 
 const app = express();
+app.use(helmet({ contentSecurityPolicy: false }));
 
 
 // Middleware
@@ -28,12 +31,26 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
+  max:      parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
+
 
 //
 app.use((req, res, next) => {
     console.log(`Incoming request: ${req.method} ${req.url}`);
     next();
 });
+
+// ═══════════════════ HELPER ════════════════════════════════════
+function tryParseJSON(str, fallback) {
+    try { return JSON.parse(str); }
+    catch { return fallback; }
+}
 
 // Serve API routes under `/api`
 app.use('/api', express.json()); // Ensure requests to `/api` parse JSON bodies
@@ -145,8 +162,9 @@ app.post('/api/auth', (req, res) => {
         if (rows.length === 0) {
             return res.status(404).json({error: 'User not found'});
         }
+        const user = rows[0];
         // Return login success message along with username
-        res.status(200).json({message: 'Login successful', username: rows[0].name});
+        res.status(200).json({message: 'Login successful', username: user.name, role: user.role || 'GEN_USER'});
     });
 });
 
@@ -276,6 +294,165 @@ app.post('/api/clients', (req, res) => {
                 createdAt
             },
         });
+    });
+});
+
+// ═══════════════════ BLOG POSTS ═════════════════════════════
+
+// Get all blog posts (with optional status filter)
+app.get('/api/blog-posts', (req, res) => {
+    const { status } = req.query;
+    const query = status
+        ? 'SELECT * FROM blog_posts WHERE status = ? ORDER BY created_at DESC'
+        : 'SELECT * FROM blog_posts ORDER BY created_at DESC';
+    const params = status ? [status] : [];
+
+    db.query(query, params, (err, posts) => {
+        if (err) {
+            console.error('Error fetching blog posts:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(200).json(posts);
+    });
+});
+
+// Get single blog post by ID
+app.get('/api/blog-posts/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM blog_posts WHERE id = ?', [id], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!rows.length) return res.status(404).json({ error: 'Post not found' });
+        res.status(200).json(rows[0]);
+    });
+});
+
+// Create blog post
+app.post('/api/blog-posts', (req, res) => {
+    const { title, category, status, excerpt, content, author } = req.body;
+
+    if (!title || !excerpt || !content) {
+        return res.status(400).json({ error: 'Title, excerpt, and content are required' });
+    }
+
+    const query = `
+        INSERT INTO blog_posts (id, title, category, status, excerpt, content, author, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const now = createdAt();
+    db.query(query, [clientID(), title, category || 'General', status || 'DRAFT', excerpt, content, author, now, now], (err, result) => {
+        if (err) {
+            console.error('Error creating blog post:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(201).json({ message: 'Blog post created successfully' });
+    });
+});
+
+// Update blog post
+app.put('/api/blog-posts/:id', (req, res) => {
+    const { id }  = req.params;
+    const { title, category, status, excerpt, content } = req.body;
+    const query = `
+        UPDATE blog_posts SET title=?, category=?, status=?, excerpt=?, content=?, updated_at=?
+        WHERE id=?
+    `;
+    db.query(query, [title, category, status, excerpt, content, createdAt(), id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Post updated successfully' });
+    });
+});
+
+// Delete blog post
+app.delete('/api/blog-posts/:id', (req, res) => {
+    db.query('DELETE FROM blog_posts WHERE id = ?', [req.params.id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Post deleted' });
+    });
+});
+
+// ═══════════════════ PORTFOLIO PROJECTS ══════════════════════
+
+// Get all projects (with optional status filter)
+app.get('/api/projects', (req, res) => {
+    const { status } = req.query;
+    const query  = status
+        ? 'SELECT * FROM projects WHERE status = ? ORDER BY created_at DESC'
+        : 'SELECT * FROM projects ORDER BY created_at DESC';
+    const params = status ? [status] : [];
+
+    db.query(query, params, (err, projects) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+
+        // Parse tags JSON
+        const result = projects.map(p => ({
+            ...p,
+            tags: tryParseJSON(p.tags, []),
+        }));
+        res.status(200).json(result);
+    });
+});
+
+// Get single project
+app.get('/api/projects/:id', (req, res) => {
+    db.query('SELECT * FROM projects WHERE id = ?', [req.params.id], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!rows.length) return res.status(404).json({ error: 'Project not found' });
+        const p = rows[0];
+        res.status(200).json({ ...p, tags: tryParseJSON(p.tags, []) });
+    });
+});
+
+// Create project (with optional thumbnail upload)
+const projectUpload = multer({ storage });
+
+app.post('/api/projects', projectUpload.single('thumbnail'), (req, res) => {
+    const { name, type, description, tags, url, status } = req.body;
+
+    if (!name || !description) {
+        return res.status(400).json({ error: 'Name and description are required' });
+    }
+
+    const thumbnail = req.file ? req.file.path : null;
+    const tagsJSON  = JSON.stringify(
+        Array.isArray(tags) ? tags : (tags || '').split(',').map(t => t.trim()).filter(Boolean)
+    );
+    const now = createdAt();
+
+    const query = `
+        INSERT INTO projects (id, name, type, description, tags, url, thumbnail, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.query(query, [clientID(), name, type || 'Website', description, tagsJSON, url || null, thumbnail, status || 'ACTIVE', now, now], (err) => {
+        if (err) {
+            console.error('Error creating project:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(201).json({ message: 'Project added successfully' });
+    });
+});
+
+// Update project
+app.put('/api/projects/:id', (req, res) => {
+    const { id }   = req.params;
+    const { name, type, description, tags, url, status } = req.body;
+    const tagsJSON = JSON.stringify(
+        Array.isArray(tags) ? tags : (tags || '').split(',').map(t => t.trim()).filter(Boolean)
+    );
+    const query = `
+        UPDATE projects SET name=?, type=?, description=?, tags=?, url=?, status=?, updated_at=?
+        WHERE id=?
+    `;
+    db.query(query, [name, type, description, tagsJSON, url, status, createdAt(), id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Project updated' });
+    });
+});
+
+// Delete project
+app.delete('/api/projects/:id', (req, res) => {
+    db.query('DELETE FROM projects WHERE id = ?', [req.params.id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Project deleted' });
     });
 });
 
@@ -2069,12 +2246,12 @@ const transporter = nodemailer.createTransport({
 });
 
 /// Load your OAuth2 credentials
-const credentialsPath = path.join(__dirname, 'credentials.json');
-const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+//const credentialsPath = path.join(__dirname, 'credentials.json');
+//const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
 // Initialize OAuth2 client
-const { client_id, client_secret, redirect_uris } = credentials.web;
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+//const { client_id, client_secret, redirect_uris } = credentials.web;
+const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
 
 // Token file path (to store access and refresh tokens)
 const tokenPath = path.join(__dirname, 'token.json');
@@ -2234,6 +2411,137 @@ app.post('/api/create-meet-link', async (req, res) => {
         console.error('Error:', error);
     }
 })();
+
+// ═══════════════ SITE SETTINGS ══════════════════════════════
+
+/**
+ * GET /api/site-settings/:section
+ * Retrieve settings for a specific section (homepage, about, services…)
+ */
+app.get('/api/site-settings/:section', (req, res) => {
+    const { section } = req.params;
+    db.query(
+        'SELECT setting_key, setting_value FROM site_settings WHERE section = ?',
+        [section],
+        (err, rows) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            // Convert rows to key-value object
+            const data = {};
+            rows.forEach(r => { data[r.setting_key] = r.setting_value; });
+            res.status(200).json(data);
+        }
+    );
+});
+
+/**
+ * PUT /api/site-settings/:section
+ * Upsert multiple settings for a section.
+ * Body: { key1: 'value1', key2: 'value2', … }
+ */
+app.put('/api/site-settings/:section', (req, res) => {
+    const { section } = req.params;
+    const settings    = req.body;
+
+    if (!settings || !Object.keys(settings).length) {
+        return res.status(400).json({ error: 'No settings provided' });
+    }
+
+    const queries = Object.entries(settings).map(([key, value]) => {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT INTO site_settings (section, setting_key, setting_value, updated_at)
+                VALUES (?, ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()
+            `;
+            db.query(sql, [section, key, value], (err) => {
+                if (err) reject(err); else resolve();
+            });
+        });
+    });
+
+    Promise.all(queries)
+        .then(() => res.status(200).json({ message: 'Settings updated successfully' }))
+        .catch(err => { console.error(err); res.status(500).json({ error: 'Database error' }); });
+});
+
+// ═══════════════ TESTIMONIALS ═══════════════════════════════
+
+/**
+ * GET /api/testimonials
+ * All active testimonials
+ */
+app.get('/api/testimonials', (req, res) => {
+    const { status } = req.query;
+    const sql = status
+        ? 'SELECT * FROM testimonials WHERE status = ? ORDER BY display_order ASC, created_at DESC'
+        : 'SELECT * FROM testimonials ORDER BY display_order ASC, created_at DESC';
+    const params = status ? [status] : [];
+
+    db.query(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json(rows);
+    });
+});
+
+/**
+ * GET /api/testimonials/:id
+ */
+app.get('/api/testimonials/:id', (req, res) => {
+    db.query('SELECT * FROM testimonials WHERE id = ?', [req.params.id], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!rows.length) return res.status(404).json({ error: 'Not found' });
+        res.status(200).json(rows[0]);
+    });
+});
+
+const testimonialUpload = multer({ storage });
+
+/**
+ * POST /api/testimonials
+ */
+app.post('/api/testimonials', testimonialUpload.single('photo'), (req, res) => {
+    const { name, company, text, stars, status, display_order } = req.body;
+    if (!name || !text) return res.status(400).json({ error: 'Name and testimonial text are required' });
+
+    const photo = req.file ? req.file.path : null;
+    const photoUrl = photo ? `${process.env.APP_API_URL}api/uploads/${require('path').basename(photo)}` : null;
+    const now = createdAt();
+
+    db.query(
+        'INSERT INTO testimonials (id, name, company, text, stars, photo, status, display_order, created_at) VALUES (?,?,?,?,?,?,?,?,?)',
+        [clientID(), name, company||'', text, parseInt(stars)||5, photoUrl, status||'ACTIVE', parseInt(display_order)||0, now],
+        (err) => {
+            if (err) { console.error(err); return res.status(500).json({ error: 'Database error' }); }
+            res.status(201).json({ message: 'Testimonial created' });
+        }
+    );
+});
+
+/**
+ * PUT /api/testimonials/:id
+ */
+app.put('/api/testimonials/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, company, text, stars, status, display_order } = req.body;
+    db.query(
+        'UPDATE testimonials SET name=?, company=?, text=?, stars=?, status=?, display_order=?, updated_at=? WHERE id=?',
+        [name, company, text, parseInt(stars)||5, status, parseInt(display_order)||0, createdAt(), id],
+        (err) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.status(200).json({ message: 'Updated' });
+        }
+    );
+});
+
+/**
+ * DELETE /api/testimonials/:id
+ */
+app.delete('/api/testimonials/:id', (req, res) => {
+    db.query('DELETE FROM testimonials WHERE id=?', [req.params.id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Deleted' });
+    });
+});
 
 app.post('/api/test-server', (req, res) => {
     res.status(200).json({ message: 'Test route works!' });
@@ -2398,3 +2706,85 @@ module.exports = app;
 
  SET GLOBAL event_scheduler = ON;
  */
+
+ // ═══════════════════ SQL MIGRATION ════════════════════════════
+/*
+Run these SQL statements to create the new tables:
+
+-- Blog Posts Table
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id           VARCHAR(20) PRIMARY KEY,
+    title        VARCHAR(255) NOT NULL,
+    category     VARCHAR(100) DEFAULT 'General',
+    status       ENUM('DRAFT','PUBLISHED') DEFAULT 'DRAFT',
+    excerpt      TEXT,
+    content      LONGTEXT,
+    author       VARCHAR(100),
+    coverImage   VARCHAR(500),
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Projects Table
+CREATE TABLE IF NOT EXISTS projects (
+    id           VARCHAR(20) PRIMARY KEY,
+    name         VARCHAR(255) NOT NULL,
+    type         ENUM('Website','Android App','UI/UX Design','Software','Marketing') DEFAULT 'Website',
+    description  TEXT NOT NULL,
+    tags         JSON,
+    url          VARCHAR(500),
+    thumbnail    VARCHAR(500),
+    status       ENUM('ACTIVE','DRAFT') DEFAULT 'ACTIVE',
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Add role column to users if not exists
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role_level ENUM('SUPER_ADMIN','ADMIN','EDITOR','GEN_USER') DEFAULT 'GEN_USER';
+-- Note: 'role' column already exists in your schema, so just ensure it accepts these values
+ALTER TABLE users MODIFY COLUMN role VARCHAR(50) DEFAULT 'GEN_USER';
+
+-- Site Settings Table (homepage CMS)
+CREATE TABLE IF NOT EXISTS site_settings (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    section       VARCHAR(80)  NOT NULL DEFAULT 'homepage',
+    setting_key   VARCHAR(100) NOT NULL,
+    setting_value TEXT,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_section_key (section, setting_key)
+);
+
+-- Seed default homepage settings
+INSERT IGNORE INTO site_settings (section, setting_key, setting_value) VALUES
+('homepage', 'hero_eyebrow',      "Kenya's #1 Real Estate Marketing Agency"),
+('homepage', 'hero_headline',     "Powering <span class='accent'>Real Estate</span> Businesses with <span class='accent-g'>HI-ROI</span> Digital Marketing"),
+('homepage', 'hero_subheadline',  "Boost your lead generation, reduce ad costs, and grow your real estate business with tailored ad strategies across Facebook, Instagram, Google and beyond."),
+('homepage', 'hero_cta_primary',  "Watch Free Strategy Video"),
+('homepage', 'hero_cta_secondary',"Book Free Consultation"),
+('homepage', 'stat_clients',      "50+"),
+('homepage', 'stat_roi',          "200%"),
+('homepage', 'result_1',          "200%"),
+('homepage', 'result_2',          "50+"),
+('homepage', 'result_3',          "60%"),
+('homepage', 'result_4',          "4+");
+
+-- Testimonials Table
+CREATE TABLE IF NOT EXISTS testimonials (
+    id            VARCHAR(20) PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    company       VARCHAR(150),
+    text          TEXT NOT NULL,
+    stars         TINYINT DEFAULT 5,
+    photo         VARCHAR(500),
+    status        ENUM('ACTIVE','INACTIVE') DEFAULT 'ACTIVE',
+    display_order INT DEFAULT 0,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Seed default testimonials
+INSERT IGNORE INTO testimonials (id, name, company, text, stars, status, display_order) VALUES
+('t001', 'Irene Nyokabi', 'Elixir Salon & Spa', '"AdConnect has been instrumental in helping us reach our target audience and generate high-quality leads. Their team is professional, responsive, and always delivers on time. Our bookings increased by 180% within the first 3 months!"', 5, 'ACTIVE', 1),
+('t002', 'Eng. James', 'Ricosam Engineering', '"Our project involved integrating multiple third-party APIs. AdConnect handled it flawlessly and optimised the process to ensure fast load times. Their technical expertise is truly impressive."', 5, 'ACTIVE', 2),
+('t003', 'John Kamau', 'Songa Real Estate', '"Our company required a custom web application and AdConnect delivered beyond expectations. Their developers were thorough and the application is intuitive and scalable."', 4, 'ACTIVE', 3);
+*/

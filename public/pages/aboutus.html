@@ -1,293 +1,659 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Us</title>
-
-  <!-- Logo Icon-->
+  <title>About Us — AdConnect | Meet Our Digital Marketing Team</title>
+  <meta name="description" content="Meet the AdConnect team — digital marketing specialists with 4+ years of expertise in social media advertising, lead generation, and web development for real estate businesses." />
+  <meta name="keywords" content="AdConnect team, digital marketing Kenya, real estate marketing experts, Misgina Fitwi, AdConnect about us" />
+  <meta property="og:title" content="About AdConnect — Our Expert Marketing Team" />
+  <meta property="og:description" content="Meet the team behind AdConnect's award-winning real estate marketing campaigns." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://adconnect.co.ke/pages/aboutus.html" />
+  <link rel="canonical" href="https://adconnect.co.ke/pages/aboutus.html" />
   <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
 
-  <!-- link css -->
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/easy.css" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TCWSW8TT');</script>
 
-  <!-- Scroll cdn -->
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
 
-  <!-- Font awesome cdn -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
-    integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Page-specific styles */
+    .about-hero {
+      padding: calc(var(--header-h) + var(--space-12)) var(--space-5) var(--space-10);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(246,87,48,.15) 0%, transparent 70%),
+        linear-gradient(170deg, rgba(26,25,23,1) 55%, rgba(48,46,44,.85) 100%),
+        url(/resources/background-image.jpeg);
+      background-position: center;
+      background-size: cover;
+      text-align: center;
+    }
+    .about-hero .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: var(--clr-primary-light);
+      border: 1px solid var(--clr-primary);
+      border-radius: var(--radius-pill);
+      padding: var(--space-1) var(--space-5);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--clr-primary);
+      margin-bottom: var(--space-5);
+    }
+    .about-hero h1 { font-size: clamp(2rem,5vw,3.4rem); line-height: 1.1; }
+    .about-hero h1 span { color: var(--clr-primary); }
+    .about-hero p { max-width: 560px; margin: var(--space-4) auto 0; font-size: 1.05rem; }
 
-  <!-- Font Oregano -->
-  <link href="https://fonts.googleapis.com/css2?family=Oregano&display=swap" rel="stylesheet" />
-  <!-- Font DM Sans  sans-serif -->
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-  <!-- Font IBM Plex Sans Hebrew sans-serif -->
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;700&display=swap"
-    rel="stylesheet" />
+    /* Values strip */
+    .values-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--clr-border);
+      border-top: 1px solid var(--clr-border);
+      border-bottom: 1px solid var(--clr-border);
+    }
+    .value-item {
+      background: var(--clr-surface-1);
+      padding: var(--space-6) var(--space-5);
+      text-align: center;
+      transition: var(--transition-base);
+    }
+    .value-item:hover { background: var(--clr-surface-2); }
+    .value-item i   { font-size: 1.4rem; color: var(--clr-primary); display: block; margin-bottom: var(--space-3); }
+    .value-item h5  { font-size: .9rem; margin-bottom: var(--space-2); }
+    .value-item p   { font-size: .78rem; line-height: 1.5; }
+
+    /* Team section */
+    .team-section { padding: var(--space-16) var(--space-5); background: var(--clr-bg); }
+    .team-section .section-header { text-align: center; margin-bottom: var(--space-10); }
+    .team-section .section-header h2 { font-size: clamp(1.6rem,4vw,2.4rem); }
+    .team-section .section-header p  { max-width: 480px; margin: var(--space-3) auto 0; }
+
+    /* Enhanced Team Card */
+    .team-card {
+      background: var(--clr-surface-1);
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: var(--transition-base);
+      position: relative;
+    }
+    .team-card:hover {
+      border-color: var(--clr-primary);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 0 1px var(--clr-primary-light);
+    }
+    .team-card .card-top-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--clr-primary), var(--clr-accent));
+    }
+    .team-card .card-body { padding: var(--space-6); }
+    .team-card .photo-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+    .team-card .member-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--clr-primary);
+      flex-shrink: 0;
+      background: var(--clr-surface-3);
+    }
+    .team-card .member-meta { flex: 1; }
+    .team-card .member-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--clr-text-primary);
+      line-height: 1.2;
+    }
+    .team-card .member-dept {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      background: var(--clr-primary-light);
+      border: 1px solid var(--clr-primary);
+      border-radius: var(--radius-pill);
+      padding: 2px var(--space-3);
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--clr-primary);
+      margin-top: var(--space-1);
+    }
+    .team-card .info-block { margin-bottom: var(--space-4); }
+    .team-card .info-block .info-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--clr-primary);
+      margin-bottom: var(--space-2);
+    }
+    .team-card .info-block p {
+      font-size: .875rem;
+      line-height: 1.75;
+      color: var(--clr-text-secondary);
+    }
+    .team-card .card-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--clr-border);
+      background: var(--clr-surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .team-card .dept-badge {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* Skeleton Card */
+    .skeleton-card {
+      background: var(--clr-surface-1);
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      overflow: hidden;
+    }
+
+    /* Stats */
+    .stats-section {
+      padding: var(--space-12) var(--space-5);
+      background: var(--clr-surface-1);
+      border-top: 1px solid var(--clr-border);
+      border-bottom: 1px solid var(--clr-border);
+    }
+    .stats-row {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-8);
+      text-align: center;
+    }
+    .stat-item .num {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--clr-primary);
+      line-height: 1;
+    }
+    .stat-item .stat-desc {
+      font-size: .82rem;
+      color: var(--clr-text-muted);
+      margin-top: var(--space-2);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* CTA */
+    .about-cta {
+      padding: var(--space-16) var(--space-5);
+      text-align: center;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(246,87,48,.12) 0%, transparent 70%);
+    }
+    .about-cta h2 { font-size: clamp(1.6rem,4vw,2.4rem); margin-bottom: var(--space-4); }
+    .about-cta p  { max-width: 480px; margin: 0 auto var(--space-8); }
+    .cta-buttons  { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+
+    /* Dept filter tabs */
+    .dept-filters {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: var(--space-8);
+    }
+  </style>
 </head>
-
 <body id="aboutUsPage">
-  <div class="site-wrapper">
-    <div class="headerindex">
-      <!-- Header Section -->
-      <header>
-        <nav class="container navbar">
-          <div class="container-nav flex">
-            <!-- Site Logo-->
-            <a href="/" class="navbar-logo">
-              <img src="/resources/logo.png" alt="" />
-            </a>
-            <button id="navbarTogler"  class="navbar-toggler" type="button">
-              <span class="fa fa-bars" aria-hidden="true"></span>
-            </button>
-            <!-- Menu -->
-            <ul class="navbar-nav flex">
-              <li><a href="/index.html" class="nav-link">Home</a></li>
-              <li><a href="../pages/aboutus.html" class="nav-link active">About Us</a></li>
-              <li><a href="/" class="nav-link">Blog</a></li>
-              <li>
-                <a href="../pages/contact.html" class="nav-link">Contact Us</a>
-              </li>
-              <li class="dropdown">
-                <a href="../pages/our-services.html" class="nav-link dropdown-toggle">Our Services
-                  <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item active">Social Media
-                            Advertising</a></li>
-                    <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics &
-                            Reporting</a></li>
-                    <li><a href="../pages/our-services.html?development-service=true" class="dropdown-item">Web Design &
-                            Development</a></li>
-                    <li><a href="../pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
-                </ul>
-              </li>
-            </ul>
-            <!--div id="searchBar" onclick="openSearch()" class="search-bar">
-              <i id="searchBarIcon" onclick="openSearch()" class="fa-solid fa-magnifying-glass"></i>
-            </div-->
-          </div>
-        </nav>
-        <!-- sidebar -->
-        <aside id="mySidePanel" class="sidepanel">
-          <div class="sidebar flex">
-            <a href=""> <img src="/resources/logo.png" alt="logo" /> </a>
-            <button id="sidePanelCloseBtn" type="button" class="closebtn btn-hover">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-          <!-- Side Menus -->
-          <div>
-            <ul>
-              <li><a href="/index.html" class="nav-link">Home</a></li>
-              <li><a href="../pages/aboutus.html" class="nav-link active">About Us</a></li>
-              <li><a href="../pages/contact.html" class="nav-link">Contact Us</a></li>
-              <li class="collapse-btn">
-                <a href="javascript:void(0);" class="nav-link dropdown-trigger">
-                  Our Services
-                  <i class="fa-solid fa-caret-down"></i>
-                </a>
-                <div class="collapse" id="services">
-                    <ul>
-                        <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item active">Social
-                                Media Advertising</a></li>
-                        <li><a href="../pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics &
-                                Reporting</a></li>
-                        <li><a href="../pages/our-services.html?development-service=true" class="dropdown-item">Web Design &
-                                Development</a></li>
-                        <li><a href="../pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
-                    </ul>
-                </div>
-              </li>
-              <li><a href="/" class="nav-link">Blog</a></li>
-            </ul>
-          </div>
-        </aside>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TCWSW8TT" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-        <!-- Searchbar -->
-        <div id="searchbar">
-          <div class="btn_hover1">
-            <i id="btnCloseSearch" onclick="closeSearch()" class="fa-solid fa-xmark"></i>
-          </div>
-          <form action="#" method="search">
-            <input type="search" required placeholder="Search ..." />
-            <button type="submit" class="btn_hover1 search_button">
-              Search
-            </button>
-          </form>
-        </div>
-      </header>
+<!-- ── NAV ── -->
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+        <a href="/" class="navbar-logo"><img src="/resources/logo.png" alt="AdConnect" /></a>
+        <button id="navbarTogler" class="navbar-toggler" type="button" aria-label="Toggle menu"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="/index.html" class="nav-link">Home</a></li>
+          <li><a href="/pages/aboutus.html" class="nav-link active">About Us</a></li>
+          <li><a href="/pages/blog.html" class="nav-link">Blog</a></li>
+          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li class="dropdown">
+            <a href="/pages/our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="/pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="/resources/logo.png" alt="AdConnect" /></a>
+        <button id="sidePanelCloseBtn" type="button" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div>
+        <ul>
+          <li><a href="/index.html" class="nav-link">Home</a></li>
+          <li><a href="/pages/aboutus.html" class="nav-link active">About Us</a></li>
+          <li><a href="/pages/blog.html" class="nav-link">Blog</a></li>
+          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li class="collapse-btn">
+            <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
+            <div class="collapse" id="services">
+              <ul>
+                <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </header>
+</div>
+
+<!-- ── HERO ── -->
+<section class="about-hero">
+  <div class="eyebrow"><i class="fa fa-users"></i> Our Team</div>
+  <h1>The People Behind<br><span>AdConnect</span></h1>
+  <p>A dedicated team of digital marketing experts, developers, and strategists passionate about growing real estate businesses through data-driven campaigns.</p>
+</section>
+
+<!-- ── VALUES ── -->
+<div class="values-strip">
+  <div class="value-item">
+    <i class="fa fa-bar-chart"></i>
+    <h5>Data-Driven</h5>
+    <p>Every decision backed by analytics and real performance data.</p>
+  </div>
+  <div class="value-item">
+    <i class="fa fa-users"></i>
+    <h5>Client-First</h5>
+    <p>Your success is our success — we treat your business like ours.</p>
+  </div>
+  <div class="value-item">
+    <i class="fa fa-lightbulb-o"></i>
+    <h5>Innovative</h5>
+    <p>Always adopting the latest strategies and technologies.</p>
+  </div>
+  <div class="value-item">
+    <i class="fa fa-shield"></i>
+    <h5>Transparent</h5>
+    <p>Clear reporting, honest communication, no hidden fees.</p>
+  </div>
+  <div class="value-item">
+    <i class="fa fa-rocket"></i>
+    <h5>Results-Focused</h5>
+    <p>We measure everything that matters — ROI, leads, conversions.</p>
+  </div>
+</div>
+
+<!-- ── STATS ── -->
+<div class="stats-section">
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="num">4+</div>
+      <div class="stat-desc">Years Experience</div>
+    </div>
+    <div class="stat-item">
+      <div class="num" id="clientsCount">50+</div>
+      <div class="stat-desc">Happy Clients</div>
+    </div>
+    <div class="stat-item">
+      <div class="num">200%</div>
+      <div class="stat-desc">Avg ROI Increase</div>
+    </div>
+    <div class="stat-item">
+      <div class="num">3</div>
+      <div class="stat-desc">Countries Served</div>
     </div>
   </div>
+</div>
 
-  <!-------------------------------- Hero Section --------------------------------------->
-
-  <section id="aboutSection">
-    <div class="outer-container about-container">
-      <div class="header-text-layout">
-        <div class="slash-rect"></div>
-        <h4 id="aboutHeader" class="header-text">
-            Meet Misgina Fitwi: Your Digital Marketing Expert
-        </h4>
+<!-- ── TEAM SECTION ── -->
+<section class="team-section">
+  <div class="container">
+    <div class="section-header">
+      <div style="display:inline-flex;align-items:center;gap:var(--space-3);background:var(--clr-primary-light);border:1px solid var(--clr-primary);border-radius:var(--radius-pill);padding:var(--space-1) var(--space-5);margin-bottom:var(--space-4);">
+        <i class="fa fa-id-badge" style="color:var(--clr-primary);"></i>
+        <span style="font-size:.78rem;font-weight:700;color:var(--clr-primary);letter-spacing:.8px;text-transform:uppercase;">Who We Are</span>
       </div>
-      <img src="/resources/elipsis-line.png" alt="elipsis-line" />
-      <div class="about-inner-container">
-        <img id="misginaIcon" src="/resources/misgina.png" alt="">
-        <div class="v-layout grid-element">
-            <div class="h-layout">
-                <div class="styled-text">
-                    <p id="introHeader">Introduction</p>
-                    <img src="/resources/base-line.png" alt="image" />
-                </div>
-                <div class="about-content">
-                    <p id="introductionInfo">Hello! I'm Misgina Fitwi, a digital marketing 
-                        specialist dedicated to helping real estate companies 
-                        thrive in the digital landscape. I studied Digital Marketing 
-                        at Oslo Kristiania University, where I honed my skills in social 
-                        media advertising, data analysis, and consumer behavior.
-                    </p>
-                </div>
-            </div>
-            <div class="h-layout">
-                <div class="styled-text">
-                    <p id="experienceHeader">Experience</p>
-                    <img src="/resources/base-line.png" alt="image" />
-                </div>
-                <div class="about-content">
-                    <p id="experienceInfo">With over four years of hands-on experience, 
-                        I have developed and executed successful social media ad campaigns 
-                        that significantly increased visibility and sales for my clients. 
-                        My approach is data-driven, ensuring that every campaign is optimized 
-                        for performance.
-                    </p>
-                </div>
-            </div>
+      <h2>Meet Our Experts</h2>
+      <p>Each team member brings deep expertise in their domain — from paid advertising to software engineering.</p>
+    </div>
+
+    <!-- Department Filters -->
+    <div class="dept-filters" id="deptFilters">
+      <button class="filter-btn active" data-dept="all">All Team</button>
+      <button class="filter-btn" data-dept="Marketing">Marketing</button>
+      <button class="filter-btn" data-dept="Development">Development</button>
+      <button class="filter-btn" data-dept="Design">Design</button>
+    </div>
+
+    <!-- Team Grid — populated by JS -->
+    <div class="about-team-grid" id="teamGrid">
+      <!-- Skeleton cards while loading -->
+      <div class="skeleton-card">
+        <div style="display:flex;gap:var(--space-4);align-items:center;margin-bottom:var(--space-5);">
+          <div class="skeleton" style="width:80px;height:80px;border-radius:50%;flex-shrink:0;"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-2);">
+            <div class="skeleton" style="height:18px;width:60%;"></div>
+            <div class="skeleton" style="height:12px;width:40%;border-radius:var(--radius-pill);"></div>
+          </div>
         </div>
-        <div class="h-layout grid-element-bottom">
-            <div class="styled-text">
-                <p id="missionHeader">Our Mission</p>
-                <img src="/resources/base-line.png" alt="image" />
-            </div>
-            <div class="about-content">
-                <p id="missionInfo">At AdConnect, our mission is to empower real estate 
-                    businesses by leveraging the full potential of digital marketing. 
-                    We believe in building long-term relationships with our clients, 
-                    providing them with the tools and insights they need to succeed.
-                </p>
-            </div>
+        <div class="skeleton" style="height:12px;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:12px;width:80%;margin-bottom:var(--space-5);"></div>
+        <div class="skeleton" style="height:12px;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:12px;width:70%;"></div>
+      </div>
+      <div class="skeleton-card">
+        <div style="display:flex;gap:var(--space-4);align-items:center;margin-bottom:var(--space-5);">
+          <div class="skeleton" style="width:80px;height:80px;border-radius:50%;flex-shrink:0;"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-2);">
+            <div class="skeleton" style="height:18px;width:70%;"></div>
+            <div class="skeleton" style="height:12px;width:45%;border-radius:var(--radius-pill);"></div>
+          </div>
         </div>
+        <div class="skeleton" style="height:12px;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:12px;width:85%;margin-bottom:var(--space-5);"></div>
+        <div class="skeleton" style="height:12px;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:12px;width:65%;"></div>
       </div>
     </div>
-  </section>
 
-  <!-------------------------------------- Footer Section ------------------------------------------>
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-logo"><img src="/resources/logo.png" alt=""></div>
-      <div class="top-items-footer">
-        <div class="consultation">
-          <img src="/resources/help.svg.svg" alt="" class="client-icon" />
-          <p class="par-consult">Need Help? Call Us!</p>
-          <a href="/?lead-capture-form=true" class="btn_hover1 small-button">CONSULTATION</a>
-        </div>
-        <!-- End of consultation Section-->
-        <div class="company-info">
-          <h5>Company</h5>
-          <ul>
-            <li><a href="../pages/aboutus.html">About Us</a></li>
-            <li><a href="../pages/contact.html">Contact Us</a></li>
-            <li><a href="/?privacy-policy=true">Privacy Policy</a></li>
-            <li><a href="#">Blog Posts</a></li>
-          </ul>
-        </div>
-        <!-- End of Company Section-->
-        <div class="services">
-          <h5>Our Services</h5>
-          <ul>
-            <li><a href="../pages/our-services.html?adverts-service=true">Social Media Management</a></li>
-            <li><a href="../pages/our-services.html?adverts-service=true">Ad Creative Design</a></li>
-            <li><a href="../pages/our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
-            <li><a href="../pages/our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
-            <li><a href="../pages/our-services.html?development-service=true">Software Slolution & Web Design</a></li>
-            <li><a href="../pages/our-services.html?development-service=true">Mobile Development (Android)</a></li>
+    <!-- Empty state -->
+    <div id="teamEmpty" style="display:none;text-align:center;padding:var(--space-12);">
+      <i class="fa fa-users" style="font-size:2.5rem;color:var(--clr-text-muted);display:block;margin-bottom:var(--space-4);"></i>
+      <h3>No Team Members Here</h3>
+      <p style="margin-top:var(--space-2);">Check back soon.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="about-cta">
+  <div class="container">
+    <h2>Ready to Work With Us?</h2>
+    <p>Book a free consultation and let's craft a digital marketing strategy that moves your real estate business forward.</p>
+    <div class="cta-buttons">
+      <a href="/?lead-capture-form=true" class="btn btn-primary btn-lg">
+        <i class="fa fa-calendar"></i> Book Free Consultation
+      </a>
+      <a href="/pages/contact.html" class="btn btn-ghost btn-lg">
+        <i class="fa fa-envelope-o"></i> Send Us a Message
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-logo"><img src="/resources/logo.png" alt="AdConnect" /></div>
+    <div class="top-items-footer">
+      <div class="consultation">
+        <p class="par-consult" style="font-size:.85rem;font-weight:600;color:var(--clr-text-primary);">Need Help? Call Us!</p>
+        <p style="font-size:.82rem;">+254 790 064 130</p>
+        <a href="/?lead-capture-form=true" class="btn_hover1 small-button">Get Consultation</a>
+      </div>
+      <div class="company-info">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="/pages/aboutus.html">About Us</a></li>
+          <li><a href="/pages/contact.html">Contact Us</a></li>
+          <li><a href="/?privacy-policy=true">Privacy Policy</a></li>
+          <li><a href="/pages/blog.html">Blog</a></li>
         </ul>
-        </div>
-        <!-- End of Service Section-->
-        <div class="newsletter">
-          <h5>Newsletter</h5>
-          <form action="#" method="newsletter">
-            <input type="email" required placeholder="Email ... (example@example.com)" />
-            <!--button type="submit" class="btn_hover1 search_button">
-                Search
-              </button-->
-          </form>
-          <a href="/?value-video-request=true" class="btn_hover1 small-button">Watch the Free Video</a>
-        </div>
-        <!-- End of Newsletter Section-->
-        <div class="footer-faq-section">
-          <img src="/resources/msg.svg.svg" alt="" class="conversation-icon" />
-          <h5>FAQs</h5>
-          <p>
-            Need a clarification? Ask our Agents for a clarified solution.
-            You'll get your clarification as soon as possible
-          </p>
-          <a href="/?faqs=true" class="btn_hover1 small-button">VIEW FAQs SECTION</a>
-        </div>
-        <!-- End of faq Section-->
       </div>
-      <!-- End of footer top items -->
-      <div class="footer-bottom">
-        <div class="social-icons">
-          <p class="footer-text-follow-us">Follow Us:</p>
-          <a href="https://www.facebook.com/profile.php?id=61567259036362"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-          <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#"><i class="fa-brands fa-youtube"></i></a>
-        </div>
-        <!-- End of footer social media -->
-        <p class="footer-text-copyright">
-          Copyright © 2024 <span><a href="/index.html">AdConnect</a></span>. All rights reserved.
-        </p>
+      <div class="services">
+        <h5>Our Services</h5>
+        <ul>
+          <li><a href="/pages/our-services.html?adverts-service=true">Social Media Management</a></li>
+          <li><a href="/pages/our-services.html?adverts-service=true">Ad Creative Design</a></li>
+          <li><a href="/pages/our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
+          <li><a href="/pages/our-services.html?development-service=true">Web Design & Development</a></li>
+          <li><a href="/pages/our-services.html?development-service=true">Mobile App Development</a></li>
+        </ul>
+      </div>
+      <div class="newsletter">
+        <h5>Newsletter</h5>
+        <input type="email" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <a href="/?value-video-request=true" class="btn_hover1 small-button">Watch Free Video</a>
+      </div>
+      <div class="footer-faq-section">
+        <h5>FAQs</h5>
+        <p>Have a question? Our team is ready to help with answers.</p>
+        <a href="/?faqs=true" class="btn_hover1 small-button">View FAQs</a>
       </div>
     </div>
-    <!-- End of footer container -->
-  </footer>
+    <div class="footer-bottom">
+      <div class="social-icons">
+        <p class="footer-text-follow-us">Follow Us:</p>
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.instagram.com/adconnect_digital/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+      <p class="footer-text-copyright">
+        Copyright © <span id="current-year"></span> <a href="/index.html">AdConnect</a>. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
 
-  <!-- Scroll animation Lib -->
-  <script src="https://unpkg.com/aos@next/dist/aos.css"></script>
-  <script>
-    AOS.init({
-      offset: 150,
-      duration: 1250,
-      once: true,
+<script type="module" src="/scripts/main.js"></script>
+<script>
+const DOMAIN = 'https://adconnect.co.ke/api/';
+let allMembers = [];
+
+// Department icon map
+const DEPT_ICONS = {
+  'Marketing':   'fa-bullhorn',
+  'Development': 'fa-code',
+  'Design':      'fa-paint-brush',
+  'Management':  'fa-briefcase',
+  'Sales':       'fa-handshake-o',
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+
+  // Sidebar toggling
+  document.getElementById('navbarTogler')?.addEventListener('click', openNav);
+  document.getElementById('sidePanelCloseBtn')?.addEventListener('click', closeNav);
+  document.querySelectorAll('.collapse-btn').forEach(item => {
+    item.querySelector('.dropdown-trigger')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      item.querySelector('.collapse')?.classList.toggle('show');
     });
-  </script>
+  });
 
-  <!-- jquery js cdn -->
+  // Dept filter buttons
+  document.querySelectorAll('#deptFilters .filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#deptFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      renderTeam(this.dataset.dept);
+    });
+  });
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
-    integrity="sha512-+k1pnlgt4F1H8L7t329503/KO+078INEcXTbno3Q/F2VqDVhwoaiVml/0EHv9HsVgxUaVW+IbiZPUJQFF/YxZw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  await loadTeamMembers();
+});
 
-  <!-- jquery min js cdn-->
+async function loadTeamMembers() {
+  try {
+    const res = await fetch(`${DOMAIN}about-data-active`);
+    const data = await res.json();
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVTBEE2iyI610V8e6M8PP2/4hpQINQ/g="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    if (data && data.length > 0) {
+      // Map API data to team member format
+      allMembers = data.map(item => ({
+        id: item.id,
+        name: item.title,
+        department: detectDepartment(item.title, item.experience),
+        role: detectRole(item.title),
+        photo: item.icon,
+        introduction: item.introduction,
+        experience: item.experience,
+        mission: item.mission,
+        status: item.status,
+      }));
+    } else {
+      // Fallback static data
+      allMembers = getStaticTeam();
+    }
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    renderTeam('all');
+  } catch (e) {
+    console.error('Failed to load team:', e);
+    allMembers = getStaticTeam();
+    renderTeam('all');
+  }
+}
 
-  <!-- slick carousel min js cdn -->
-  <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
-    integrity="sha256-DHF4zGyjT760MP8wpeehwoey18z8uiz9864PRu2lVBA=" crossorigin="anonymous"></script>
+// Auto-detect department from name/experience keywords
+function detectDepartment(title, experience) {
+  const text = (title + ' ' + experience).toLowerCase();
+  if (text.includes('develop') || text.includes('code') || text.includes('software') || text.includes('android') || text.includes('web')) return 'Development';
+  if (text.includes('design') || text.includes('figma') || text.includes('ui') || text.includes('ux')) return 'Design';
+  if (text.includes('market') || text.includes('ads') || text.includes('campaign') || text.includes('social')) return 'Marketing';
+  return 'Marketing'; // default
+}
 
-  <!-- Custom JS-->
-  <script type="module" src="../scripts/main.js"></script>
+function detectRole(title) {
+  const t = title.toLowerCase();
+  if (t.includes('developer') || t.includes('engineer')) return 'Software Engineer';
+  if (t.includes('designer')) return 'UI/UX Designer';
+  if (t.includes('marketing')) return 'Marketing Specialist';
+  if (t.includes('manager')) return 'Manager';
+  return 'Digital Marketing Specialist';
+}
+
+function renderTeam(dept) {
+  const grid  = document.getElementById('teamGrid');
+  const empty = document.getElementById('teamEmpty');
+  const items = dept === 'all' ? allMembers : allMembers.filter(m => m.department === dept);
+
+  if (!items.length) {
+    grid.innerHTML  = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = items.map((m, idx) => `
+    <article class="team-card" style="animation: fadeInUp .4s ease ${idx * .08}s both;">
+      <div class="card-top-bar"></div>
+      <div class="card-body">
+        <div class="photo-row">
+          <img
+            class="member-photo"
+            src="${m.photo || '/resources/pic-back.png'}"
+            alt="${esc(m.name)}"
+            loading="lazy"
+            onerror="this.src='/resources/pic-back.png'"
+          />
+          <div class="member-meta">
+            <div class="member-name">${esc(m.name)}</div>
+            <div class="member-dept">
+              <i class="fa ${DEPT_ICONS[m.department] || 'fa-star'}"></i>
+              ${esc(m.department)}
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-label"><i class="fa fa-user-o"></i> Introduction</div>
+          <p>${esc(m.introduction)}</p>
+        </div>
+
+        <div class="info-block">
+          <div class="info-label"><i class="fa fa-briefcase"></i> Experience</div>
+          <p>${esc(m.experience)}</p>
+        </div>
+
+        <div class="info-block" style="margin-bottom:0;">
+          <div class="info-label"><i class="fa fa-rocket"></i> Mission</div>
+          <p>${esc(m.mission)}</p>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="dept-badge"><i class="fa ${DEPT_ICONS[m.department] || 'fa-star'}"></i> ${esc(m.department)} Team</span>
+        <div style="display:flex;gap:var(--space-2);">
+          <a href="/pages/contact.html" class="btn btn-ghost btn-sm" title="Contact"><i class="fa fa-envelope-o"></i></a>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+// Fallback static data used if API isn't available
+function getStaticTeam() {
+  return [
+    {
+      id: '1',
+      name: 'Misgina Fitwi',
+      department: 'Marketing',
+      role: 'Digital Marketing Specialist',
+      photo: '/resources/misgina.png',
+      introduction: "Hello! I'm Misgina Fitwi, a digital marketing specialist dedicated to helping real estate companies thrive in the digital landscape. I studied Digital Marketing at Oslo Kristiania University, where I honed my skills in social media advertising, data analysis, and consumer behaviour.",
+      experience: "With over four years of hands-on experience, I have developed and executed successful social media ad campaigns that significantly increased visibility and sales for clients. My approach is data-driven, ensuring that every campaign is optimised for maximum performance and ROI.",
+      mission: "At AdConnect, our mission is to empower real estate businesses by leveraging the full potential of digital marketing. We believe in building long-term relationships, providing clients with the tools and insights they need to succeed in a competitive market.",
+      status: 'ACTIVE',
+    },
+    {
+      id: '2',
+      name: 'Michael Maina',
+      department: 'Development',
+      role: 'Full-Stack Developer',
+      photo: '/resources/pic-back.png',
+      introduction: "I'm Michael, a full-stack software engineer focused on building scalable web applications, Android apps, and CRM platforms. I bring ideas to life through clean, maintainable code and thoughtful system architecture.",
+      experience: "3+ years building production-ready web and mobile applications using React, Node.js, Java, and Kotlin. I've delivered custom CRM systems, booking platforms, and e-commerce solutions for clients across Kenya and East Africa.",
+      mission: "My goal is to bridge the gap between powerful marketing strategies and the technology that makes them possible — delivering digital products that are fast, reliable, and beautiful.",
+      status: 'ACTIVE',
+    },
+  ];
+}
+
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function openNav()  { document.getElementById('mySidePanel').style.left = '0'; }
+function closeNav() { document.getElementById('mySidePanel').style.left = '-320px'; }
+</script>
+
+<style>
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
 </body>
-
 </html>

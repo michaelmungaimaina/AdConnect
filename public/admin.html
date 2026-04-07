@@ -1,718 +1,848 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Adconnect</title>
-    <!-- Logo Icon-->
-    <link rel="shortcut icon" href="../resources/logo.png" type="image/x-icon" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — AdConnect</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
 
-    <!-- link css -->
-    <link rel="stylesheet" href="../css/admin.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/easy.css" />
+  <!-- Theme CSS (combined) -->
+  <link rel="stylesheet" href="/css/theme.css" />
 
-    <script src="../scripts/admin.js" defer></script>
-    <!-- Scroll cdn -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Font awesome cdn -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
-          integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <!-- Font Oregano -->
-    <link href="https://fonts.googleapis.com/css2?family=Oregano&display=swap" rel="stylesheet" />
-    <!-- Font DM Sans  sans-serif -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-    <!-- Font IBM Plex Sans Hebrew sans-serif -->
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;700&display=swap"
-          rel="stylesheet" />
-
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-
 <body>
-<header id="admin-header">
-    <nav id="nav-bar" class="h-layout">
-        <div class="left-nav-section h-layout">
-            <a href="/">
-                <img src="../resources/logo.png" alt="" />
-            </a>
-            <p>Dashboard</p>
-        </div>
-        <div class="right-nav-section h-layout">
-            <div class="v-layout">
-                <p id="usernameSession">Maina Michael</p>
-                <p>Kenya</p>
-            </div>
-        </div>
-    </nav>
-</header>
 
-<!-- Login Page -->
-<section id="login-page" class="hidden">
-    <div class="h-layout">
-        <form id="login-form">
-            <div id="errorMessage"
-                 style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-            </div>
-            <h6>LOGIN</h6>
-            <label for="email">E-Mail:</label>
-            <input type="email" id="email" name="email" placeholder="example@example.com" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="password" required>
-
-            <button onclick="handleLogin()">LOGIN</button>
-        </form>
+<!-- ══════════════ LOGIN PAGE ══════════════ -->
+<section id="login-page">
+  <form id="login-form" onsubmit="handleLogin(event)">
+    <div class="login-header">
+      <img src="/resources/logo.png" alt="AdConnect" style="height:50px;margin:0 auto var(--space-4);display:block;border-radius:var(--radius-md);" />
+      <h2>Welcome Back</h2>
+      <p>Sign in to your dashboard</p>
     </div>
+    <div id="login-error" id="errorMessage"></div>
+    <div>
+      <label class="label" for="email">Email Address</label>
+      <input class="input-field" type="email" id="email" placeholder="admin@adconnect.co.ke" required />
+    </div>
+    <div>
+      <label class="label" for="password">Password</label>
+      <input class="input-field" type="password" id="password" placeholder="••••••••" required />
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:var(--space-2);">
+      <i class="fa fa-sign-in"></i> Sign In
+    </button>
+  </form>
 </section>
 
-<section id="adminHero" class="admin-hero">
-    <!-- Header Text -->
-    <div class="v-layout admin-header-text">
-        <div class="h-layout">
-            <div class="slash-rect"></div>
-            <p class="header-text">Admin Dashboard</p>
-        </div>
-        <img src="../resources/elipsis-line.png" alt="">
-    </div>
-
-    <!-- Navigation Section -->
-    <div class="admin-sidebar v-layout">
-        <ul>
-            <li id="userMgt">User Management</li>
-            <li id="contentMgt" class="dropdown">
-                <a href="#" class="nav-link dropdown-toggle">Content Management</a>
-                <ul class="dropdown-menu" style="width: 140px; margin-left: 2px; background-color: #737373;">
-                    <li id="aboutMgt" class="dropdown-item" style="padding-top: 2px;">About</li>
-                    <li id="videoMgt" class="dropdown-item" style="padding-top: 2px;">Video</li>
-                </ul>
-            </li>
-            <li id="leadMgt">Leads</li>
-            <li id="apptMgt">Appointments</li>
-            <li id="crmMgt">CRM</li>
-            <li id="applicationMgt">Applications</li>
-            <li id="reportMgt">Reports & Analytics</li>
-            <li id="settingMgt">Settings & Customization</li>
-            <li id="workflowMgt">Automated Workflows</li>
-            <li id="commMgt">Communication Center</li>
-            <li id="docsMgt">Document Management</li>
-        </ul>
-    </div>
-
-    <!-- Right Dashboard Content-->
-    <div id="content" class="v-layout content">
-        <!-- Manage Users -->
-        <div id="userContentMgt" class="v-layout">
-            <div id="userTopHeader">
-                <div class="h-layout contact-top-controls">
-                    <div id="searchBar" class="h-layout">
-                        <i id="searchBarIcon" class="fa-solid fa-magnifying-glass"></i>
-                        <input id="searchUserInput" type="text" placeholder="Search User">
-                    </div>
-                    <button id="refreshUserButton" onclick="refreshUserTable()" class="buttons">REFRESH
-                        TABLE</button>
-                    <button id="createUserButton" class="buttons">CREATE NEW USER</button>
-                </div>
-                <!-- Title Bar -->
-                <div class="h-layout field-bar">
-                    <p class="title-user-id">USER ID</p>
-                    <p class="title-user-name">USER NAME</p>
-                    <p class="title-user-email">USER EMAIL</p>
-                    <p class="title-user-roles">USER ROLES</p>
-                    <p class="title-user-access">ACCESS LEVEL</p>
-                    <p class="title-user-action">ACTIONS</p>
-                </div>
-            </div>
-            <div id="userList" class="v-layout field-item">
-                <!-- Control Data -->
-                <div class="h-layout item-content">
-                    <p class="item-user-id">USER ID</p>
-                    <p class="item-user-name">USER NAME</p>
-                    <p class="item-user-email">USER EMAIL</p>
-                    <p class="item-user-roles">USER ROLES</p>
-                    <p class="item-user-access">ACCESS LEVEL</p>
-                    <button id="userUpdateBtn">UPDATE</button>
-                    <button id="userDeleteBtn">DELETE</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manage About -->
-        <div id="videoContentMgt" class="v-layout hidden">
-            <div id="aboutSec" class="v-layout">
-                <div id="userTopHeader">
-                    <div class="h-layout contact-top-controls">
-                        <button id="refreshUserButton" class="buttons" style="visibility: hidden;">REFRESH
-                            TABLE</button>
-                        <div id="searchBar" class="h-layout">
-                            <p style="color: white; font-family: 'DM Sans'; font-size: 16px; font-weight: 700;">
-                                MANAGE ABOUT SECTION </p>
-                        </div>
-                        <button id="createAboutButton" onclick="openaboutRegisterPopup()" class="buttons" style="visibility: visible;">ADD NEW
-                            ABOUT</button>
-                    </div>
-                    <!-- Title Bar -->
-                    <div class="h-layout field-bar">
-                        <p class="title-about-id">PROF ID</p>
-                        <p class="title-about-title">TITLE</p>
-                        <p class="title-about-introduction">INTRODUCTION</p>
-                        <p class="title-about-experience">EXPERiENCE</p>
-                        <p class="title-about-mission">MISSION</p>
-                        <p class="title-about-status">STATUS</p>
-                        <p class="title-about-image">ICON</p>
-                        <i id="leadUnsubscribeBtn" onclick="refreshAbout()" class="fa fa-refresh" aria-hidden="true"></i>
-                    </div>
-                </div>
-                <div id="aboutList" class="v-layout field-item">
-                    <!-- Control Data -->
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">MICHAEL MUNGAI MAINA</p>
-                        <p class="item-about-introduction">michaelmunaimaina@gmail.com</p>
-                        <p class="item-about-experience">0799292048</p>
-                        <p class="item-about-mission">NAIROBI</p>
-                        <p class="item-about-status">2025-01-27</p>
-                        <p class="item-about-image">11.30 AM</p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-
-                </div>
-            </div>
-            <div id="vidSec" class="v-layout">
-                <div id="userTopHeader">
-                    <div class="h-layout contact-top-controls">
-                        <button id="refreshUserButton" class="buttons" style="visibility: hidden;">REFRESH
-                            TABLE</button>
-                        <div id="searchBar" class="h-layout">
-                            <p style="color: white; font-family: 'DM Sans'; font-size: 16px; font-weight: 700;">
-                                MANAGE VIDEO SECTION </p>
-                        </div>
-                        <button id="createNewVideoButton" onclick="openVideoRegisterPopup()" class="buttons" style="visibility: visible;">NEW
-                            VIDEO</button>
-                    </div>
-                    <!-- Title Bar -->
-                    <div class="h-layout field-bar">
-                        <p class="title-about-id">VIDEO ID</p>
-                        <p class="title-about-title">TITLE</p>
-                        <p class="title-about-introduction">CREATED BY</p>
-                        <p class="title-about-introduction">CREATED ON</p>
-                        <p class="title-about-status">STATUS</p>
-                        <p class="title-about-image">VIDEO</p>
-                        <i id="leadUnsubscribeBtn" onclick="refreshVideos()" class="fa fa-refresh" aria-hidden="true"></i>
-                    </div>
-                </div>
-                <div id="videoList" class="v-layout field-item">
-                    <!-- Control Data -->
-                    <div class="h-layout item-content">
-                        <p class="item-about-id">123456789012</p>
-                        <p class="item-about-title">FIRST VIDEO</p>
-                        <p class="item-about-introduction">2025-02-10</p>
-                        <p class="item-about-introduction">2025-02-10</p>
-                        <p class="item-about-status">ACTIVE</p>
-                        <p class="item-about-image"></p>
-                        <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAnage Leads -->
-        <div id="leadsContentMgt" class="v-layout hidden">
-            <div id="userTopHeader">
-                <div class="h-layout contact-top-controls">
-                    <button id="refreshUserButton" onclick="refreshLeadsTable()" class="buttons">REFRESH
-                        TABLE</button>
-                    <div id="searchBar" class="h-layout">
-                        <i id="searchBarIcon" class="fa-solid fa-magnifying-glass"></i>
-                        <input id="searchLeadsInput" type="text" placeholder="Filter Lead(s)">
-                    </div>
-                    <button id="createUserButton" class="buttons">CREATE NEW USER</button>
-                    <i id="downloadButton" class="fa fa-download" aria-hidden="true"></i>
-                </div>
-                <!-- Title Bar -->
-                <div class="h-layout field-bar">
-                    <p class="title-lead-id">LEAD ID</p>
-                    <p class="title-lead-name">LEAD NAME</p>
-                    <p class="title-lead-email">LEAD EMAIL</p>
-                    <p class="title-lead-phone">PHONE</p>
-                    <p class="title-lead-source">SOURCE</p>
-                    <p class="title-lead-status">STATUS</p>
-                    <p class="title-lead-subscription">SUBSCRIPTION</p>
-                    <p class="title-lead-date">DATE</p>
-                    <p class="title-lead-action">ACTIONS</p>
-                </div>
-            </div>
-
-            <div id="leadList" class="v-layout field-item">
-                <!-- Control Data -->
-                <div class="h-layout item-content">
-                    <p class="item-lead-id">1234567890123456789</p>
-                    <p class="item-lead-name">Michael Maina Mungai</p>
-                    <p class="item-lead-email">michaelmungaimaina@gmail.com</p>
-                    <p class="item-lead-phone">0799292048</p>
-                    <p class="item-lead-source">WEBSITE</p>
-                    <p class="item-lead-status">1ST CONTACT</p>
-                    <p class="item-lead-subscription">UNSUBSCRIBED</p>
-                    <p class="item-lead-date">2025-01-26 10:11:15</p>
-                    <i id="leadPreviewMailBtn" class="fa fa-envelope-open" aria-hidden="true"></i>
-                    <i id="leadSendMailBtn" class="fa fa-envelope" aria-hidden="true"></i>
-                    <i id="leadUnsubscribeBtn" class="fa fa-sign-out" aria-hidden="true"></i>
-                    <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Manage Reports -->
-        <div id="reportsContentMgt" class="v-layout hidden"></div>
-
-        <!-- Manage Settings -->
-        <div id="settingsContentMgt" class="v-layout"></div>
-
-        <!-- Manage Workflows -->
-        <div id="workflowsContentMgt" class="v-layout"></div>
-
-        <!-- Manage Communications -->
-        <div id="communicationContentMgt" class="v-layout"></div>
-
-        <!-- Manage Documents -->
-        <div id="documentContentMgt" class="v-layout"></div>
-
-        <!-- Manage Applications -->
-        <div id="applictionContentMgt" class="v-layout">
-            <div id="userTopHeader">
-                <div class="h-layout contact-top-controls">
-                    <div id="searchBar" class="h-layout">
-                        <i id="searchBarIcon" class="fa-solid fa-magnifying-glass"></i>
-                        <input id="searchApplicationInput" type="text" placeholder="Search Applications">
-                    </div>
-                    <button id="refreshUserButton" onclick="refreshApplicationTable()" class="buttons">REFRESH
-                        TABLE</button>
-                    <button id="createUserButton" class="buttons" style="visibility: collapse"></button>
-                </div>
-                <!-- Title Bar -->
-                <div class="h-layout field-bar">
-                    <p class="title-user-id">CLIENT ID</p>
-                    <p class="title-user-name">CLIENT NAME</p>
-                    <p class="title-user-email">EMAIL</p>
-                    <p class="title-appointment-phone">PHONE</p>
-                    <p class="title-appointment-notes">OCCUPATION</p>
-                    <p class="title-appointment-notes">TRIGGER</p>
-                    <p class="title-appointment-notes">GOAL</p>
-                    <p class="title-appointment-notes">INVESTMENT</p>
-                    <p class="title-appointment-status">STATUS</p>
-                    <p class="title-user-action">ACTIONS</p>
-                </div>
-            </div>
-            <div id="applicationList" class="v-layout field-item">
-                <!-- Control Data -->
-                <div class="h-layout item-content">
-                    <p class="item-user-id">202502081700</p>
-                    <p class="item-user-name">Michael Maina</p>
-                    <p class="item-user-email">maina@gmail.com</p>
-                    <p class="item-appointment-phone">0799292048</p>
-                    <p class="item-appointment-notes">Digital Marketting</p>
-                    <p class="item-appointment-notes">I have to</p>
-                    <p class="item-appointment-notes">My goal is to have a </p>
-                    <p class="item-appointment-notes">75,000 - 110,000</p>
-                    <p class="item-appointment-status">UNRESOLVED</p>
-                    <button id="userDeleteBtn">DELETE</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manage Appointment -->
-        <div id="appointmentContentMgt" class="v-layout hidden">
-            <div id="userTopHeader">
-                <div class="h-layout contact-top-controls">
-                    <button id="refreshUserButton" onclick="refreshAppointmentTable()"
-                            class="buttons">REFRESH
-                        TABLE</button>
-                    <div id="searchBar" class="h-layout">
-                        <i id="searchBarIcon" class="fa-solid fa-magnifying-glass"></i>
-                        <input id="searchAppointmentInput" type="text" placeholder="Filter Appointments">
-                    </div>
-                    <button id="createUserButton" class="buttons">CREATE NEW USER</button>
-                </div>
-                <!-- Title Bar -->
-                <div class="h-layout field-bar">
-                    <p class="title-appointment-id">CLIENT ID</p>
-                    <p class="title-appointment-name">CLIENT NAME</p>
-                    <p class="title-appointment-email">CLIENT EMAIL</p>
-                    <p class="title-appointment-phone">PHONE</p>
-                    <p class="title-appointment-location">LOCATION</p>
-                    <p class="title-appointment-date">DATE</p>
-                    <p class="title-appointment-time">TIME</p>
-                    <p class="title-appointment-type">TYPE</p>
-                    <p class="title-appointment-status">STATUS</p>
-                    <p class="title-appointment-notes">NOTES</p>
-                    <p class="title-appointment-action">ACTIONS</p>
-                </div>
-            </div>
-            <div id="appointmentList" class="v-layout field-item">
-                <!-- Control Data -->
-                <div class="h-layout item-content">
-                    <p class="item-appointment-id">123456789012</p>
-                    <p class="item-appointment-name">MICHAEL MUNGAI MAINA</p>
-                    <p class="item-appointment-email">michaelmunaimaina@gmail.com</p>
-                    <p class="item-appointment-phone">0799292048</p>
-                    <p class="item-appointment-location">NAIROBI</p>
-                    <p class="item-appointment-date">2025-01-27</p>
-                    <p class="item-appointment-time">11.30 AM</p>
-                    <p class="item-appointment-type">ONLINE</p>
-                    <p class="item-appointment-status">UPCOMING</p>
-                    <p class="item-appointment-notes">I WOULD LIKE TO FIX BLA BLA BLA</p>
-                    <i id="apptReschedule" class="fa fa-calendar" aria-hidden="true"></i>
-                    <i id="apptReschedule" class="fa fa-clock" aria-hidden="true"></i>
-                    <i id="leadSendMailBtn" class="fa fa-video-camera" aria-hidden="true"></i>
-                    <i id="leadUnsubscribeBtn" class="fa fa-check-circle" aria-hidden="true"></i>
-                    <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                </div>
-                <div class="h-layout item-content">
-                    <p class="item-appointment-id">123456789012</p>
-                    <p class="item-appointment-name">MICHAEL MUNGAI MAINA</p>
-                    <p class="item-appointment-email">michaelmunaimaina@gmail.com</p>
-                    <p class="item-appointment-phone">0799292048</p>
-                    <p class="item-appointment-location">NAIROBI</p>
-                    <p class="item-appointment-date">2025-01-27</p>
-                    <p class="item-appointment-time">11.30 AM</p>
-                    <p class="item-appointment-type">ONLINE</p>
-                    <p class="item-appointment-status">UPCOMING</p>
-                    <p class="item-appointment-notes">I WOULD LIKE TO FIX BLA BLA BLA</p>
-                    <i id="apptReschedule" class="fa fa-envelope-open" aria-hidden="true"></i>
-                    <i id="apptReschedule" class="fa fa-envelope-open" aria-hidden="true"></i>
-                    <i id="leadSendMailBtn" class="fa fa-envelope" aria-hidden="true"></i>
-                    <i id="leadUnsubscribeBtn" class="fa fa-sign-out" aria-hidden="true"></i>
-                    <i id="leadDeleteBtn" class="fa fa-trash" aria-hidden="true"></i>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
+<!-- ══════════════ LOADER ══════════════ -->
+<section id="loaderPopup">
+  <div class="loader"></div>
+  <p id="loadingText"></p>
 </section>
 
-<!-- Show A Dark Overlay While loading -->
-<section id="loaderPopup" class="background-tint-black" style="z-index: 10000000;">
-    <p id="loadingText" style="margin-top: 16%; color: #466b44; font-weight: 600; font-family: 'DM Sans';">Loading .
-        . .</p>
+<!-- ══════════════ ADMIN SHELL ══════════════ -->
+<div id="adminHero">
+
+  <!-- Header -->
+  <header id="admin-header">
+    <div class="logo-area">
+      <a href="/"><img src="/resources/logo.png" alt="AdConnect" /></a>
+      <span class="dashboard-label">Admin Panel</span>
+    </div>
+    <div class="user-area">
+      <div class="user-info">
+        <span class="user-name" id="usernameSession">Loading…</span>
+        <span class="user-role" id="userRoleDisplay">—</span>
+      </div>
+      <div class="avatar" id="userAvatar">A</div>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()" title="Logout">
+        <i class="fa fa-sign-out"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar" id="adminSidebar">
+    <span class="nav-section-label">Overview</span>
+    <ul>
+      <li id="nav-dashboard"><span onclick="navigate('dashboard')"><i class="fa fa-th-large"></i> Dashboard</span></li>
+      <li id="nav-analytics"><span onclick="navigate('analytics')"><i class="fa fa-bar-chart"></i> Analytics</span></li>
+    </ul>
+
+    <span class="nav-section-label">Content</span>
+    <ul>
+      <li id="nav-content"><span onclick="navigate('content')"><i class="fa fa-pencil-square-o"></i> Content Mgmt</span></li>
+      <li id="nav-blog"><span onclick="navigate('blog')"><i class="fa fa-rss"></i> Blog Posts</span></li>
+      <li id="nav-portfolio"><span onclick="navigate('portfolio')"><i class="fa fa-briefcase"></i> Portfolio</span></li>
+      <li id="nav-homepage"><span onclick="navigate('homepage')"><i class="fa fa-home"></i> Homepage CMS</span></li>
+      <li id="nav-testimonials"><span onclick="navigate('testimonials')"><i class="fa fa-quote-left"></i> Testimonials</span></li>
+    </ul>
+
+    <span class="nav-section-label" id="crm-section-label">CRM</span>
+    <ul id="crm-nav">
+      <li id="nav-leads"><span onclick="navigate('leads')"><i class="fa fa-users"></i> Leads</span></li>
+      <li id="nav-appointments"><span onclick="navigate('appointments')"><i class="fa fa-calendar"></i> Appointments</span></li>
+      <li id="nav-applications"><span onclick="navigate('applications')"><i class="fa fa-file-text"></i> Applications</span></li>
+    </ul>
+
+    <span class="nav-section-label" id="admin-section-label">Admin</span>
+    <ul id="admin-nav">
+      <li id="nav-users"><span onclick="navigate('users')"><i class="fa fa-user-circle"></i> Users</span></li>
+    </ul>
+
+    <span class="nav-section-label">Settings</span>
+    <ul>
+      <li id="nav-settings"><span onclick="navigate('settings')"><i class="fa fa-cog"></i> Settings</span></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="admin-main" id="adminMain">
+    <!-- ── HOMEPAGE CMS PANEL ── -->
+<section id="panel-homepage" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-home" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Homepage CMS</h2>
+    <button class="btn btn-accent btn-sm" onclick="saveHomepageSettings()"><i class="fa fa-save"></i> Save All Changes</button>
+  </div>
+
+  <!-- Hero Section Settings -->
+  <div class="content-panel">
+    <div class="panel-header">
+      <span class="panel-title">Hero Section</span>
+      <span class="badge badge-info">Live preview on save</span>
+    </div>
+    <div style="padding:var(--space-6);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);">
+      <div>
+        <label class="label">Eyebrow Text (above headline)</label>
+        <input id="cms-hero_eyebrow" type="text" class="input-field" placeholder="Kenya's #1 Real Estate Marketing Agency" />
+      </div>
+      <div>
+        <label class="label">Primary CTA Button Text</label>
+        <input id="cms-hero_cta_primary" type="text" class="input-field" placeholder="Watch Free Strategy Video" />
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="label">Main Headline (HTML allowed for <span class="accent"></span> tags)</label>
+        <textarea id="cms-hero_headline" class="input-field" style="height:80px;" placeholder="Powering Real Estate Businesses with HI-ROI Digital Marketing"></textarea>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="label">Sub-headline</label>
+        <textarea id="cms-hero_subheadline" class="input-field" style="height:80px;" placeholder="Boost your lead generation..."></textarea>
+      </div>
+      <div>
+        <label class="label">Secondary CTA Button Text</label>
+        <input id="cms-hero_cta_secondary" type="text" class="input-field" placeholder="Book Free Consultation" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="content-panel">
+    <div class="panel-header"><span class="panel-title">Hero Stat Cards</span></div>
+    <div style="padding:var(--space-6);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-5);">
+      <div>
+        <label class="label">Clients Stat (e.g. 50+)</label>
+        <input id="cms-stat_clients" type="text" class="input-field" placeholder="50+" />
+      </div>
+      <div>
+        <label class="label">ROI Stat (e.g. 200%)</label>
+        <input id="cms-stat_roi" type="text" class="input-field" placeholder="200%" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="content-panel">
+    <div class="panel-header"><span class="panel-title">Results / Metrics Section</span></div>
+    <div style="padding:var(--space-6);display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-5);">
+      <div>
+        <label class="label">Result 1 (e.g. 200%)</label>
+        <input id="cms-result_1" type="text" class="input-field" placeholder="200%" />
+        <label class="label" style="margin-top:8px;">Label 1</label>
+        <input id="cms-result_1_label" type="text" class="input-field" placeholder="Average ROI Increase" />
+      </div>
+      <div>
+        <label class="label">Result 2</label>
+        <input id="cms-result_2" type="text" class="input-field" placeholder="50+" />
+        <label class="label" style="margin-top:8px;">Label 2</label>
+        <input id="cms-result_2_label" type="text" class="input-field" placeholder="Clients Served" />
+      </div>
+      <div>
+        <label class="label">Result 3</label>
+        <input id="cms-result_3" type="text" class="input-field" placeholder="60%" />
+        <label class="label" style="margin-top:8px;">Label 3</label>
+        <input id="cms-result_3_label" type="text" class="input-field" placeholder="Ad Cost Reduction" />
+      </div>
+      <div>
+        <label class="label">Result 4</label>
+        <input id="cms-result_4" type="text" class="input-field" placeholder="4+" />
+        <label class="label" style="margin-top:8px;">Label 4</label>
+        <input id="cms-result_4_label" type="text" class="input-field" placeholder="Years of Expertise" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Section -->
+  <div class="content-panel">
+    <div class="panel-header"><span class="panel-title">Strategy Video Section Text</span></div>
+    <div style="padding:var(--space-6);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);">
+      <div style="grid-column:1/-1;">
+        <label class="label">Video Section Headline</label>
+        <input id="cms-video_headline" type="text" class="input-field" placeholder="5 Proven Strategies to Generate More Real Estate Leads" />
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="label">Video Sub-headline</label>
+        <textarea id="cms-video_subheadline" class="input-field" style="height:80px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:right;padding:var(--space-4);">
+    <button class="btn btn-accent btn-lg" onclick="saveHomepageSettings()">
+      <i class="fa fa-save"></i> Save All Homepage Settings
+    </button>
+  </div>
 </section>
 
-<!-- User Popup -->
-<section id="userPopUp" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
+<!-- ── TESTIMONIALS PANEL ── -->
+<section id="panel-testimonials" class="panel" style="display:none;">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-quote-left" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Testimonials</h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="fetchTestimonials()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-accent btn-sm" onclick="openTestimonialForm()"><i class="fa fa-plus"></i> Add Testimonial</button>
     </div>
-    <div id="errorMessage"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
+  </div>
+  <div class="content-panel">
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Photo</th><th>Name</th><th>Company</th><th>Stars</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+        <tbody id="testimonialsList"><tr><td colspan="7" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+      </table>
     </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderText" class="header-text" style="font-size: 16px;">Register A New User</p>
-            <div class="slash-rect"></div>
-        </div>
-        <div id="loader" class="loader hidden"></div>
-        <form class="form-section">
-            <div class="h-layout">
-                <div>
-                    <label class="label" for="name">Full Name:</label>
-                    <img class="star" src="/resources/starr.png" alt="">
-                </div>
-                <input id="name" type="text" class="input-field" placeholder="John Doe Doe"
-                       style="margin-left: 20px;">
-            </div>
-            <div class="h-layout">
-                <div>
-                    <label class="label" for="email">E-Mail:</label>
-                    <img class="star" src="/resources/starr.png" alt="">
-                </div>
-                <input id="email" type="text" class="input-field" placeholder="johndoe@example.com"
-                       style="margin-left: 40px;">
-            </div>
-            <div class="h-layout">
-                <div>
-                    <label class="label" for="role">User Roles:</label>
-                    <img class="star" src="/resources/starr.png" alt="">
-                </div>
-                <select id="role" class="input-field" style="margin-left: 18px;">
-                    <option value="" disabled selected>Select User Role</option>
-                    <option value="SUPER_ADMIN">SUPER ADMIN</option>
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="GEN_USER">GEN USER</option>
-                </select>
-            </div>
-            <div class="h-layout">
-                <div>
-                    <label class="label" for="access">User Access:</label>
-                    <img class="star" src="/resources/starr.png" alt="">
-                </div>
-                <select id="access" class="input-field" style="margin-left: 10px;">
-                    <option value="" disabled selected>Select User Access</option>
-                    <option value="CRUD">CRUD</option>
-                    <option value="0RUD">0RUD</option>
-                    <option value="0RU0">0RU0</option>
-                    <option value="0R00">0R00</option>
-                    <option value="0R0D">0R0D</option>
-                </select>
-            </div>
-            <div class="h-layout">
-                <div>
-                    <label class="label" for="password">Password:</label>
-                    <img class="star" src="/resources/starr.png" alt="">
-                </div>
-                <input id="password" type="password" class="input-field" placeholder="Password"
-                       style="margin-left: 23px;">
-            </div>
-            <button id="submitButton">SUBMIT</button>
-        </form>
-    </div>
+  </div>
 </section>
 
-<!-- Appointment Popup -->
-<section id="appointmentPopup" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div id="errorMessage"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextAppt" class="header-text" style="font-size: 16px;">Register A New User</p>
-            <div class="slash-rect"></div>
+    <!-- ── DASHBOARD PANEL ── -->
+    <section id="panel-dashboard" class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-th-large" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Dashboard</h2>
+        <span id="dashboardDate" style="font-size:.82rem;color:var(--clr-text-muted);"></span>
+      </div>
+      <div class="stats-grid" id="statsGrid" style="margin-bottom:var(--space-6);">
+        <div class="stat-card" style="--accent-color:var(--clr-primary);">
+          <i class="fa fa-users stat-icon"></i>
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-value" id="statLeads">—</div>
+          <div class="stat-change up" id="statLeadsChange">—</div>
         </div>
-        <div class="v-layout" style="margin: 0 10px 0 30px;">
-            <p id="titleText"
-               style="height: 150px; width: 400px; visibility: collapse; background-color: grey; color: azure; border-radius: 5px; padding: 10px; font-size: 12px; font-family: 'DM Sans';">
-                Content Here</p>
-            <p id="subtitleText"
-               style="font-size: 13px; visibility: collapse; font-family: 'DM Sans'; margin: 10px 0; color: azure;">
-                Reschedule appointment date and time to:</p>
-            <input id="appointmentInput" type="text" style="height: 30px; width: 100%; visibility: collapse;"
-                   class="input-field" placeholder="2025-01-20, 01.30 PM - 02.00 PM">
-            <button id="btnReschedule" onclick="rescheduleMeeting()"
-                    style="height: 30px; visibility: collapse; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px; ">RESCHEDULE</button>
+        <div class="stat-card" style="--accent-color:var(--clr-accent);">
+          <i class="fa fa-calendar stat-icon"></i>
+          <div class="stat-label">Appointments</div>
+          <div class="stat-value" id="statAppts">—</div>
+          <div class="stat-change up" id="statApptsChange">—</div>
         </div>
+        <div class="stat-card" style="--accent-color:var(--clr-info);">
+          <i class="fa fa-file-text stat-icon"></i>
+          <div class="stat-label">Applications</div>
+          <div class="stat-value" id="statApps">—</div>
+          <div class="stat-change up" id="statAppsChange">—</div>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--clr-warning);">
+          <i class="fa fa-eye stat-icon"></i>
+          <div class="stat-label">Blog Posts</div>
+          <div class="stat-value" id="statBlogs">—</div>
+          <div class="stat-change" id="statBlogsChange">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-5);margin-bottom:var(--space-6);">
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">Lead Acquisition — Last 7 Days</span>
+            <span class="badge badge-success">Live</span>
+          </div>
+          <canvas id="leadsChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Lead Sources</span></div>
+          <canvas id="sourceChart" height="160"></canvas>
+        </div>
+      </div>
+
+      <div class="content-panel">
+        <div class="panel-header">
+          <span class="panel-title">Recent Leads</span>
+          <button class="btn btn-ghost btn-sm" onclick="navigate('leads')">View All <i class="fa fa-arrow-right"></i></button>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table" id="recentLeadsTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Source</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="recentLeadsTbody"><tr><td colspan="5" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonial Modal -->
+<section id="testimonialPopup" class="background-tint-black">
+  <button onclick="closeModal('testimonialPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="testimonialModalTitle">Add Testimonial</h3>
+      </div>
+      <div class="form-section">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div><label class="label">Client Name *</label><input id="tName" type="text" class="input-field" placeholder="Irene Nyokabi" /></div>
+          <div><label class="label">Company</label><input id="tCompany" type="text" class="input-field" placeholder="Elixir Salon & Spa" /></div>
+        </div>
+        <div><label class="label">Testimonial Text *</label><textarea id="tText" class="input-field" style="height:120px;" placeholder="What the client said…"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-4);">
+          <div>
+            <label class="label">Stars (1–5)</label>
+            <select id="tStars" class="input-field">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Status</label>
+            <select id="tStatus" class="input-field">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Display Order</label>
+            <input id="tOrder" type="number" class="input-field" placeholder="1" min="0" />
+          </div>
+        </div>
+        <div>
+          <label class="label">Client Photo</label>
+          <input type="file" id="tPhoto" accept=".png,.jpg,.jpeg,.webp" style="color:var(--clr-text-secondary);font-size:.85rem;" />
+        </div>
+        <button onclick="saveTestimonial()" class="btn btn-accent">Save Testimonial</button>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- About Popup -->
-<section id="aboutPopup" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div id="errorMessage"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextAbout" class="header-text" style="font-size: 16px;">ABOUT - MISSION</p>
-            <div class="slash-rect"></div>
+    <!-- ── ANALYTICS PANEL ── -->
+    <section id="panel-analytics" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-bar-chart" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Analytics</h2>
+        <div style="display:flex;gap:var(--space-3);">
+          <button class="btn btn-secondary btn-sm" onclick="loadAnalytics()"><i class="fa fa-refresh"></i> Refresh</button>
         </div>
-        <div class="v-layout" style="margin: 0 10px 0 30px;">
-            <p id="titleText"
-               style="height: 150px; width: 400px; visibility: collapse; background-color: grey; color: azure; border-radius: 5px; padding: 10px; font-size: 12px; font-family: 'DM Sans';">
-                Content Here</p>
-            <p id="subtitleText"
-               style="font-size: 13px; visibility: collapse; font-family: 'DM Sans'; margin: 10px 0; color: azure;">
-                Reschedule appointment date and time to:</p>
-            <textarea id="aboutInput" type="text" style="height: 200px; width: 500px;  max-width: 500px; max-height: 250px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                      class="input-field" placeholder="Content Goes Here"></textarea>
-            <button id="btnUpdateAbout" onclick="updateAboutSection()"
-                    style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px; ">UPDATE</button>
+      </div>
+      <div class="stats-grid" style="margin-bottom:var(--space-6);" id="analyticsStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Monthly Leads vs Appointments</span></div>
+          <canvas id="monthlyChart" height="160"></canvas>
         </div>
-    </div>
-</section>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Application Status Breakdown</span></div>
+          <canvas id="statusChart" height="160"></canvas>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);">
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Lead Subscription Rates</span></div>
+          <canvas id="subChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><span class="chart-title">Top Lead Sources</span></div>
+          <div id="sourceList" style="margin-top:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3);"></div>
+        </div>
+      </div>
+    </section>
 
-<!-- Application Popup -->
-<section id="applicationPopup" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div id="errorMessage"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextApplication" class="header-text" style="font-size: 16px;">ABOUT - MISSION</p>
-            <div class="slash-rect"></div>
-        </div>
-        <div class="v-layout" style="margin: 0 10px 0 30px;">
-            <p id="titleTextApplication"
-               style="height: 150px; width: 400px; background-color: grey; color: azure; border-radius: 5px; padding: 10px; font-size: 12px; font-family: 'DM Sans';">
-                Content Here</p>
-            <p id="subtitleText"
-               style="font-size: 13px; visibility: collapse; font-family: 'DM Sans'; margin: 10px 0; color: azure;">
-                Reschedule appointment date and time to:</p>
-            <button id="btnUpdateAbout"
-                    style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px;visibility: collapse ">UPDATE</button>
-        </div>
-    </div>
-</section>
+    <!-- ── CONTENT MANAGEMENT PANEL ── -->
+    <section id="panel-content" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-pencil-square-o" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Content Management</h2>
+        <button class="btn btn-accent btn-sm" onclick="openAboutRegisterPopup()"><i class="fa fa-plus"></i> Add Profile</button>
+      </div>
 
-<!-- Photo Popup -->
-<section id="aboutPhotoPopup" class="background-tint-black">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div class="h-layout">
-        <div class="border center">
-            <div id="photoViewArea"></div>
+      <!-- About Section -->
+      <div class="content-panel" style="margin-bottom:var(--space-5);">
+        <div class="panel-header">
+          <span class="panel-title">About / Team Profiles</span>
+          <button class="btn btn-ghost btn-sm" onclick="refreshAbout()"><i class="fa fa-refresh"></i></button>
         </div>
-    </div>
-</section>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Title / Name</th><th>Introduction</th><th>Status</th><th>Icon</th><th>Actions</th></tr></thead>
+            <tbody id="aboutList"><tr><td colspan="6" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
 
-<!-- Video Popup -->
-<div class="background-tint-black" id="aboutVideoPopup">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <video id="popupVideo" controls autoplay muted></video>
+      <!-- Video Section -->
+      <div class="content-panel">
+        <div class="panel-header">
+          <span class="panel-title">Video Uploads</span>
+          <button class="btn btn-accent btn-sm" onclick="openVideoRegisterPopup()"><i class="fa fa-plus"></i> Upload Video</button>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Title</th><th>Created By</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="videoList"><tr><td colspan="6" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BLOG PANEL ── -->
+    <section id="panel-blog" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-rss" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Blog Posts</h2>
+        <button class="btn btn-accent btn-sm" id="btn-new-blog" onclick="openBlogForm()"><i class="fa fa-plus"></i> New Post</button>
+      </div>
+      <div class="content-panel">
+        <div class="panel-header" style="border-bottom:none;">
+          <div class="search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input class="search-input" id="searchBlogInput" placeholder="Search posts…" />
+          </div>
+          <div style="display:flex;gap:var(--space-3);align-items:center;">
+            <select class="input-field" id="blogStatusFilter" style="width:140px;height:36px;" onchange="filterBlogPosts()">
+              <option value="">All Status</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="DRAFT">Draft</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="fetchBlogPosts()"><i class="fa fa-refresh"></i></button>
+          </div>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="blogList"><tr><td colspan="6" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PORTFOLIO PANEL ── -->
+    <section id="panel-portfolio" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-briefcase" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Portfolio Projects</h2>
+        <button class="btn btn-accent btn-sm" onclick="openProjectForm()"><i class="fa fa-plus"></i> Add Project</button>
+      </div>
+      <div class="content-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Type</th><th>Tags</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="projectList"><tr><td colspan="6" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LEADS PANEL ── -->
+    <section id="panel-leads" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-users" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Leads</h2>
+        <div class="panel-actions">
+          <div class="search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input class="search-input" id="searchLeadsInput" placeholder="Search leads…" />
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshLeadsTable()"><i class="fa fa-refresh"></i></button>
+          <button class="btn btn-primary btn-sm" onclick="downloadExcel()"><i class="fa fa-download"></i> Export</button>
+        </div>
+      </div>
+      <div class="content-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lead ID</th><th>Name</th><th>Email</th><th>Phone</th>
+                <th>Source</th><th>Status</th><th>Subscription</th><th>Date</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadList"><tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">No data loaded</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── APPOINTMENTS PANEL ── -->
+    <section id="panel-appointments" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-calendar" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Appointments</h2>
+        <div class="panel-actions">
+          <div class="search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input class="search-input" id="searchAppointmentInput" placeholder="Search appointments…" />
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshAppointmentTable()"><i class="fa fa-refresh"></i></button>
+        </div>
+      </div>
+      <div class="content-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Client</th><th>Email</th><th>Phone</th><th>Date</th><th>Time</th>
+                <th>Type</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentList"><tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">No data loaded</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── APPLICATIONS PANEL ── -->
+    <section id="panel-applications" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-file-text" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Applications</h2>
+        <div class="panel-actions">
+          <div class="search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input class="search-input" id="searchApplicationInput" placeholder="Search applications…" />
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshApplicationTable()"><i class="fa fa-refresh"></i></button>
+        </div>
+      </div>
+      <div class="content-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Email</th><th>Phone</th>
+                <th>Occupation</th><th>Investment</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="applicationList"><tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">No data loaded</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── USERS PANEL (SUPER_ADMIN only) ── -->
+    <section id="panel-users" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-user-circle" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>User Management</h2>
+        <div class="panel-actions">
+          <div class="search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input class="search-input" id="searchUserInput" placeholder="Search users…" />
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshUserTable()"><i class="fa fa-refresh"></i></button>
+          <button class="btn btn-accent btn-sm" onclick="openCreateUserModal()"><i class="fa fa-plus"></i> New User</button>
+        </div>
+      </div>
+      <div class="content-panel">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Actions</th></tr></thead>
+            <tbody id="userList"><tr><td colspan="6" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">No data loaded</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SETTINGS PANEL ── -->
+    <section id="panel-settings" class="panel" style="display:none;">
+      <div class="panel-header">
+        <h2 class="panel-title"><i class="fa fa-cog" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Settings</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5);">
+        <div class="card">
+          <h5 style="margin-bottom:var(--space-4);">Site Information</h5>
+          <div class="form-section">
+            <div><label class="label">Site Name</label><input class="input-field" value="AdConnect" /></div>
+            <div><label class="label">Contact Email</label><input class="input-field" value="info@adconnect.co.ke" /></div>
+            <div><label class="label">Phone</label><input class="input-field" value="+254 790 064 130" /></div>
+            <button class="btn btn-primary btn-sm" style="align-self:flex-start;">Save Changes</button>
+          </div>
+        </div>
+        <div class="card">
+          <h5 style="margin-bottom:var(--space-4);">Email Templates</h5>
+          <p style="font-size:.85rem;margin-bottom:var(--space-4);">Configure automated email subjects and bodies for each lead status.</p>
+          <button class="btn btn-secondary btn-sm">Manage Templates</button>
+        </div>
+        <div class="card">
+          <h5 style="margin-bottom:var(--space-4);">Account Security</h5>
+          <div class="form-section">
+            <div><label class="label">Current Password</label><input class="input-field" type="password" /></div>
+            <div><label class="label">New Password</label><input class="input-field" type="password" /></div>
+            <button class="btn btn-primary btn-sm" style="align-self:flex-start;">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ACCESS DENIED ── -->
+    <section id="panel-access-denied" class="panel" style="display:none;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+      <div>
+        <i class="fa fa-lock" style="font-size:3rem;color:var(--clr-error);margin-bottom:var(--space-4);display:block;"></i>
+        <h3>Access Restricted</h3>
+        <p style="margin-top:var(--space-3);">You don't have permission to view this section.</p>
+      </div>
+    </section>
+
+  </main>
 </div>
 
-<!-- New About Registration Popup -->
-<section id="aboutRegisterPopup" class="background-tint-black" style="height: 0%;">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
-    </div>
-    <div id="errorMessage1"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextAbout" class="header-text" style="font-size: 16px;">NEW ABOUT INFO</p>
-            <div class="slash-rect"></div>
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+
+<!-- User Modal -->
+<section id="userPopUp" class="background-tint-black">
+  <button onclick="closeModal('userPopUp')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="userModalTitle">Create New User</h3>
+      </div>
+      <div id="userModalError" class="toast toast-error" style="display:none;position:static;margin-bottom:var(--space-4);"></div>
+      <div class="form-section">
+        <div><label class="label">Full Name *</label><input id="name" type="text" class="input-field" placeholder="John Doe" /></div>
+        <div><label class="label">Email Address *</label><input id="userEmail" type="email" class="input-field" placeholder="john@example.com" /></div>
+        <div>
+          <label class="label">Role *</label>
+          <select id="role" class="input-field">
+            <option value="" disabled selected>Select Role</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="ADMIN">Admin</option>
+            <option value="EDITOR">Editor</option>
+            <option value="GEN_USER">General User</option>
+          </select>
         </div>
-        <div class="v-layout">
-            <label for="inputTitle" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Title</label>
-            <textarea id="inputTitle1" type="text" style="height: 50px; width: 500px;  max-width: 500px; max-height: 250px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                      class="input-field" placeholder="Title Goes Here">
-                </textarea>
-            <label for="inputIntroduction" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Introduction</label>
-            <textarea id="inputIntroduction" type="text" style="height: 50px; width: 500px;  max-width: 500px; max-height: 250px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                      class="input-field" placeholder="Introduction Goes Here">
-                </textarea>
-            <label for="inputExperience" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Experience</label>
-            <textarea id="inputExperience" type="text" style="height: 50px; width: 500px;  max-width: 500px; max-height: 250px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                      class="input-field" placeholder="Experience Goes Here">
-                </textarea>
-            <label for="inputMission" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Mission</label>
-            <textarea id="inputMission" type="text" style="height: 50px; width: 500px;  max-width: 500px; max-height: 250px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                      class="input-field" placeholder="Mission Goes Here">
-                </textarea>
-            <label for="inputIcon" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Select Image</label>
-            <input type="file" id="inputIcon" accept=".png" required="true">
-            <button id="btnRegisterAbout" onclick="registerAboutSection()"
-                    style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px; ">SUBMIT</button>
+        <div>
+          <label class="label">Access Level *</label>
+          <select id="access" class="input-field">
+            <option value="" disabled selected>Select Access</option>
+            <option value="CRUD">Full Access (CRUD)</option>
+            <option value="0RUD">Read/Update/Delete</option>
+            <option value="0RU0">Read/Update Only</option>
+            <option value="0R00">Read Only</option>
+          </select>
         </div>
+        <div><label class="label">Password *</label><input id="userPassword" type="password" class="input-field" placeholder="Min 6 chars, upper+lower+num" /></div>
+        <button id="submitButton" onclick="userRegistrationOrUpdate(event)" class="btn btn-primary">Submit</button>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- New About Registration Popup -->
-<section id="videoRegisterPopup" class="background-tint-black" style="height: 0%;">
-    <div id="btnClosePopup" onclick="closePopup()" class="btn_hover1" style="position: fixed;">
-        <i class="fa-solid fa-xmark"></i>
+<!-- Appointment Modal -->
+<section id="appointmentPopup" class="background-tint-black">
+  <button onclick="closeModal('appointmentPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="popupHeaderTextAppt">Appointment Details</h3>
+      </div>
+      <p id="titleText" style="display:none;background:var(--clr-surface-2);padding:var(--space-4);border-radius:var(--radius-md);font-size:.875rem;margin-bottom:var(--space-4);"></p>
+      <div id="rescheduleForm" style="display:none;">
+        <p style="font-size:.85rem;color:var(--clr-text-secondary);margin-bottom:var(--space-3);">Reschedule to (format: 2025-01-20, 01.30 PM - 02.00 PM):</p>
+        <input id="appointmentInput" type="text" class="input-field" placeholder="2025-01-20, 01.30 PM - 02.00 PM" style="margin-bottom:var(--space-4);" />
+        <button id="btnReschedule" onclick="rescheduleMeeting()" class="btn btn-primary">Reschedule</button>
+      </div>
     </div>
-    <div id="errorMessage2"
-         style="color: rgb(236, 2, 2); display: none; margin: 65px 10px 2px 10px; background-color: #fc7b7b; text-align: center; font-size: 11px; padding: 4px 15px; border-radius: 5px; position: fixed; margin-top: 65px;">
-    </div>
-    <div class="appointment-layout outer-container">
-        <div class="h-layout" style="justify-content: space-between; width: 100%; padding-right: 20px;">
-            <div class="slash-rect"></div>
-            <p id="popupHeaderTextAbout" class="header-text" style="font-size: 16px;">NEW VIDEO UPLOAD</p>
-            <div class="slash-rect"></div>
-        </div>
-        <div class="v-layout">
-            <label for="inputTitle2" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Title</label>
-            <input id="inputTitle2" type="text" style="height: 50px; width: 500px; visibility: visible; text-align: start; text-overflow: clip; padding: 15px; margin-top: 20px;"
-                   class="input-field" placeholder="Title Goes Here">
-            </input>
-            <label for="inputVideo" style="font-size: 13px; font-family: 'DM Sans'; margin: 10px 0; color: azure;">Select Video</label>
-            <input type="file" id="inputVideo" accept=".mp4" required="true">
-            <button id="btnRegisterVideo" onclick="registerVideoSection()"
-                    style="height: 30px; visibility: visible; margin: 10px 0; color: azure; background-color: coral; border-radius: 5px; font-size: 13px; font-weight: bold; font-family: 'DM Sans'; padding: 5px 30px; ">UPLOAD</button>
-        </div>
-    </div>
+  </div>
 </section>
 
+<!-- About Edit Modal -->
+<section id="aboutPopup" class="background-tint-black">
+  <button onclick="closeModal('aboutPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="popupHeaderTextAbout">Edit Content</h3>
+      </div>
+      <textarea id="aboutInput" class="input-field" style="height:180px;resize:vertical;" placeholder="Content goes here…"></textarea>
+      <button id="btnUpdateAbout" onclick="updateAboutSection()" class="btn btn-primary" style="margin-top:var(--space-4);">Update</button>
+    </div>
+  </div>
+</section>
+
+<!-- Application Preview Modal -->
+<section id="applicationPopup" class="background-tint-black">
+  <button onclick="closeModal('applicationPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="popupHeaderTextApplication">Application Detail</h3>
+      </div>
+      <p id="titleTextApplication" style="background:var(--clr-surface-2);padding:var(--space-5);border-radius:var(--radius-md);font-size:.875rem;line-height:1.7;min-height:100px;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- About Register Modal -->
+<section id="aboutRegisterPopup" class="background-tint-black">
+  <button onclick="closeModal('aboutRegisterPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title">Add New Profile</h3>
+      </div>
+      <div id="aboutRegError" class="toast toast-error" style="display:none;position:static;margin-bottom:var(--space-4);"></div>
+      <div class="form-section">
+        <div><label class="label">Title / Name *</label><textarea id="inputTitle1" class="input-field" style="height:60px;" placeholder="e.g. Misgina Fitwi — Digital Marketing Specialist"></textarea></div>
+        <div><label class="label">Introduction *</label><textarea id="inputIntroduction" class="input-field" style="height:80px;" placeholder="Brief introduction…"></textarea></div>
+        <div><label class="label">Experience *</label><textarea id="inputExperience" class="input-field" style="height:80px;" placeholder="Years of experience, achievements…"></textarea></div>
+        <div><label class="label">Mission *</label><textarea id="inputMission" class="input-field" style="height:80px;" placeholder="Mission statement…"></textarea></div>
+        <div>
+          <label class="label">Profile Photo (PNG) *</label>
+          <input type="file" id="inputIcon" accept=".png,.jpg,.jpeg,.webp" style="color:var(--clr-text-secondary);font-size:.85rem;" />
+        </div>
+        <button id="btnRegisterAbout" onclick="registerAboutSection()" class="btn btn-accent">Submit Profile</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Video Register Modal -->
+<section id="videoRegisterPopup" class="background-tint-black">
+  <button onclick="closeModal('videoRegisterPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title">Upload New Video</h3>
+      </div>
+      <div id="videoRegError" class="toast toast-error" style="display:none;position:static;margin-bottom:var(--space-4);"></div>
+      <div class="form-section">
+        <div><label class="label">Video Title *</label><input id="inputTitle2" type="text" class="input-field" placeholder="Campaign Overview — Q1 2025" /></div>
+        <div>
+          <label class="label">Select Video File (MP4) *</label>
+          <input type="file" id="inputVideo" accept=".mp4,.webm,.mov" style="color:var(--clr-text-secondary);font-size:.85rem;" />
+        </div>
+        <button id="btnRegisterVideo" onclick="registerVideoSection()" class="btn btn-accent">Upload Video</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Post Modal -->
+<section id="blogPopup" class="background-tint-black">
+  <button onclick="closeModal('blogPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:700px;">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="blogModalTitle">New Blog Post</h3>
+      </div>
+      <div id="blogFormError" class="toast toast-error" style="display:none;position:static;margin-bottom:var(--space-4);"></div>
+      <div class="form-section">
+        <div><label class="label">Title *</label><input id="blogTitle" type="text" class="input-field" placeholder="10 Real Estate Marketing Strategies for 2025" /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div>
+            <label class="label">Category</label>
+            <select id="blogCategory" class="input-field">
+              <option value="Marketing">Marketing</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Social Media">Social Media</option>
+              <option value="Technology">Technology</option>
+              <option value="Business">Business</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Status</label>
+            <select id="blogStatus" class="input-field">
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+            </select>
+          </div>
+        </div>
+        <div><label class="label">Excerpt *</label><textarea id="blogExcerpt" class="input-field" style="height:80px;" placeholder="Brief summary of the post (shown in previews)…"></textarea></div>
+        <div><label class="label">Content *</label><textarea id="blogContent" class="input-field" style="height:200px;" placeholder="Full blog post content…"></textarea></div>
+        <div>
+          <label class="label">Cover Image</label>
+          <input type="file" id="blogCoverImage" accept=".png,.jpg,.jpeg,.webp" style="color:var(--clr-text-secondary);font-size:.85rem;" />
+        </div>
+        <div style="display:flex;gap:var(--space-4);">
+          <button onclick="saveBlogPost('DRAFT')" class="btn btn-secondary">Save as Draft</button>
+          <button onclick="saveBlogPost('PUBLISHED')" class="btn btn-accent">Publish Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio Project Modal -->
+<section id="projectPopup" class="background-tint-black">
+  <button onclick="closeModal('projectPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:680px;">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="projectModalTitle">Add New Project</h3>
+      </div>
+      <div class="form-section">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div><label class="label">Project Name *</label><input id="projectName" type="text" class="input-field" placeholder="Elixir Salon Website" /></div>
+          <div>
+            <label class="label">Project Type *</label>
+            <select id="projectType" class="input-field">
+              <option value="Website">Website</option>
+              <option value="Android App">Android App</option>
+              <option value="UI/UX Design">UI/UX Design (Figma)</option>
+              <option value="Software">Software Solution</option>
+              <option value="Marketing">Marketing Campaign</option>
+            </select>
+          </div>
+        </div>
+        <div><label class="label">Description *</label><textarea id="projectDesc" class="input-field" style="height:100px;" placeholder="Brief description of the project…"></textarea></div>
+        <div><label class="label">Tags (comma-separated)</label><input id="projectTags" type="text" class="input-field" placeholder="React, Node.js, MySQL" /></div>
+        <div><label class="label">Live URL (optional)</label><input id="projectUrl" type="url" class="input-field" placeholder="https://client.co.ke" /></div>
+        <div><label class="label">Thumbnail Image</label><input type="file" id="projectImage" accept=".png,.jpg,.jpeg,.webp" style="color:var(--clr-text-secondary);font-size:.85rem;" /></div>
+        <div>
+          <label class="label">Status</label>
+          <select id="projectStatus" class="input-field"><option value="ACTIVE">Active / Live</option><option value="DRAFT">Draft</option></select>
+        </div>
+        <button onclick="saveProject()" class="btn btn-accent">Save Project</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Photo Preview Modal -->
+<section id="aboutPhotoPopup" class="background-tint-black">
+  <button onclick="closeModal('aboutPhotoPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div style="display:flex;align-items:center;justify-content:center;height:100%;padding:var(--space-10);">
+    <div id="photoViewArea" style="width:380px;height:440px;border-radius:var(--radius-xl);background-size:cover;background-position:center;border:2px solid var(--clr-primary);"></div>
+  </div>
+</section>
+
+<!-- Video Preview Modal -->
+<div id="aboutVideoPopup" class="background-tint-black" style="align-items:center;justify-content:center;">
+  <button onclick="closeModal('aboutVideoPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <video id="popupVideo" controls autoplay muted style="max-width:680px;width:90%;border-radius:var(--radius-xl);margin-top:80px;"></video>
+</div>
+
+<!-- Mobile Warning -->
 <section class="mobile-warning">
-    <h2>⚠ This site is only available on desktops.</h2>
+  <i class="fa fa-desktop" style="font-size:3rem;color:var(--clr-text-muted);display:block;margin-bottom:var(--space-5);"></i>
+  <h2>Desktop Required</h2>
+  <p style="margin-top:var(--space-3);">The admin dashboard is optimized for screens 1024px and wider. Please use a desktop or laptop computer.</p>
 </section>
 
 <!-- Footer -->
-<footer id="admin-footer" class="h-layout">
-    <div class="h-layout">
-        <p id="footerText">©  AdConnect | All rights reserved.</p>
-        <p>Follow Us:</p>
-        <a href="https://www.facebook.com/profile.php?id=61567259036362" style="margin-left: 10px;"><i
-                class="fa-brands fa-facebook"></i></a>
-        <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.instagram.com/adconnect_digital/" style="margin-left: 10px;"><i
-                class="fa-brands fa-instagram"></i></a>
-        <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-youtube"></i></a>
-    </div>
+<footer id="admin-footer" style="position:fixed;bottom:0;left:var(--sidebar-w);right:0;height:36px;background:var(--clr-surface-2);border-top:1px solid var(--clr-border);display:flex;align-items:center;padding:0 var(--space-5);z-index:300;transition:left .3s ease;">
+  <p id="footerText" style="font-size:.75rem;color:var(--clr-text-muted);"></p>
 </footer>
+
+<script src="/scripts/admin.js" defer></script>
 </body>
-
-
 </html>

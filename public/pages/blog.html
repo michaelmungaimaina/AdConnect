@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — AdConnect | Real Estate Marketing Insights</title>
+  <meta name="description" content="Expert insights on real estate marketing, social media advertising, lead generation strategies, and digital marketing trends from the AdConnect team." />
+  <meta name="keywords" content="real estate marketing blog, social media advertising tips, lead generation, digital marketing Kenya" />
+  <meta property="og:title" content="AdConnect Blog — Real Estate Marketing Insights" />
+  <meta property="og:description" content="Expert digital marketing insights for real estate professionals." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://adconnect.co.ke/pages/blog.html" />
+  <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body id="blogPage">
+
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+        <a href="/" class="navbar-logo"><img src="/resources/logo.png" alt="AdConnect" /></a>
+        <button id="navbarTogler" class="navbar-toggler" type="button"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="/index.html" class="nav-link">Home</a></li>
+          <li><a href="/pages/aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="/pages/blog.html" class="nav-link active">Blog</a></li>
+          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li class="dropdown">
+            <a href="/pages/our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="/pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="/resources/logo.png" alt="AdConnect" /></a>
+        <button id="sidePanelCloseBtn" type="button" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div>
+        <ul>
+          <li><a href="/index.html" class="nav-link">Home</a></li>
+          <li><a href="/pages/aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="/pages/blog.html" class="nav-link active">Blog</a></li>
+          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li class="collapse-btn">
+            <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
+            <div class="collapse" id="services">
+              <ul>
+                <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="/pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </header>
+</div>
+
+<!-- Hero -->
+<section id="blogSection">
+  <div class="blog-container">
+    <!-- Page Header -->
+    <div style="text-align:center;padding:var(--space-12) 0 var(--space-8);">
+      <div style="display:inline-flex;align-items:center;gap:var(--space-3);background:var(--clr-primary-light);border:1px solid var(--clr-primary);border-radius:var(--radius-pill);padding:var(--space-2) var(--space-5);margin-bottom:var(--space-5);">
+        <i class="fa fa-rss" style="color:var(--clr-primary);"></i>
+        <span style="font-size:.82rem;font-weight:700;color:var(--clr-primary);letter-spacing:.5px;text-transform:uppercase;">Our Blog</span>
+      </div>
+      <h1 style="font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;margin-bottom:var(--space-4);">Marketing Insights &<br><span style="color:var(--clr-primary);">Strategy</span></h1>
+      <p style="max-width:500px;margin:0 auto;font-size:1rem;">Expert perspectives on real estate marketing, social media growth, and digital transformation for property businesses.</p>
+    </div>
+
+    <!-- Search + Filters -->
+    <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-8);">
+      <div class="search-wrapper" style="flex:1;min-width:220px;">
+        <i class="fa fa-search search-icon"></i>
+        <input class="search-input" id="blogSearch" placeholder="Search articles…" style="width:100%;" oninput="filterPublicBlog()" />
+      </div>
+      <div id="categoryFilters" class="portfolio-filters"></div>
+    </div>
+
+    <!-- Blog Grid -->
+    <div class="blog-grid" id="publicBlogGrid">
+      <!-- Skeleton Loading Cards -->
+      ${Array(6).fill(0).map(()=>`
+        <div class="blog-card">
+          <div class="blog-thumb"><div class="skeleton" style="width:100%;height:180px;"></div></div>
+          <div class="blog-content">
+            <div class="skeleton" style="height:14px;width:80px;margin-bottom:var(--space-3);border-radius:var(--radius-pill);"></div>
+            <div class="skeleton" style="height:20px;margin-bottom:var(--space-2);"></div>
+            <div class="skeleton" style="height:20px;width:70%;margin-bottom:var(--space-4);"></div>
+            <div class="skeleton" style="height:12px;margin-bottom:6px;"></div>
+            <div class="skeleton" style="height:12px;width:80%;"></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Empty State -->
+    <div id="blogEmpty" style="display:none;text-align:center;padding:var(--space-16);">
+      <i class="fa fa-newspaper-o" style="font-size:3rem;color:var(--clr-text-muted);display:block;margin-bottom:var(--space-5);"></i>
+      <h3>No Posts Found</h3>
+      <p style="margin-top:var(--space-3);">Check back soon — we're working on new content.</p>
+    </div>
+
+    <!-- Load More -->
+    <div style="text-align:center;margin-top:var(--space-10);" id="loadMoreSection" style="display:none;">
+      <button class="btn btn-secondary btn-lg" id="loadMoreBtn" onclick="loadMorePosts()">
+        <i class="fa fa-refresh"></i> Load More Posts
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Post Detail Modal -->
+<div id="postModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;overflow-y:auto;">
+  <div style="max-width:780px;margin:80px auto;padding:0 var(--space-5) var(--space-10);">
+    <div style="background:var(--clr-surface-1);border:1.5px solid var(--clr-border);border-radius:var(--radius-xl);overflow:hidden;">
+      <div id="postModalThumb" style="height:300px;background:var(--clr-surface-2);background-size:cover;background-position:center;position:relative;">
+        <button onclick="closePostModal()" style="position:absolute;top:var(--space-4);right:var(--space-4);width:40px;height:40px;background:rgba(0,0,0,.6);border:none;border-radius:var(--radius-md);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div style="padding:var(--space-8);">
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);">
+          <span id="postModalCategory" class="badge badge-info"></span>
+          <span id="postModalDate" style="font-size:.78rem;color:var(--clr-text-muted);"></span>
+        </div>
+        <h1 id="postModalTitle" style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:var(--space-5);"></h1>
+        <div style="display:flex;align-items:center;gap:var(--space-3);padding-bottom:var(--space-5);border-bottom:1px solid var(--clr-border);margin-bottom:var(--space-6);">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--clr-primary);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;" id="postModalAvatar"></div>
+          <div>
+            <div id="postModalAuthor" style="font-weight:600;font-size:.9rem;color:var(--clr-text-primary);"></div>
+            <div style="font-size:.78rem;color:var(--clr-text-muted);">AdConnect Team</div>
+          </div>
+        </div>
+        <div id="postModalContent" style="font-size:.95rem;line-height:1.9;color:var(--clr-text-secondary);white-space:pre-wrap;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-logo"><img src="/resources/logo.png" alt="AdConnect" /></div>
+    <div class="top-items-footer">
+      <div class="consultation">
+        <img src="/resources/help.svg.svg" alt="" class="client-icon" style="width:40px;" />
+        <p class="par-consult" style="font-size:.85rem;">Need Help? Call Us!</p>
+        <a href="/?lead-capture-form=true" class="btn_hover1 small-button">Get Consultation</a>
+      </div>
+      <div class="company-info">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="/pages/aboutus.html">About Us</a></li>
+          <li><a href="/pages/contact.html">Contact Us</a></li>
+          <li><a href="/?privacy-policy=true">Privacy Policy</a></li>
+          <li><a href="/pages/blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="services">
+        <h5>Our Services</h5>
+        <ul>
+          <li><a href="/pages/our-services.html?adverts-service=true">Social Media Management</a></li>
+          <li><a href="/pages/our-services.html?adverts-service=true">Ad Creative Design</a></li>
+          <li><a href="/pages/our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
+          <li><a href="/pages/our-services.html?development-service=true">Web Design & Development</a></li>
+        </ul>
+      </div>
+      <div class="newsletter">
+        <h5>Newsletter</h5>
+        <input type="email" placeholder="your@email.com" />
+        <a href="/?value-video-request=true" class="btn_hover1 small-button">Watch Free Video</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="social-icons">
+        <p class="footer-text-follow-us">Follow Us:</p>
+        <a href="https://www.facebook.com/profile.php?id=61567259036362"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+      <p class="footer-text-copyright">Copyright © <span id="current-year"></span> <a href="/index.html">AdConnect</a>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const DOMAIN = 'https://adconnect.co.ke/api/';
+let allPosts = [], displayedPosts = [];
+const PAGE_SIZE = 9;
+let page = 1;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+  document.getElementById('navbarTogler')?.addEventListener('click', openNav);
+  document.getElementById('sidePanelCloseBtn')?.addEventListener('click', closeNav);
+  document.querySelectorAll('.collapse-btn').forEach(item => {
+    item.querySelector('.dropdown-trigger')?.addEventListener('click', function(e) {
+      e.preventDefault(); item.querySelector('.collapse')?.classList.toggle('show');
+    });
+  });
+  await loadBlogPosts();
+});
+
+async function loadBlogPosts() {
+  try {
+    const res = await fetch(`${DOMAIN}blog-posts?status=PUBLISHED`);
+    allPosts  = res.ok ? await res.json() : [];
+    buildCategoryFilters();
+    renderBlogGrid(allPosts.slice(0, PAGE_SIZE));
+    if (allPosts.length > PAGE_SIZE) document.getElementById('loadMoreSection').style.display = 'block';
+  } catch(e) {
+    document.getElementById('publicBlogGrid').innerHTML = `<p style="color:var(--clr-text-muted);text-align:center;grid-column:1/-1;padding:var(--space-10);">Could not load posts. Please try again later.</p>`;
+  }
+}
+
+function buildCategoryFilters() {
+  const cats   = [...new Set(allPosts.map(p=>p.category).filter(Boolean))];
+  const filDiv = document.getElementById('categoryFilters');
+  filDiv.innerHTML = `<button class="filter-btn active" onclick="filterByCategory('',this)">All</button>` +
+    cats.map(c=>`<button class="filter-btn" onclick="filterByCategory('${c}',this)">${c}</button>`).join('');
+}
+
+function filterByCategory(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  const filtered = cat ? allPosts.filter(p=>p.category===cat) : allPosts;
+  page = 1; renderBlogGrid(filtered.slice(0,PAGE_SIZE));
+  document.getElementById('loadMoreSection').style.display = filtered.length > PAGE_SIZE ? 'block' : 'none';
+}
+
+function filterPublicBlog() {
+  const q = document.getElementById('blogSearch').value.toLowerCase();
+  const filtered = allPosts.filter(p => p.title.toLowerCase().includes(q) || (p.excerpt||'').toLowerCase().includes(q));
+  renderBlogGrid(filtered.slice(0, PAGE_SIZE));
+  document.getElementById('blogEmpty').style.display = filtered.length ? 'none' : 'block';
+}
+
+function renderBlogGrid(posts) {
+  const grid = document.getElementById('publicBlogGrid');
+  document.getElementById('blogEmpty').style.display = posts.length ? 'none' : 'block';
+  if (!posts.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = posts.map(p => `
+    <article class="blog-card" onclick="openPost('${p.id}')" style="cursor:pointer;">
+      <div class="blog-thumb">
+        ${p.coverImage ? `<img src="${p.coverImage}" alt="${p.title}" loading="lazy" />` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--clr-surface-2),var(--clr-surface-3));display:flex;align-items:center;justify-content:center;"><i class='fa fa-file-text-o' style='font-size:2rem;color:var(--clr-text-muted);'></i></div>`}
+      </div>
+      <div class="blog-content">
+        <div class="blog-category">${p.category||'General'}</div>
+        <h3 class="blog-title">${p.title}</h3>
+        <p class="blog-excerpt">${p.excerpt||''}</p>
+        <div class="blog-meta">
+          <div class="blog-author">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--clr-primary);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;">${(p.author||'A').charAt(0)}</div>
+            <span>${p.author||'AdConnect'}</span>
+          </div>
+          <span class="blog-date">${formatDate(p.created_at)}</span>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+function openPost(id) {
+  const p = allPosts.find(x=>x.id===id); if (!p) return;
+  document.getElementById('postModalTitle').textContent     = p.title;
+  document.getElementById('postModalCategory').textContent  = p.category||'General';
+  document.getElementById('postModalDate').textContent      = formatDate(p.created_at);
+  document.getElementById('postModalAuthor').textContent    = p.author||'AdConnect Team';
+  document.getElementById('postModalAvatar').textContent    = (p.author||'A').charAt(0).toUpperCase();
+  document.getElementById('postModalContent').textContent   = p.content||'';
+  document.getElementById('postModalThumb').style.backgroundImage = p.coverImage ? `url(${p.coverImage})` : '';
+  document.getElementById('postModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePostModal() {
+  document.getElementById('postModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function loadMorePosts() {
+  page++;
+  const newPosts = allPosts.slice(0, page * PAGE_SIZE);
+  renderBlogGrid(newPosts);
+  if (newPosts.length >= allPosts.length) document.getElementById('loadMoreSection').style.display = 'none';
+}
+
+const formatDate = d => d ? new Date(d).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'}) : '';
+
+function openNav() { document.getElementById('mySidePanel').style.left = '0'; }
+function closeNav() { document.getElementById('mySidePanel').style.left = '-320px'; }
+
+document.getElementById('postModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closePostModal();
+});
+</script>
+</body>
+</html>
