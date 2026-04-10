@@ -2547,6 +2547,392 @@ app.post('/api/test-server', (req, res) => {
     res.status(200).json({ message: 'Test route works!' });
 });
 
+// ── CV Upload storage ────────────────────────────────────────
+const cvStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, 'uploads', 'cvs');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+        cb(null, `${clientID()}_${safe}`);
+    },
+});
+const cvUpload = multer({
+    storage: cvStorage,
+    limits:  { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'application/pdf') cb(null, true);
+        else cb(new Error('Only PDF files are accepted'));
+    },
+});
+
+// Serve CVs (admin only — add auth middleware in production)
+app.use('/api/cvs', express.static(path.join(__dirname, 'uploads', 'cvs')));
+
+// ═══════════════ JOB LISTINGS ════════════════════════════════
+
+/** GET /api/careers  — public, returns OPEN jobs */
+app.get('/api/careers', (req, res) => {
+    const { status, department } = req.query;
+    let sql    = 'SELECT * FROM career_listings WHERE 1=1';
+    const params = [];
+
+    if (status)     { sql += ' AND status = ?';     params.push(status); }
+    if (department) { sql += ' AND department = ?'; params.push(department); }
+    sql += ' ORDER BY pinned DESC, created_at DESC';
+
+    db.query(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        // Parse JSON tags
+        const result = rows.map(r => ({ ...r, tags: tryParseJSON(r.tags, []) }));
+        res.status(200).json(result);
+    });
+});
+
+/** GET /api/careers/:id */
+app.get('/api/careers/:id', (req, res) => {
+    db.query('SELECT * FROM career_listings WHERE id = ?', [req.params.id], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!rows.length) return res.status(404).json({ error: 'Job not found' });
+        const r = rows[0];
+        res.status(200).json({ ...r, tags: tryParseJSON(r.tags, []) });
+    });
+});
+
+/** POST /api/careers  — admin creates a job */
+app.post('/api/careers', (req, res) => {
+    const { title, department, type, location, mode, salary, description,
+            requirements, deadline, status, pinned, tags } = req.body;
+
+    if (!title || !department || !description) {
+        return res.status(400).json({ error: 'title, department, and description are required' });
+    }
+    const tagsJSON = JSON.stringify(
+        Array.isArray(tags) ? tags : (tags || '').split(',').map(t => t.trim()).filter(Boolean)
+    );
+    const now = createdAt();
+    db.query(
+        `INSERT INTO career_listings
+         (id, title, department, type, location, mode, salary, description, requirements, deadline, status, pinned, tags, created_at, updated_at)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [clientID(), title, department, type||'Full-time', location||'Nairobi', mode||'On-site',
+         salary||null, description, requirements||null, deadline||null,
+         status||'OPEN', pinned?1:0, tagsJSON, now, now],
+        (err) => {
+            if (err) { console.error(err); return res.status(500).json({ error: 'Database error' }); }
+            res.status(201).json({ message: 'Job listing created' });
+        }
+    );
+});
+
+/** PUT /api/careers/:id  — admin updates a job */
+app.put('/api/careers/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, department, type, location, mode, salary, description,
+            requirements, deadline, status, pinned, tags } = req.body;
+    const tagsJSON = JSON.stringify(
+        Array.isArray(tags) ? tags : (tags || '').split(',').map(t => t.trim()).filter(Boolean)
+    );
+    db.query(
+        `UPDATE career_listings SET title=?,department=?,type=?,location=?,mode=?,salary=?,
+         description=?,requirements=?,deadline=?,status=?,pinned=?,tags=?,updated_at=? WHERE id=?`,
+        [title, department, type, location, mode, salary, description,
+         requirements, deadline, status, pinned?1:0, tagsJSON, createdAt(), id],
+        (err) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.status(200).json({ message: 'Job updated' });
+        }
+    );
+});
+
+/** DELETE /api/careers/:id */
+app.delete('/api/careers/:id', (req, res) => {
+    db.query('DELETE FROM career_listings WHERE id = ?', [req.params.id], (err) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json({ message: 'Job deleted' });
+    });
+});
+
+// ═══════════════ CAREER APPLICATIONS ════════════════════════
+
+/** POST /api/career-applications  — public, with CV upload */
+app.post('/api/career-applications', cvUpload.single('cv'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'CV PDF is required' });
+
+    const { jobId, firstName, lastName, email, phone,
+            currentRole, experience, motivation, portfolio } = req.body;
+
+    if (!jobId || !firstName || !lastName || !email || !phone || !motivation) {
+        return res.status(400).json({ error: 'Required fields missing' });
+    }
+
+    // Get job title for reference
+    db.query('SELECT title, department FROM career_listings WHERE id = ?', [jobId], (err, jobs) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        const jobTitle  = jobs[0]?.title      || 'Unknown Role';
+        const jobDept   = jobs[0]?.department || 'Unknown Dept';
+        const cvPath    = req.file.filename;
+        const now       = createdAt();
+
+        db.query(
+            `INSERT INTO career_applications
+             (id, job_id, job_title, job_department, first_name, last_name, email, phone,
+              current_role, experience, motivation, portfolio, cv_filename, status, created_at)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,'PENDING',?)`,
+            [clientID(), jobId, jobTitle, jobDept, firstName, lastName, email, phone,
+             currentRole||null, experience, motivation, portfolio||null, cvPath, now],
+            (err2) => {
+                if (err2) { console.error(err2); return res.status(500).json({ error: 'Failed to save application' }); }
+
+                // Notify admin (fire-and-forget)
+                sendApplicationNotificationEmail(firstName+' '+lastName, email, phone, jobTitle, jobDept, experience)
+                    .catch(e => console.error('Notification email error:', e));
+
+                // Auto-acknowledge applicant
+                sendApplicationAcknowledgement(firstName, email, jobTitle)
+                    .catch(e => console.error('Acknowledgement email error:', e));
+
+                res.status(201).json({ message: 'Application submitted successfully' });
+            }
+        );
+    });
+});
+
+/** GET /api/career-applications  — admin */
+app.get('/api/career-applications', (req, res) => {
+    const { status, jobId } = req.query;
+    let sql = 'SELECT * FROM career_applications WHERE 1=1';
+    const params = [];
+    if (status) { sql += ' AND status = ?'; params.push(status); }
+    if (jobId)  { sql += ' AND job_id = ?';  params.push(jobId); }
+    sql += ' ORDER BY created_at DESC';
+
+    db.query(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        res.status(200).json(rows);
+    });
+});
+
+/** GET /api/career-applications/:id */
+app.get('/api/career-applications/:id', (req, res) => {
+    db.query('SELECT * FROM career_applications WHERE id = ?', [req.params.id], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!rows.length) return res.status(404).json({ error: 'Application not found' });
+        // Build CV download URL
+        const app = rows[0];
+        app.cv_url = app.cv_filename
+            ? `${process.env.APP_API_URL}api/cvs/${app.cv_filename}`
+            : null;
+        res.status(200).json(app);
+    });
+});
+
+/** PUT /api/career-applications/:id/status  — update status */
+app.put('/api/career-applications/:id/status', (req, res) => {
+    const { id }     = req.params;
+    const { status } = req.body;
+    const allowed    = ['PENDING','REVIEWING','SHORTLISTED','INTERVIEW','REJECTED','HIRED'];
+    if (!allowed.includes(status)) return res.status(400).json({ error: `Status must be: ${allowed.join(', ')}` });
+
+    db.query(
+        'UPDATE career_applications SET status=?, updated_at=? WHERE id=?',
+        [status, createdAt(), id],
+        (err) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.status(200).json({ message: 'Status updated' });
+        }
+    );
+});
+
+/** PUT /api/career-applications/:id/notes  — add admin notes */
+app.put('/api/career-applications/:id/notes', (req, res) => {
+    const { notes } = req.body;
+    db.query(
+        'UPDATE career_applications SET admin_notes=?, updated_at=? WHERE id=?',
+        [notes, createdAt(), req.params.id],
+        (err) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.status(200).json({ message: 'Notes saved' });
+        }
+    );
+});
+
+/** DELETE /api/career-applications/:id */
+app.delete('/api/career-applications/:id', (req, res) => {
+    db.query('SELECT cv_filename FROM career_applications WHERE id=?', [req.params.id], (err, rows) => {
+        if (!err && rows.length && rows[0].cv_filename) {
+            const cvPath = path.join(__dirname, 'uploads', 'cvs', rows[0].cv_filename);
+            if (fs.existsSync(cvPath)) fs.unlinkSync(cvPath);
+        }
+        db.query('DELETE FROM career_applications WHERE id=?', [req.params.id], (err2) => {
+            if (err2) return res.status(500).json({ error: 'Database error' });
+            res.status(200).json({ message: 'Application deleted' });
+        });
+    });
+});
+
+// ═══════════════ INTERVIEW INVITATION EMAIL ══════════════════
+
+/** POST /api/career-applications/:id/invite  — send interview invitation */
+app.post('/api/career-applications/:id/invite', async (req, res) => {
+    const { id }                                = req.params;
+    const { interviewDate, interviewTime,
+            interviewType, interviewLink,
+            interviewNotes, interviewLocation } = req.body;
+
+    db.query('SELECT * FROM career_applications WHERE id=?', [id], async (err, rows) => {
+        if (err || !rows.length) return res.status(404).json({ error: 'Application not found' });
+        const applicant = rows[0];
+
+        try {
+            await sendInterviewInvitationEmail(
+                applicant.first_name,
+                applicant.email,
+                applicant.job_title,
+                interviewDate,
+                interviewTime,
+                interviewType  || 'Online',
+                interviewLink  || '',
+                interviewLocation || 'Nairobi, Kenya',
+                interviewNotes || ''
+            );
+
+            // Update status to INTERVIEW
+            db.query(
+                'UPDATE career_applications SET status=?, interview_date=?, interview_notes=?, updated_at=? WHERE id=?',
+                ['INTERVIEW', `${interviewDate} ${interviewTime}`, interviewNotes||'', createdAt(), id],
+                () => {}
+            );
+
+            res.status(200).json({ message: `Interview invitation sent to ${applicant.email}` });
+        } catch (e) {
+            console.error('Interview email error:', e);
+            res.status(500).json({ error: 'Failed to send invitation email' });
+        }
+    });
+});
+
+// ═══════════════ EMAIL FUNCTIONS ════════════════════════════
+
+async function sendApplicationNotificationEmail(name, email, phone, jobTitle, dept, experience) {
+    await transporter.sendMail({
+        from:    `"AdConnect Careers" <${process.env.EMAIL_USER}>`,
+        to:      process.env.ADMIN_EMAIL || 'info@adconnect.co.ke',
+        subject: `📋 New Application: ${jobTitle} — ${name}`,
+        html: `
+        <body style="font-family:Arial,sans-serif;background:#1A1917;color:#F4F1EE;padding:20px;">
+          <div style="max-width:580px;margin:0 auto;background:#252320;border:1px solid #3d3b39;border-radius:12px;overflow:hidden;">
+            <div style="background:#F65730;padding:20px 28px;">
+              <h2 style="margin:0;color:#fff;">New Career Application</h2>
+              <p style="margin:4px 0 0;color:rgba(255,255,255,.8);font-size:13px;">${new Date().toLocaleString('en-KE',{timeZone:'Africa/Nairobi'})}</p>
+            </div>
+            <div style="padding:28px;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;width:130px;">Position</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;font-weight:700;color:#F65730;">${jobTitle}</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Department</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;">${dept}</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Applicant</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;font-weight:600;">${name}</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Email</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;"><a href="mailto:${email}" style="color:#F65730;">${email}</a></td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Phone</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;">${phone||'—'}</td></tr>
+                <tr><td style="padding:10px 0;color:#7a7874;font-size:12px;">Experience</td><td style="padding:10px 0;">${experience||'—'}</td></tr>
+              </table>
+              <div style="margin-top:24px;text-align:center;">
+                <a href="${process.env.APP_BASE_URL}/admin.html" style="display:inline-block;padding:12px 28px;background:#F65730;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">View in Admin Panel</a>
+              </div>
+            </div>
+          </div>
+        </body>`,
+    });
+}
+
+async function sendApplicationAcknowledgement(firstName, email, jobTitle) {
+    await transporter.sendMail({
+        from:    `"AdConnect Careers" <${process.env.EMAIL_USER}>`,
+        to:      email,
+        subject: `Application Received — ${jobTitle} at AdConnect`,
+        html: `
+        <body style="font-family:Arial,sans-serif;background:#1A1917;color:#F4F1EE;padding:20px;">
+          <div style="max-width:560px;margin:0 auto;background:#252320;border:1px solid #3d3b39;border-radius:12px;overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#4d4c4b,#646464);padding:28px;text-align:center;">
+              <img src="${process.env.APP_BASE_URL}/resources/logo.png" alt="AdConnect" style="height:40px;margin-bottom:16px;" />
+              <h2 style="margin:0;color:#fff;">Application Received!</h2>
+            </div>
+            <div style="padding:32px;">
+              <p>Hi <strong>${firstName}</strong>,</p>
+              <p style="margin-top:12px;line-height:1.7;">Thank you for applying for the <strong style="color:#F65730;">${jobTitle}</strong> position at AdConnect. We've received your application and our team will carefully review it.</p>
+              <div style="margin:24px 0;padding:20px;background:#302E2C;border-radius:8px;border-left:3px solid #F65730;">
+                <p style="font-weight:700;margin-bottom:8px;">What happens next?</p>
+                <p style="font-size:13px;line-height:1.7;color:#B8B4B0;">Our hiring team will review your CV and application within <strong>5–7 business days</strong>. If your profile is a strong match, we'll reach out to schedule an interview.</p>
+              </div>
+              <p style="font-size:13px;color:#7a7874;">Questions? Reply to this email or reach us at <a href="mailto:careers@adconnect.co.ke" style="color:#F65730;">careers@adconnect.co.ke</a></p>
+              <p style="margin-top:24px;">Best regards,<br /><strong>The AdConnect Hiring Team</strong></p>
+            </div>
+            <div style="padding:16px 28px;border-top:1px solid #3d3b39;text-align:center;font-size:11px;color:#7a7874;">
+              AdConnect · Nairobi, Kenya · <a href="${process.env.APP_BASE_URL}" style="color:#4ABC4F;">adconnect.co.ke</a>
+            </div>
+          </div>
+        </body>`,
+    });
+}
+
+async function sendInterviewInvitationEmail(firstName, email, jobTitle, date, time, type, link, location, notes) {
+    const dateFormatted = new Date(date).toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+    await transporter.sendMail({
+        from:    `"AdConnect Careers" <${process.env.EMAIL_USER}>`,
+        to:      email,
+        subject: `🎉 Interview Invitation — ${jobTitle} at AdConnect`,
+        html: `
+        <body style="font-family:Arial,sans-serif;background:#1A1917;color:#F4F1EE;padding:20px;">
+          <div style="max-width:560px;margin:0 auto;background:#252320;border:1px solid #3d3b39;border-radius:12px;overflow:hidden;">
+            <div style="background:#F65730;padding:28px;text-align:center;">
+              <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
+              <h2 style="margin:0;color:#fff;">You're Invited to Interview!</h2>
+              <p style="margin:6px 0 0;color:rgba(255,255,255,.85);font-size:14px;">${jobTitle} · AdConnect</p>
+            </div>
+            <div style="padding:32px;">
+              <p>Congratulations <strong>${firstName}</strong>!</p>
+              <p style="margin-top:12px;line-height:1.7;">We've reviewed your application and we're excited to invite you for an interview. Please see the details below:</p>
+
+              <div style="margin:24px 0;padding:24px;background:#302E2C;border-radius:10px;">
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;width:120px;">Date</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;font-weight:700;">${dateFormatted}</td></tr>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Time</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;font-weight:700;">${time} EAT</td></tr>
+                  <tr><td style="padding:10px 0;border-bottom:1px solid #3d3b39;color:#7a7874;font-size:12px;">Format</td><td style="padding:10px 0;border-bottom:1px solid #3d3b39;">${type}</td></tr>
+                  <tr><td style="padding:10px 0;${notes?'border-bottom:1px solid #3d3b39;':''}color:#7a7874;font-size:12px;">Location</td><td style="padding:10px 0;${notes?'border-bottom:1px solid #3d3b39;':''}">${type==='Online' ? 'Video Call' : location}</td></tr>
+                  ${notes ? `<tr><td style="padding:10px 0;color:#7a7874;font-size:12px;vertical-align:top;">Notes</td><td style="padding:10px 0;font-size:13px;line-height:1.6;">${notes}</td></tr>` : ''}
+                </table>
+              </div>
+
+              ${link ? `
+              <div style="text-align:center;margin-bottom:24px;">
+                <a href="${link}" style="display:inline-block;padding:13px 32px;background:#F65730;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">
+                  Join Video Interview
+                </a>
+              </div>` : ''}
+
+              <div style="padding:16px;background:#1A1917;border-radius:8px;margin-bottom:20px;">
+                <p style="font-weight:700;font-size:13px;margin-bottom:8px;">How to Prepare:</p>
+                <ul style="font-size:13px;color:#B8B4B0;line-height:1.8;padding-left:20px;">
+                  <li>Review your application and the job description</li>
+                  <li>Prepare examples from your past experience</li>
+                  <li>Have any portfolio or project links ready</li>
+                  <li>Join a few minutes early if it's a video call</li>
+                </ul>
+              </div>
+
+              <p style="font-size:13px;color:#7a7874;">Need to reschedule? Reply to this email or call us at <a href="tel:+254790064130" style="color:#F65730;">+254 790 064 130</a></p>
+              <p style="margin-top:20px;">Looking forward to meeting you!<br /><strong>The AdConnect Hiring Team</strong></p>
+            </div>
+            <div style="padding:16px 28px;border-top:1px solid #3d3b39;text-align:center;font-size:11px;color:#7a7874;">
+              AdConnect · <a href="${process.env.APP_BASE_URL}" style="color:#4ABC4F;">adconnect.co.ke</a> · careers@adconnect.co.ke
+            </div>
+          </div>
+        </body>`,
+    });
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

@@ -5,8 +5,8 @@
 'use strict';
 
 /* ── Config ─────────────────────────────────── */
-const DOMAIN = 'https://adconnect.co.ke/api/';
-// const DOMAIN = 'http://127.0.0.1:3000/api/';
+//const DOMAIN = 'https://adconnect.co.ke/api/';
+ const DOMAIN = 'http://127.0.0.1:3000/api/';
 
 /* ── State ───────────────────────────────────── */
 const AppState = {

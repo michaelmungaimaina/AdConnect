@@ -10,14 +10,14 @@
   <meta name="keywords" content="real estate digital marketing Kenya, social media advertising real estate, lead generation real estate, Facebook ads Kenya, Google ads real estate, real estate marketing agency Nairobi, AdConnect Kenya" />
   <meta name="author" content="AdConnect" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <link rel="canonical" href="https://adconnect.co.ke/" />
+  <link rel="canonical" href="https://www.adconnect.co.ke/" />
 
   <!-- ── Open Graph / Facebook ── -->
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://adconnect.co.ke/" />
+  <meta property="og:url"         content="https://www.adconnect.co.ke/" />
   <meta property="og:title"       content="AdConnect — Real Estate Digital Marketing Agency Kenya" />
   <meta property="og:description" content="Generate more real estate leads, reduce ad spend, and grow your business with AdConnect's proven digital marketing strategies." />
-  <meta property="og:image"       content="https://adconnect.co.ke/resources/og-image.jpg" />
+  <meta property="og:image"       content="https://www.adconnect.co.ke/resources/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name"   content="AdConnect" />
@@ -28,7 +28,7 @@
   <meta name="twitter:card"        content="summary_large_image" />
   <meta name="twitter:title"       content="AdConnect — Real Estate Digital Marketing Kenya" />
   <meta name="twitter:description" content="High-ROI social media advertising and lead generation for real estate businesses." />
-  <meta name="twitter:image"       content="https://adconnect.co.ke/resources/og-image.jpg" />
+  <meta name="twitter:image"       content="https://www.adconnect.co.ke/resources/og-image.jpg" />
   <meta name="twitter:site"        content="@adconnect_ke" />
 
   <!-- ── Structured Data — Organization ── -->
@@ -37,8 +37,8 @@
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "AdConnect",
-    "url": "https://adconnect.co.ke",
-    "logo": "https://adconnect.co.ke/resources/logo.png",
+    "url": "https://www.adconnect.co.ke",
+    "logo": "https://www.adconnect.co.ke/resources/logo.png",
     "description": "AdConnect specializes in high-ROI digital marketing and social media advertising tailored for real estate businesses, plus web development, mobile applications, and UI/UX design.",
     "foundingDate": "2020",
     "areaServed": ["KE","ET","RW","UG","TZ"],
@@ -114,7 +114,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- ── Master Theme CSS ── -->
-  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="css/theme.css" />
 
   <style>
   /* ════════════════════════════════════════
@@ -150,9 +150,9 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(246,87,48,.18) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(74,188,79,.08) 0%, transparent 60%),
-      url(/resources/background-image.jpeg) center/cover no-repeat;
+      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(246,87,48,.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(74,188,79,.08) 0%, transparent 70%),
+      url(resources/background-image.jpeg) center/cover no-repeat;
     filter: brightness(.35);
     z-index: 0;
   }
@@ -205,7 +205,7 @@
 
   .hero-h1 {
     font-family: var(--font-display);
-    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-size: clamp(1.5.0rem, 4vw, 3rem);
     font-weight: 900;
     line-height: 1.05;
     color: var(--clr-text-primary);
@@ -325,7 +325,7 @@
   .hero-stats {
     position: absolute;
     right: 6%;
-    top: 50%;
+    top: 30%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
@@ -688,7 +688,7 @@
     border-radius: 50%;
     pointer-events: none;
   }
-  .testimonials-carousel-wrap { position: relative; overflow: hidden; margin-top: 56px; }
+  .testimonials-carousel-wrap { position: relative; overflow:hidden; margin-top: 56px; }
   .testimonials-track {
     display: flex;
     gap: 24px;
@@ -701,6 +701,7 @@
     padding: 32px;
     min-width: calc(50% - 12px);
     flex-shrink: 0;
+    width:fit-content;
     transition: var(--transition-base);
     position: relative;
     overflow: hidden;
@@ -709,7 +710,7 @@
   .tcard:hover { border-color: var(--clr-primary); }
   .tcard .stars { display: flex; gap: 4px; margin-bottom: 20px; }
   .tcard .stars i { color: #F5A623; font-size: .85rem; }
-  .tcard .quote { font-size: .95rem; line-height: 1.8; color: var(--clr-text-secondary); margin-bottom: 24px; font-style: italic; }
+  .tcard .quote { font-size: .95rem; line-height: 1.8; color: var(--clr-text-secondary); margin-bottom: 24px; font-style: italic;}
   .tcard .author { display: flex; align-items: center; gap: 14px; padding-top: 20px; border-top: 1px solid var(--clr-border); }
   .tcard .author-photo {
     width: 48px; height: 48px;
@@ -948,7 +949,7 @@
     background: rgba(0,0,0,.92);
     backdrop-filter: blur(12px);
     height: 0;
-    overflow: hidden;
+    overflow: scroll;
     transition: height .5s ease;
   }
   .appt-wrapper { max-width: 900px; margin: 0 auto; padding: 80px 20px 40px; }
@@ -1115,63 +1116,65 @@
     <nav class="container navbar">
       <div class="container-nav flex">
         <a href="/" class="navbar-logo" aria-label="AdConnect Home">
-          <img src="/resources/logo.png" alt="AdConnect Logo" />
+          <img src="resources/logo.png" alt="AdConnect Logo" />
         </a>
         <button id="navbarTogler" class="navbar-toggler" type="button" aria-label="Toggle navigation">
           <i class="fa fa-bars"></i>
         </button>
         <ul class="navbar-nav flex" role="navigation" aria-label="Main Navigation">
-          <li><a href="/index.html" class="nav-link active" aria-current="page">Home</a></li>
-          <li><a href="/pages/aboutus.html" class="nav-link">About Us</a></li>
-          <li><a href="/pages/blog.html" class="nav-link">Blog</a></li>
-          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
-          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li><a href="index.html" class="nav-link active" aria-current="page">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
           <li class="dropdown">
-            <a href="/pages/our-services.html" class="nav-link dropdown-toggle">
+            <a href="our-services.html" class="nav-link dropdown-toggle">
               Services <i class="fa fa-caret-down" aria-hidden="true"></i>
             </a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Social Media Advertising</a></li>
-              <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Analytics & Reporting</a></li>
-              <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item" role="menuitem">Web Design & Development</a></li>
-              <li><a href="/pages/our-services.html?courses-service=true" class="dropdown-item" role="menuitem">Courses</a></li>
+              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Social Media Advertising</a></li>
+              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Analytics & Reporting</a></li>
+              <li><a href="our-services.html?development-service=true" class="dropdown-item" role="menuitem">Web Design & Development</a></li>
+              <li><a href="our-services.html?courses-service=true" class="dropdown-item" role="menuitem">Courses</a></li>
             </ul>
           </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
         </ul>
-        <button id="searchBarBtn" class="btn btn-ghost btn-icon btn-sm" onclick="openSearch()" aria-label="Search" style="margin-left:var(--space-3);">
+        <!--button id="searchBarBtn" class="btn btn-ghost btn-icon btn-sm" onclick="openSearch()" aria-label="Search" style="margin-left:var(--space-3);">
           <i class="fa fa-search"></i>
-        </button>
+        </button-->
       </div>
     </nav>
 
     <!-- Sidebar -->
     <aside id="mySidePanel" class="sidepanel" role="complementary" aria-label="Mobile Navigation">
       <div class="sidebar flex">
-        <a href="/"><img src="/resources/logo.png" alt="AdConnect" /></a>
+        <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
         <button id="sidePanelCloseBtn" type="button" class="closebtn" aria-label="Close menu">
           <i class="fa fa-times"></i>
         </button>
       </div>
       <div>
         <ul role="navigation">
-          <li><a href="/index.html" class="nav-link active">Home</a></li>
-          <li><a href="/pages/aboutus.html" class="nav-link">About Us</a></li>
-          <li><a href="/pages/blog.html" class="nav-link">Blog</a></li>
-          <li><a href="/pages/portfolio.html" class="nav-link">Portfolio</a></li>
-          <li><a href="/pages/contact.html" class="nav-link">Contact</a></li>
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
           <li class="collapse-btn">
             <a href="javascript:void(0);" class="nav-link dropdown-trigger">
               Services <i class="fa fa-caret-down"></i>
             </a>
             <div class="collapse" id="services">
               <ul>
-                <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
-                <li><a href="/pages/our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
-                <li><a href="/pages/our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
-                <li><a href="/pages/our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
               </ul>
             </div>
           </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
         </ul>
       </div>
     </aside>
@@ -1321,7 +1324,7 @@
         <span class="section-label"><i class="fa fa-star"></i> Exclusive Services</span>
         <h2 class="section-title" id="services-title">Everything You Need<br />to Win Online</h2>
       </div>
-      <a href="/pages/our-services.html" class="btn btn-ghost btn-sm">View All Services <i class="fa fa-arrow-right"></i></a>
+      <a href="our-services.html" class="btn btn-ghost btn-sm">View All Services <i class="fa fa-arrow-right"></i></a>
     </div>
     <!-- Dynamic services grid populated from API -->
     <div class="services-grid" id="servicesGrid">
@@ -1330,37 +1333,37 @@
         <div class="svc-icon"><i class="fa fa-bullhorn"></i></div>
         <h4>Social Media Advertising</h4>
         <p>Targeted campaigns on Facebook, Instagram, TikTok & more — designed to attract qualified real estate buyers and sellers.</p>
-        <a href="/pages/our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
+        <a href="our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="service-card">
         <div class="svc-icon"><i class="fa fa-bar-chart"></i></div>
         <h4>Analytics & Reporting</h4>
         <p>In-depth analytics to track campaign performance, measure ROI, and make data-driven decisions with confidence.</p>
-        <a href="/pages/our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
+        <a href="our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="service-card">
         <div class="svc-icon"><i class="fa fa-code"></i></div>
         <h4>Web Design & Development</h4>
         <p>High-converting real estate websites built with modern frameworks — fast, mobile-first and SEO-optimized.</p>
-        <a href="/pages/our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
+        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="service-card">
         <div class="svc-icon"><i class="fa fa-mobile"></i></div>
         <h4>Android Development</h4>
         <p>Native Android applications built with Kotlin & Java — intuitive, performant apps for your business needs.</p>
-        <a href="/pages/our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
+        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="service-card">
         <div class="svc-icon"><i class="fa fa-paint-brush"></i></div>
         <h4>UI/UX Design</h4>
         <p>Beautiful, user-centered Figma designs that convert visitors into leads — crafted for real estate audiences.</p>
-        <a href="/pages/our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
+        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="service-card">
         <div class="svc-icon"><i class="fa fa-graduation-cap"></i></div>
         <h4>Marketing Courses</h4>
         <p>Learn proven strategies through our structured digital marketing programs — tailored for real estate professionals.</p>
-        <a href="/pages/our-services.html?courses-service=true" class="arrow-link">Coming Soon <i class="fa fa-lock"></i></a>
+        <a href="our-services.html?courses-service=true" class="arrow-link">Coming Soon <i class="fa fa-lock"></i></a>
       </div>
     </div>
   </div>
@@ -1409,7 +1412,7 @@
 
       <!-- Right: Thumbnail -->
       <div class="video-thumb-wrapper" onclick="openLeadCaptureSection()" role="button" aria-label="Watch free strategy video" tabindex="0">
-        <img id="videoThumbnail" src="/resources/background-image.jpeg" alt="Free Real Estate Marketing Strategy Video" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+        <img id="videoThumbnail" src="resources/background-image.jpeg" alt="Free Real Estate Marketing Strategy Video" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
         <div class="video-play-overlay">
           <div class="big-play-btn"><i class="fa fa-play" style="margin-left:3px;"></i></div>
           <div class="video-play-label">Watch Free Strategy</div>
@@ -1508,7 +1511,7 @@
       <button onclick="openLeadCaptureSection()" class="btn-hero-primary">
         <i class="fa fa-calendar"></i> Book Free Consultation
       </button>
-      <a href="/pages/contact.html" class="btn-hero-outline">
+      <a href="contact.html" class="btn-hero-outline">
         <i class="fa fa-envelope"></i> Send Us a Message
       </a>
     </div>
@@ -1518,40 +1521,42 @@
 <!-- ════════════════ FOOTER ════════════════ -->
 <footer id="footerSection" class="footer" role="contentinfo">
   <div class="footer-container">
-    <div class="footer-logo"><img src="/resources/logo.png" alt="AdConnect" /></div>
+    <div class="footer-logo"><img src="resources/logo.png" alt="AdConnect" /></div>
     <div class="top-items-footer">
       <div class="consultation">
-        <i class="fa fa-phone" style="font-size:1.5rem;color:var(--clr-primary);margin-bottom:var(--space-3);"></i>
+        <!--i class="fa fa-phone" style="font-size:1.5rem;color:var(--clr-primary);margin-bottom:var(--space-3);"></i-->
+        <img src="resources/help.svg.svg" alt="" class="client-icon" style="margin-top: 30px; margin-bottom:var(--space-3);">
         <p style="font-weight:600;color:var(--clr-text-primary);">Need Help? Call Us!</p>
         <p style="font-size:.82rem;margin-top:4px;">+254 790 064 130</p>
-        <button id="footerConsultationBtn" class="btn_hover1 small-button" style="margin-top:12px;">CONSULTATION</button>
+        <button id="footerConsultationBtn" class="btn_hover1 small-button" style="margin-top:12px;">Get Consultation</button>
       </div>
       <div class="company-info">
         <h5>Company</h5>
         <ul>
-          <li><a href="/pages/aboutus.html">About Us</a></li>
-          <li><a href="/pages/contact.html">Contact Us</a></li>
-          <li><a href="/?privacy-policy=true">Privacy Policy</a></li>
-          <li><a href="/pages/blog.html">Blog Posts</a></li>
-          <li><a href="/pages/portfolio.html">Portfolio</a></li>
+          <li><a href="aboutus.html">About Us</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="?privacy-policy=true">Privacy Policy</a></li>
+          <li><a href="blog.html">Blog Posts</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="careers.html">Careers</a></li>
         </ul>
       </div>
       <div class="services">
         <h5>Our Services</h5>
         <ul>
-          <li><a href="/pages/our-services.html?adverts-service=true">Social Media Management</a></li>
-          <li><a href="/pages/our-services.html?adverts-service=true">Ad Creative Design</a></li>
-          <li><a href="/pages/our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
-          <li><a href="/pages/our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
-          <li><a href="/pages/our-services.html?development-service=true">Web Design & Development</a></li>
-          <li><a href="/pages/our-services.html?development-service=true">Mobile Development (Android)</a></li>
+          <li><a href="our-services.html?adverts-service=true">Social Media Management</a></li>
+          <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
+          <li><a href="our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
+          <li><a href="our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
+          <li><a href="our-services.html?development-service=true">Web Design & Development</a></li>
+          <li><a href="our-services.html?development-service=true">Mobile Development (Android)</a></li>
         </ul>
       </div>
       <div class="newsletter">
         <h5>Newsletter</h5>
         <input type="email" id="newsletterEmail" placeholder="your@email.com" aria-label="Newsletter email" />
         <button onclick="subscribeNewsletter()" class="btn_hover1 small-button" style="margin-top:8px;width:100%;justify-content:center;">Subscribe</button>
-        <a href="/?value-video-request=true" class="btn_hover1 small-button" style="margin-top:8px;">Watch Free Video</a>
+        <a href="?value-video-request=true" class="btn_hover1 small-button" style="margin-top:8px; width:100%;justify-content:center;">Watch Free Video</a>
       </div>
       <div class="footer-faq-section">
         <h5>FAQs</h5>
@@ -1569,7 +1574,7 @@
         <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
       </div>
       <p class="footer-text-copyright">
-        Copyright © <span id="current-year"></span> <a href="/index.html">AdConnect</a>. All rights reserved.
+        Copyright © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
       </p>
     </div>
   </div>
@@ -1633,7 +1638,7 @@
         <h2 style="font-size:1.5rem;"><span style="color:var(--clr-accent);">🎉</span> Your Free Video is Ready!</h2>
         <p style="font-size:.85rem;margin-top:4px;">Exclusive real estate marketing strategies inside.</p>
       </div>
-      <img src="/resources/logo.png" alt="AdConnect" style="height:36px;border-radius:var(--radius-sm);" />
+      <img src="resources/logo.png" alt="AdConnect" style="height:36px;border-radius:var(--radius-sm);" />
     </div>
     <div style="border:1.5px solid var(--clr-primary);border-radius:var(--radius-lg);overflow:hidden;background:var(--clr-surface-2);">
       <video id="valueVideoView" controls autoplay muted playsinline style="width:100%;display:block;max-height:400px;" preload="metadata">
@@ -1744,7 +1749,7 @@
     <div class="appt-two-col">
       <!-- Profile -->
       <div class="appt-profile">
-        <img id="appointeeIcon" src="/resources/misgina.png" alt="Misgina Fitwi — Digital Marketing Specialist" loading="lazy" />
+        <img id="appointeeIcon" src="resources/misgina.png" alt="Misgina Fitwi — Digital Marketing Specialist" loading="lazy" />
         <div class="pname">Misgina Fitwi</div>
         <div class="ptitle">Digital Marketing Specialist</div>
         <div class="pschool">BSc Digital Marketing · Oslo Kristiania University</div>
@@ -1872,7 +1877,7 @@
       <h2 style="font-size:1.4rem;">Privacy Policy</h2>
     </div>
     <p style="font-size:.75rem;color:var(--clr-primary);font-weight:600;margin-bottom:20px;">Effective: December 20th, 2024</p>
-    <p>At <a href="/index.html">AdConnect</a>, your privacy is a priority. This policy explains how we collect, use, and protect your personal data when you engage with our services.</p>
+    <p>At <a href="index.html">AdConnect</a>, your privacy is a priority. This policy explains how we collect, use, and protect your personal data when you engage with our services.</p>
     <h6>1. Information We Collect</h6>
     <p>We collect <b>Personal Information</b> (name, email, phone), <b>Usage Data</b> (IP, browser, browsing behaviour via cookies, Google Analytics, Facebook Pixel), and <b>Device Information</b> (device type, location if shared).</p>
     <h6>2. How We Use Your Data</h6>
@@ -1886,11 +1891,11 @@
     <h6>6. Your Rights</h6>
     <p>You have the right to access, correct, delete your data, and opt out of marketing communications at any time by contacting us at <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a>.</p>
     <h6>7. Contact Us</h6>
-    <p>Questions about this policy? <a href="/pages/contact.html">Contact AdConnect</a> or email <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a>.</p>
+    <p>Questions about this policy? <a href="contact.html">Contact AdConnect</a> or email <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a>.</p>
   </div>
 </section>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
-<script src="/scripts/main.js" defer></script>
+<script src="scripts/main.js" defer></script>
 </body>
 </html>

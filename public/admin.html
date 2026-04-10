@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard — AdConnect</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
 
   <!-- Theme CSS (combined) -->
-  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="css/theme.css" />
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -18,11 +18,21 @@
 </head>
 <body>
 
+  <!-- Mobile wall — shown on phones only, hidden on tablets/desktops -->
+<div class="admin-mobile-wall" aria-label="Desktop required">
+  <img src="resources/logo.png" alt="AdConnect" style="height:44px;border-radius:8px;" />
+  <div class="wall-icon"><i class="fa fa-desktop"></i></div>
+  <h2>Tablet or Desktop Required</h2>
+  <p>The AdConnect admin panel is designed for screens 768 px and wider. Please open it on a tablet, laptop, or desktop computer.</p>
+  <a href="index.html"><i class="fa fa-home"></i> Back to Website</a>
+</div>
+
+<div class="admin-shell"></div>
 <!-- ══════════════ LOGIN PAGE ══════════════ -->
 <section id="login-page">
   <form id="login-form" onsubmit="handleLogin(event)">
     <div class="login-header">
-      <img src="/resources/logo.png" alt="AdConnect" style="height:50px;margin:0 auto var(--space-4);display:block;border-radius:var(--radius-md);" />
+      <img src="resources/logo.png" alt="AdConnect" style="height:50px;margin:0 auto var(--space-4);display:block;border-radius:var(--radius-md);" />
       <h2>Welcome Back</h2>
       <p>Sign in to your dashboard</p>
     </div>
@@ -53,7 +63,7 @@
   <!-- Header -->
   <header id="admin-header">
     <div class="logo-area">
-      <a href="/"><img src="/resources/logo.png" alt="AdConnect" /></a>
+      <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
       <span class="dashboard-label">Admin Panel</span>
     </div>
     <div class="user-area">
@@ -85,6 +95,21 @@
       <li id="nav-testimonials"><span onclick="navigate('testimonials')"><i class="fa fa-quote-left"></i> Testimonials</span></li>
     </ul>
 
+    <span class="nav-section-label">Recruitment</span>
+<ul>
+  <li id="nav-careers">
+    <span onclick="navigate('careers')">
+      <i class="fa fa-briefcase"></i> Job Listings
+    </span>
+  </li>
+  <li id="nav-career-apps">
+    <span onclick="navigate('career-apps')">
+      <i class="fa fa-file-text-o"></i> Applications
+      <span id="pendingAppsBadge" style="display:none;background:var(--clr-primary);color:#fff;font-size:.65rem;padding:1px 6px;border-radius:999px;margin-left:4px;"></span>
+    </span>
+  </li>
+</ul>
+
     <span class="nav-section-label" id="crm-section-label">CRM</span>
     <ul id="crm-nav">
       <li id="nav-leads"><span onclick="navigate('leads')"><i class="fa fa-users"></i> Leads</span></li>
@@ -105,6 +130,166 @@
 
   <!-- Main Content -->
   <main class="admin-main" id="adminMain">
+
+    <!-- ── JOB LISTINGS PANEL ── -->
+<section id="panel-careers" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-briefcase" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Job Listings</h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="fetchCareerListings()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-accent btn-sm" onclick="openJobForm()"><i class="fa fa-plus"></i> New Job</button>
+    </div>
+  </div>
+  <div class="content-panel">
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Title</th><th>Dept</th><th>Type</th><th>Mode</th><th>Deadline</th><th>Tags</th><th>Status</th><th>Apps</th><th>Actions</th></tr></thead>
+        <tbody id="careerListingsTbody"><tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── APPLICATIONS PANEL ── -->
+<section id="panel-career-apps" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-file-text-o" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Career Applications</h2>
+    <div class="panel-actions">
+      <select id="appJobFilter" class="input-field" style="width:200px;height:36px;" onchange="fetchCareerApplications()">
+        <option value="">All Jobs</option>
+      </select>
+      <select id="appStatusFilter" class="input-field" style="width:150px;height:36px;" onchange="fetchCareerApplications()">
+        <option value="">All Statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="REVIEWING">Reviewing</option>
+        <option value="SHORTLISTED">Shortlisted</option>
+        <option value="INTERVIEW">Interview</option>
+        <option value="HIRED">Hired</option>
+        <option value="REJECTED">Rejected</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="fetchCareerApplications()"><i class="fa fa-refresh"></i></button>
+    </div>
+  </div>
+  <div class="content-panel">
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Position</th><th>Experience</th><th>Status</th><th>CV</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="careerAppsTbody"><tr><td colspan="9" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── JOB FORM MODAL ── -->
+<section id="jobFormPopup" class="background-tint-black">
+  <button onclick="closeModal('jobFormPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:700px;">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="jobFormTitle">Create Job Listing</h3>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div style="grid-column:1/-1;"><label class="label">Job Title *</label><input id="jTitle" type="text" class="input-field" placeholder="Digital Marketing Specialist" /></div>
+        <div><label class="label">Department *</label>
+          <select id="jDept" class="input-field">
+            <option value="">Select…</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Design">Design</option>
+            <option value="Sales">Sales</option>
+            <option value="Operations">Operations</option>
+            <option value="Finance">Finance</option>
+          </select>
+        </div>
+        <div><label class="label">Employment Type</label>
+          <select id="jType" class="input-field">
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Contract">Contract</option>
+            <option value="Internship">Internship</option>
+          </select>
+        </div>
+        <div><label class="label">Work Mode</label>
+          <select id="jMode" class="input-field">
+            <option value="On-site">On-site</option>
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div><label class="label">Location</label><input id="jLocation" type="text" class="input-field" placeholder="Nairobi, Kenya" /></div>
+        <div><label class="label">Salary Range</label><input id="jSalary" type="text" class="input-field" placeholder="KES 80,000 – 120,000/mo" /></div>
+        <div><label class="label">Application Deadline</label><input id="jDeadline" type="date" class="input-field" /></div>
+        <div><label class="label">Status</label>
+          <select id="jStatus" class="input-field">
+            <option value="OPEN">Open</option>
+            <option value="PAUSED">Paused</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label class="label">Tags (comma-separated) <span style="font-size:.68rem;color:var(--clr-text-muted);font-weight:400;">e.g. New, Urgent, Hot, Remote</span></label>
+          <input id="jTags" type="text" class="input-field" placeholder="New, Urgent" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;grid-column:1/-1;">
+          <input type="checkbox" id="jPinned" style="accent-color:var(--clr-primary);width:16px;height:16px;" />
+          <label for="jPinned" style="font-size:.85rem;color:var(--clr-text-secondary);cursor:pointer;">Pin this job to the top of the listings</label>
+        </div>
+        <div style="grid-column:1/-1;"><label class="label">Job Description *</label><textarea id="jDesc" class="input-field" style="height:120px;" placeholder="Describe the role, responsibilities, and what success looks like…"></textarea></div>
+        <div style="grid-column:1/-1;"><label class="label">Requirements (one per line)</label><textarea id="jReqs" class="input-field" style="height:100px;" placeholder="3+ years of experience in digital marketing&#10;Strong knowledge of Facebook Ads Manager&#10;…"></textarea></div>
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-6);">
+        <button onclick="saveJobListing()" class="btn btn-accent" style="flex:1;">Save Listing</button>
+        <button onclick="closeModal('jobFormPopup')" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── APPLICATION DETAIL MODAL ── -->
+<section id="appDetailPopup" class="background-tint-black">
+  <button onclick="closeModal('appDetailPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:680px;">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title">Application Detail</h3>
+      </div>
+      <div id="appDetailContent"></div>
+
+      <!-- Interview Invite Form -->
+      <div id="inviteForm" style="display:none;margin-top:var(--space-6);padding-top:var(--space-6);border-top:1px solid var(--clr-border);">
+        <h4 style="font-family:var(--font-display);font-size:.95rem;margin-bottom:var(--space-4);color:var(--clr-primary);">
+          <i class="fa fa-calendar"></i> Schedule Interview Invitation
+        </h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div><label class="label">Interview Date *</label><input id="ivDate" type="date" class="input-field" /></div>
+          <div><label class="label">Interview Time *</label><input id="ivTime" type="time" class="input-field" /></div>
+          <div><label class="label">Interview Type</label>
+            <select id="ivType" class="input-field">
+              <option value="Online">Online (Video Call)</option>
+              <option value="In-person">In-person</option>
+              <option value="Phone">Phone Call</option>
+            </select>
+          </div>
+          <div><label class="label">Location (if in-person)</label><input id="ivLocation" type="text" class="input-field" placeholder="AdConnect Office, Nairobi" /></div>
+          <div style="grid-column:1/-1;"><label class="label">Meeting / Video Link</label><input id="ivLink" type="url" class="input-field" placeholder="https://meet.google.com/…" /></div>
+          <div style="grid-column:1/-1;"><label class="label">Additional Notes for Candidate</label><textarea id="ivNotes" class="input-field" style="height:80px;" placeholder="Please bring your portfolio, ID, etc."></textarea></div>
+        </div>
+        <button id="sendInviteBtn" onclick="sendInterviewInvite()" class="btn btn-accent" style="width:100%;margin-top:var(--space-4);">
+          <i class="fa fa-paper-plane"></i> Send Interview Invitation
+        </button>
+      </div>
+
+      <!-- Admin Notes -->
+      <div style="margin-top:var(--space-5);padding-top:var(--space-5);border-top:1px solid var(--clr-border);">
+        <label class="label">Admin Notes (internal only)</label>
+        <textarea id="appNotesInput" class="input-field" style="height:80px;margin-top:6px;" placeholder="Internal notes about this applicant…"></textarea>
+        <button onclick="saveAppNotes()" class="btn btn-secondary btn-sm" style="margin-top:8px;"><i class="fa fa-save"></i> Save Notes</button>
+      </div>
+    </div>
+  </div>
+</section>
     <!-- ── HOMEPAGE CMS PANEL ── -->
 <section id="panel-homepage" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
   <div class="panel-header">
@@ -211,7 +396,7 @@
 </section>
 
 <!-- ── TESTIMONIALS PANEL ── -->
-<section id="panel-testimonials" class="panel" style="display:none;">
+<section id="panel-testimonials" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
   <div class="panel-header">
     <h2 class="panel-title"><i class="fa fa-quote-left" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Testimonials</h2>
     <div class="panel-actions">
@@ -230,7 +415,7 @@
 </section>
 
     <!-- ── DASHBOARD PANEL ── -->
-    <section id="panel-dashboard" class="panel">
+    <section id="panel-dashboard" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-th-large" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Dashboard</h2>
         <span id="dashboardDate" style="font-size:.82rem;color:var(--clr-text-muted);"></span>
@@ -337,7 +522,7 @@
 </section>
 
     <!-- ── ANALYTICS PANEL ── -->
-    <section id="panel-analytics" class="panel" style="display:none;">
+    <section id="panel-analytics" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-bar-chart" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Analytics</h2>
         <div style="display:flex;gap:var(--space-3);">
@@ -368,7 +553,7 @@
     </section>
 
     <!-- ── CONTENT MANAGEMENT PANEL ── -->
-    <section id="panel-content" class="panel" style="display:none;">
+    <section id="panel-content" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-pencil-square-o" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Content Management</h2>
         <button class="btn btn-accent btn-sm" onclick="openAboutRegisterPopup()"><i class="fa fa-plus"></i> Add Profile</button>
@@ -404,7 +589,7 @@
     </section>
 
     <!-- ── BLOG PANEL ── -->
-    <section id="panel-blog" class="panel" style="display:none;">
+    <section id="panel-blog" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-rss" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Blog Posts</h2>
         <button class="btn btn-accent btn-sm" id="btn-new-blog" onclick="openBlogForm()"><i class="fa fa-plus"></i> New Post</button>
@@ -434,7 +619,7 @@
     </section>
 
     <!-- ── PORTFOLIO PANEL ── -->
-    <section id="panel-portfolio" class="panel" style="display:none;">
+    <section id="panel-portfolio" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-briefcase" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Portfolio Projects</h2>
         <button class="btn btn-accent btn-sm" onclick="openProjectForm()"><i class="fa fa-plus"></i> Add Project</button>
@@ -450,7 +635,7 @@
     </section>
 
     <!-- ── LEADS PANEL ── -->
-    <section id="panel-leads" class="panel" style="display:none;">
+    <section id="panel-leads" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-users" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Leads</h2>
         <div class="panel-actions">
@@ -478,7 +663,7 @@
     </section>
 
     <!-- ── APPOINTMENTS PANEL ── -->
-    <section id="panel-appointments" class="panel" style="display:none;">
+    <section id="panel-appointments" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-calendar" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Appointments</h2>
         <div class="panel-actions">
@@ -505,7 +690,7 @@
     </section>
 
     <!-- ── APPLICATIONS PANEL ── -->
-    <section id="panel-applications" class="panel" style="display:none;">
+    <section id="panel-applications" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-file-text" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Applications</h2>
         <div class="panel-actions">
@@ -532,7 +717,7 @@
     </section>
 
     <!-- ── USERS PANEL (SUPER_ADMIN only) ── -->
-    <section id="panel-users" class="panel" style="display:none;">
+    <section id="panel-users" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-user-circle" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>User Management</h2>
         <div class="panel-actions">
@@ -555,7 +740,7 @@
     </section>
 
     <!-- ── SETTINGS PANEL ── -->
-    <section id="panel-settings" class="panel" style="display:none;">
+    <section id="panel-settings" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-cog" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Settings</h2>
       </div>
@@ -842,7 +1027,8 @@
 <footer id="admin-footer" style="position:fixed;bottom:0;left:var(--sidebar-w);right:0;height:36px;background:var(--clr-surface-2);border-top:1px solid var(--clr-border);display:flex;align-items:center;padding:0 var(--space-5);z-index:300;transition:left .3s ease;">
   <p id="footerText" style="font-size:.75rem;color:var(--clr-text-muted);"></p>
 </footer>
+</div>
 
-<script src="/scripts/admin.js" defer></script>
+<script src="scripts/admin.js" defer></script>
 </body>
 </html>

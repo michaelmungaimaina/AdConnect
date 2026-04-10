@@ -6,13 +6,13 @@
 'use strict';
 
 // ── Config ────────────────────────────────────────────────────
-const DOMAIN = 'https://adconnect.co.ke/api/';
-// const DOMAIN = 'http://127.0.0.1:3000/api/';
+//const DOMAIN = 'https://adconnect.co.ke/api/';
+ const DOMAIN = 'http://localhost:3000/api/';
 
 // ── Role Permissions ──────────────────────────────────────────
 const ROLE_PERMISSIONS = {
-  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials'],
-  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials'],
+  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials','careers', 'career-apps'],
+  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials','careers', 'career-apps'],
   EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials'],
   GEN_USER:    ['dashboard'],
 };
@@ -25,6 +25,7 @@ let currentPanel = 'dashboard';
 let editIndex = null, aboutIndex = null, appointmentIndex = null;
 let editFlags = { isTitle:false, isIntro:false, isMission:false, isExperience:false };
 let charts = {};
+let careerListings = [], careerApplications = [], currentAppId = null, editJobId = null;
 
 // ── DOM Refs ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -119,12 +120,277 @@ async function handleLogin(e) {
     // Show admin
     $('login-page').style.display = 'none';
     $('adminHero').style.display  = 'block';
+    console.log(`Logged in as ${data.username} with role ${session.role}`);
     navigate('dashboard');
     toast(`Welcome back, ${data.username}!`);
   } catch (err) {
     showErr('Network error — please try again', errEl);
   } finally { hideLoader(); }
 }
+
+// ── Job Listings ─────────────────────────────────────────────
+async function fetchCareerListings() {
+  showLoader('Loading job listings…');
+  try {
+    const res   = await fetch(`${DOMAIN}careers`);
+    careerListings = res.ok ? await res.json() : [];
+    renderCareerListings();
+    populateJobFilter();
+  } finally { hideLoader(); }
+}
+
+function renderCareerListings() {
+  const tbody = document.getElementById('careerListingsTbody');
+  if (!tbody) return;
+  if (!careerListings.length) { tbody.innerHTML = emptyRow(9,'No job listings yet'); return; }
+  tbody.innerHTML = careerListings.map((j,i) => `
+    <tr>
+      <td><strong>${esc(j.title)}</strong> ${j.pinned?'<span class="badge badge-warning" style="font-size:.62rem;">Pinned</span>':''}</td>
+      <td>${esc(j.department)}</td>
+      <td><span class="badge badge-default">${esc(j.type)}</span></td>
+      <td><span class="badge ${modeB(j.mode)}">${esc(j.mode)}</span></td>
+      <td style="font-size:.78rem;font-family:var(--font-mono);">${j.deadline ? formatDate(j.deadline) : '—'}</td>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${(j.tags||[]).map(t=>`<span class="badge badge-info" style="font-size:.65rem;">${esc(t)}</span>`).join('')}
+        </div>
+      </td>
+      <td>${jobStatusBadge(j.status)}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="viewAppsForJob('${j.id}','${esc(j.title)}')" style="font-size:.75rem;">
+          <i class="fa fa-users"></i> View
+        </button>
+      </td>
+      <td class="actions-cell">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editJobListing(${i})"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteJobListing('${j.id}')"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+const modeB = m => ({ 'Remote':'badge-success', 'On-site':'badge-warning', 'Hybrid':'badge-info' }[m] || 'badge-default');
+const jobStatusBadge = s => ({ 'OPEN':'badge-success','PAUSED':'badge-warning','CLOSED':'badge-error' }[s] ? `<span class="badge ${{'OPEN':'badge-success','PAUSED':'badge-warning','CLOSED':'badge-error'}[s]}">${esc(s)}</span>` : `<span class="badge badge-default">${esc(s)}</span>`);
+
+function openJobForm() { editJobId=null; document.getElementById('jobFormTitle').textContent='Create Job Listing'; clearJobForm(); openModal('jobFormPopup'); }
+
+function editJobListing(i) {
+  const j = careerListings[i]; editJobId = j.id;
+  document.getElementById('jobFormTitle').textContent = 'Edit Job Listing';
+  setValue('jTitle',    j.title);   setValue('jDept',     j.department);
+  setValue('jType',     j.type);    setValue('jMode',     j.mode);
+  setValue('jLocation', j.location||''); setValue('jSalary', j.salary||'');
+  setValue('jDeadline', j.deadline||''); setValue('jStatus', j.status);
+  setValue('jDesc', j.description||''); setValue('jReqs', j.requirements||'');
+  setValue('jTags', (j.tags||[]).join(', '));
+  document.getElementById('jPinned').checked = !!j.pinned;
+  openModal('jobFormPopup');
+}
+
+function clearJobForm() {
+  ['jTitle','jLocation','jSalary','jDeadline','jDesc','jReqs','jTags'].forEach(id => setValue(id,''));
+  ['jDept','jType','jMode','jStatus'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  document.getElementById('jPinned').checked = false;
+}
+
+async function saveJobListing() {
+  const title = getValue('jTitle'), dept = getValue('jDept'), desc = getValue('jDesc');
+  if (!title || !dept || !desc) { toast('Title, department, and description are required','error'); return; }
+  const body = {
+    title, department:dept, type:getValue('jType'), mode:getValue('jMode'),
+    location:getValue('jLocation')||'Nairobi', salary:getValue('jSalary'),
+    description:desc, requirements:getValue('jReqs'), deadline:getValue('jDeadline'),
+    status:getValue('jStatus')||'OPEN',
+    pinned:document.getElementById('jPinned').checked,
+    tags: getValue('jTags').split(',').map(t=>t.trim()).filter(Boolean),
+  };
+  showLoader('Saving…');
+  try {
+    const url    = editJobId ? `${DOMAIN}careers/${editJobId}` : `${DOMAIN}careers`;
+    const method = editJobId ? 'PUT' : 'POST';
+    const res    = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) { toast(editJobId?'Job updated!':'Job created!'); closeModal('jobFormPopup'); fetchCareerListings(); }
+    else toast('Save failed','error');
+  } finally { hideLoader(); editJobId=null; }
+}
+
+async function deleteJobListing(id) {
+  if (!confirm('Delete this job listing? Applications will remain.')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}careers/${id}`, {method:'DELETE'});
+    toast('Deleted'); fetchCareerListings();
+  } finally { hideLoader(); }
+}
+
+// ── Career Applications ──────────────────────────────────────
+async function fetchCareerApplications() {
+  showLoader('Loading applications…');
+  try {
+    const jobId  = document.getElementById('appJobFilter')?.value  || '';
+    const status = document.getElementById('appStatusFilter')?.value || '';
+    let url = `${DOMAIN}career-applications`;
+    const params = [];
+    if (jobId)  params.push(`jobId=${jobId}`);
+    if (status) params.push(`status=${status}`);
+    if (params.length) url += '?' + params.join('&');
+
+    const res = await fetch(url);
+    careerApplications = res.ok ? await res.json() : [];
+    renderCareerApplications();
+    updatePendingBadge();
+  } finally { hideLoader(); }
+}
+
+function populateJobFilter() {
+  const sel = document.getElementById('appJobFilter');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Jobs</option>' +
+    careerListings.map(j => `<option value="${j.id}" ${j.id===cur?'selected':''}>${esc(j.title)}</option>`).join('');
+}
+
+function viewAppsForJob(jobId, jobTitle) {
+  navigate('career-apps');
+  setTimeout(() => {
+    const sel = document.getElementById('appJobFilter');
+    if (sel) { sel.value = jobId; fetchCareerApplications(); }
+  }, 200);
+}
+
+function renderCareerApplications() {
+  const tbody = document.getElementById('careerAppsTbody');
+  if (!tbody) return;
+  if (!careerApplications.length) { tbody.innerHTML = emptyRow(9,'No applications found'); return; }
+  tbody.innerHTML = careerApplications.map((a,i) => `
+    <tr style="${a.status==='PENDING'?'font-weight:600;':''}">
+      <td><strong>${esc(a.first_name)} ${esc(a.last_name)}</strong></td>
+      <td><a href="mailto:${esc(a.email)}" style="color:var(--clr-primary);">${esc(a.email)}</a></td>
+      <td>${esc(a.phone||'—')}</td>
+      <td style="font-size:.8rem;">${esc(a.job_title||'—')}</td>
+      <td><span class="badge badge-default">${esc(a.experience||'—')}</span></td>
+      <td>${appStatusBadge(a.status)}</td>
+      <td>
+        ${a.cv_filename ? `<a href="${DOMAIN}cvs/${esc(a.cv_filename)}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:.75rem;"><i class="fa fa-file-pdf-o" style="color:var(--clr-error);"></i> Download</a>` : '—'}
+      </td>
+      <td style="font-size:.78rem;color:var(--clr-text-muted);">${formatDate(a.created_at)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-primary btn-sm btn-icon" onclick="viewApplication('${a.id}')" title="View"><i class="fa fa-eye"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCareerApp('${a.id}')" title="Delete"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function updatePendingBadge() {
+  const count = careerApplications.filter(a => a.status==='PENDING').length;
+  const b = document.getElementById('pendingAppsBadge');
+  if (b) { b.textContent = count; b.style.display = count > 0 ? 'inline' : 'none'; }
+}
+
+const appStatusBadge = s => {
+  const map = { PENDING:'badge-warning', REVIEWING:'badge-info', SHORTLISTED:'badge-info',
+                INTERVIEW:'badge-success', HIRED:'badge-success', REJECTED:'badge-error' };
+  return `<span class="badge ${map[s]||'badge-default'}">${esc(s)}</span>`;
+};
+
+// ── View Application Detail ───────────────────────────────────
+async function viewApplication(id) {
+  showLoader('Loading application…');
+  try {
+    const res = await fetch(`${DOMAIN}career-applications/${id}`);
+    const a   = await res.json();
+    currentAppId = id;
+
+    const detail = document.getElementById('appDetailContent');
+    detail.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div>
+          <div class="label">Applicant</div>
+          <div style="font-weight:700;font-size:1rem;color:var(--clr-text-primary);">${esc(a.first_name)} ${esc(a.last_name)}</div>
+        </div>
+        <div><div class="label">Status</div>${appStatusBadge(a.status)}</div>
+        <div><div class="label">Email</div><a href="mailto:${esc(a.email)}" style="color:var(--clr-primary);">${esc(a.email)}</a></div>
+        <div><div class="label">Phone</div><a href="tel:${esc(a.phone||'')}" style="color:var(--clr-primary);">${esc(a.phone||'—')}</a></div>
+        <div><div class="label">Applied For</div><span style="color:var(--clr-primary);font-weight:600;">${esc(a.job_title)}</span></div>
+        <div><div class="label">Experience</div>${esc(a.experience||'—')}</div>
+        ${a.current_role ? `<div style="grid-column:1/-1;"><div class="label">Current / Last Role</div>${esc(a.current_role)}</div>` : ''}
+        ${a.portfolio    ? `<div style="grid-column:1/-1;"><div class="label">Portfolio / LinkedIn</div><a href="${esc(a.portfolio)}" target="_blank" style="color:var(--clr-primary);">${esc(a.portfolio)}</a></div>` : ''}
+        <div style="grid-column:1/-1;">
+          <div class="label" style="margin-bottom:8px;">Motivation</div>
+          <div style="background:var(--clr-surface-2);border:1px solid var(--clr-border);border-radius:var(--radius-lg);padding:16px;font-size:.875rem;line-height:1.8;white-space:pre-wrap;">${esc(a.motivation||'—')}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;">
+        ${a.cv_url ? `<a href="${a.cv_url}" target="_blank" class="btn btn-ghost btn-sm"><i class="fa fa-file-pdf-o" style="color:var(--clr-error);"></i> Download CV</a>` : ''}
+        <select id="appStatusSelect" class="input-field" style="width:160px;height:36px;" onchange="updateAppStatus(this.value)">
+          ${['PENDING','REVIEWING','SHORTLISTED','INTERVIEW','HIRED','REJECTED'].map(s => `<option value="${s}" ${s===a.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <button onclick="document.getElementById('inviteForm').style.display=document.getElementById('inviteForm').style.display==='none'?'block':'none'" class="btn btn-accent btn-sm">
+          <i class="fa fa-calendar-plus-o"></i> Invite to Interview
+        </button>
+      </div>`;
+
+    // Pre-fill notes
+    setValue('appNotesInput', a.admin_notes||'');
+
+    // Pre-fill invite date
+    setValue('ivDate', new Date().toISOString().slice(0,10));
+
+    openModal('appDetailPopup');
+  } catch (e) { toast('Failed to load application','error'); }
+  finally { hideLoader(); }
+}
+
+async function updateAppStatus(status) {
+  showLoader('Updating…');
+  try {
+    const res = await fetch(`${DOMAIN}career-applications/${currentAppId}/status`, {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}),
+    });
+    if (res.ok) { toast(`Status updated to ${status}`); const a = careerApplications.find(x=>x.id===currentAppId); if(a) a.status=status; renderCareerApplications(); }
+    else toast('Update failed','error');
+  } finally { hideLoader(); }
+}
+
+async function saveAppNotes() {
+  const notes = getValue('appNotesInput');
+  showLoader('Saving notes…');
+  try {
+    const res = await fetch(`${DOMAIN}career-applications/${currentAppId}/notes`, {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({notes}),
+    });
+    if (res.ok) toast('Notes saved!'); else toast('Save failed','error');
+  } finally { hideLoader(); }
+}
+
+async function sendInterviewInvite() {
+  const btn = document.getElementById('sendInviteBtn');
+  const date = getValue('ivDate'), time = getValue('ivTime');
+  if (!date || !time) { toast('Interview date and time are required','error'); return; }
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending…';
+  try {
+    const res = await fetch(`${DOMAIN}career-applications/${currentAppId}/invite`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        interviewDate: date, interviewTime: time,
+        interviewType: getValue('ivType'), interviewLink: getValue('ivLink'),
+        interviewLocation: getValue('ivLocation'), interviewNotes: getValue('ivNotes'),
+      }),
+    });
+    const d = await res.json();
+    if (res.ok) { toast(d.message||'Invitation sent!'); document.getElementById('inviteForm').style.display='none'; }
+    else toast(d.error||'Failed to send','error');
+  } finally { btn.disabled=false; btn.innerHTML='<i class="fa fa-paper-plane"></i> Send Interview Invitation'; }
+}
+
+async function deleteCareerApp(id) {
+  if (!confirm('Delete this application and CV?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}career-applications/${id}`, {method:'DELETE'});
+    toast('Deleted'); careerApplications = careerApplications.filter(a=>a.id!==id); renderCareerApplications();
+  } finally { hideLoader(); }
+}
+
 
 function handleLogout() {
   if (!confirm_action('Sign out?')) return;
@@ -194,6 +460,8 @@ function navigate(panel) {
     testimonials: fetchTestimonials,
     users:        fetchUsers,
     settings:     () => {},
+    'careers':     fetchCareerListings,
+    'career-apps': fetchCareerApplications,
   };
   if (loaders[panel]) loaders[panel]();
 }
@@ -1183,14 +1451,16 @@ const subBadge = s => {
   return s==='SUBSCRIBED' ? `<span class="badge badge-success">Subscribed</span>` : `<span class="badge badge-default">Unsubscribed</span>`;
 };
 const apptStatusBadge = s => {
-  const map = { DONE:'badge-success', UPCOMING:'badge-info', PENDING:'badge-warning', CANCELLED:'badge-error' };
+  const map = { RESOLVED:'badge-success', REVIEWING:'badge-info', INTERVIEW:'badge-success', HIRED:'badge-success',DONE:'badge-success', SHORTLISTED:'badge-info', UPCOMING:'badge-info', PENDING:'badge-warning', CANCELLED:'badge-error', REJECTED:'badge-error' };
   return `<span class="badge ${map[s]||'badge-default'}">${esc(s||'—')}</span>`;
 };
-const appStatusBadge = s => {
-  return s==='RESOLVED' ? `<span class="badge badge-success">Resolved</span>` : `<span class="badge badge-warning">Pending</span>`;
-};
+
 const blogStatusBadge = s => {
   return s==='PUBLISHED' ? `<span class="badge badge-success">Published</span>` : `<span class="badge badge-warning">Draft</span>`;
 };
 const getValue = id => document.getElementById(id)?.value?.trim() || '';
 const setValue = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
+
+// Wire into navigate() loaders:
+// 'careers':     fetchCareerListings,
+// 'career-apps': fetchCareerApplications,

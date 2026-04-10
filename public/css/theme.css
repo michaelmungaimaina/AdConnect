@@ -442,6 +442,7 @@ select.input-field   { appearance: none; cursor: pointer; }
   right: 0;
   z-index: 1000;
   border-bottom: 1px solid var(--clr-border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   animation: slideDown .4s ease;
 }
 @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
@@ -459,7 +460,7 @@ select.input-field   { appearance: none; cursor: pointer; }
 }
 .navbar-logo img { height: 100%; width: 100%; object-fit: contain; }
 
-.navbar-nav { display: flex; align-items: center; gap: var(--space-6); margin-left: auto; }
+.navbar-nav { display: flex; list-style: none; align-items: center; gap: var(--space-6); margin-left: auto; }
 .nav-link {
   font-family: var(--font-display);
   font-weight: 600;
@@ -656,6 +657,7 @@ select.input-field   { appearance: none; cursor: pointer; }
 .footer-container h5 { font-family: var(--font-display); color: var(--clr-text-primary); margin-bottom: var(--space-4); font-size: .95rem; }
 .footer-container ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
 .footer-container a { font-size: .85rem; color: var(--clr-text-muted); }
+.footer-container .newsletter a { font-size: .85rem; color: var(--clr-text-primary); }
 .footer-container a:hover { color: var(--clr-primary); }
 .footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-6); flex-wrap: wrap; gap: var(--space-4); }
 .footer-bottom .social-icons { display: flex; align-items: center; gap: var(--space-3); }
@@ -670,6 +672,38 @@ select.input-field   { appearance: none; cursor: pointer; }
 .footer-container .footer-faq-section a { font-size: .78rem; font-weight: 700; padding: var(--space-2) var(--space-4); }
 .footer-container .footer-faq-section p { font-size: .8rem; margin-bottom: var(--space-3); }
 .footer-logo img { height: 42px; }
+
+/* ── Admin Screen Guard ────────────────────────────────── */
+/* Block on phones (< 768px). Allow tablets (768px+) */
+.admin-shell { display: block; }
+.admin-mobile-wall { display: none; }
+
+@media (max-width: 767px) {
+  .admin-shell { display: none !important; }
+  .admin-mobile-wall {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--clr-bg);
+    padding: 40px 24px;
+    text-align: center;
+    gap: 20px;
+  }
+  .admin-mobile-wall .wall-icon {
+    width: 80px; height: 80px;
+    background: var(--clr-surface-1);
+    border: 1.5px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    color: var(--clr-primary);
+  }
+  .admin-mobile-wall h2 { font-family: var(--font-display); font-size: 1.5rem; color: var(--clr-text-primary); }
+  .admin-mobile-wall p  { font-size: .9rem; color: var(--clr-text-secondary); max-width: 300px; line-height: 1.7; }
+  .admin-mobile-wall a  { padding: 12px 28px; background: var(--clr-primary); color: #fff; border-radius: var(--radius-md); font-family: var(--font-display); font-weight: 700; font-size: .9rem; text-decoration: none; }
+}
 
 /* ── Icon Actions (admin tables) ────────────────────────────── */
 .action-icon {
@@ -1007,7 +1041,6 @@ select.input-field   { appearance: none; cursor: pointer; }
   .admin-sidebar { left: calc(-1 * var(--sidebar-w)); }
   .admin-sidebar.open { left: 0; box-shadow: var(--shadow-lg); }
   .admin-main { margin-left: 0; }
-  .mobile-warning { display: none; }
 }
 
 @media (max-width: 880px) {
@@ -1158,7 +1191,7 @@ select.input-field   { appearance: none; cursor: pointer; }
   z-index: 9999;
   background: linear-gradient(135deg, rgba(26,25,23,.98) 0%, rgba(48,46,44,.95) 100%);
   height: 0;
-  overflow: hidden;
+  overflow: scroll;
   transition: height .5s ease;
 }
 .appt-layout { max-width: 900px; margin: 80px auto; padding: var(--space-5); }
@@ -1184,6 +1217,83 @@ select.input-field   { appearance: none; cursor: pointer; }
 .time-slot.selected { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; }
 .time-slot.booked { border-color: var(--clr-error); color: var(--clr-text-muted); cursor: not-allowed; opacity: .5; pointer-events: none; }
 @media (max-width: 700px) { .appt-grid { grid-template-columns: 1fr; } .time-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ── Appointment Profile — Mobile ── */
+@media (max-width: 700px) {
+  .appt-two-col {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-5) !important;
+  }
+
+  /* Horizontal profile card on mobile */
+  .appt-profile {
+    flex-direction: row !important;
+    text-align: left !important;
+    align-items: center !important;
+    padding: var(--space-4) var(--space-5) !important;
+    gap: var(--space-4) !important;
+  }
+  .appt-profile img {
+    width: 64px !important;
+    height: 64px !important;
+    flex-shrink: 0;
+  }
+  .appt-profile .pschool {
+    display: none; /* hide long school name on small screens */
+  }
+  .appt-profile .exp-badge {
+    font-size: .72rem !important;
+    padding: 7px 10px !important;
+  }
+
+  /* Stack profile info vertically inside the row */
+  .appt-profile > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  /* Inputs full width */
+  .appt-inputs {
+    grid-template-columns: 1fr !important;
+  }
+  .appt-inputs .full { grid-column: 1 !important; }
+
+  /* Time grid fewer columns */
+  .time-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .time-chip { font-size: .68rem !important; padding: 8px 4px !important; }
+
+  /* Appt wrapper top padding */
+  .appt-wrapper { padding-top: 70px !important; }
+}
+
+/* Also fix the old appointment layout classes for mobile */
+@media (max-width: 700px) {
+  .appointment-layout.outer-container .myhlayout,
+  .appointment-layout.outer-container .second-row {
+    flex-direction: column !important;
+  }
+  .appointment-layout.outer-container .left-column,
+  .appointment-layout.outer-container .right-column {
+    width: 100% !important;
+  }
+  .appointment-layout.outer-container .left-column img {
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 auto !important;
+  }
+  .appointment-layout.outer-container .left-column {
+    align-items: center;
+    text-align: center;
+  }
+  .background-tint-black .appointment-layout {
+    margin: 70px 12px !important;
+    padding: 20px !important;
+  }
+}
 
 /* ── Lead Capture ───────────────────────────────────────────── */
 #leadCaptureSection {
