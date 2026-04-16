@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQs — AdConnect</title>
+  <meta name="description" content="Frequently asked questions about AdConnect's real estate digital marketing services." />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <style>
+  .faq-page { padding-top: var(--header-h); min-height: 100vh; background: var(--clr-bg); }
+  .faq-container { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
+  .faq-hero { text-align: center; margin-bottom: 52px; }
+  .faq-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 5px 16px; background: var(--clr-primary-light); border: 1px solid var(--clr-primary); border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--clr-primary); margin-bottom: 18px; }
+  .faq-hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+  .faq-hero p { font-size: .9rem; color: var(--clr-text-muted); max-width: 480px; margin: 0 auto; }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition-base); }
+  .faq-item:hover { border-color: var(--clr-primary); }
+  .faq-item.open { border-color: var(--clr-primary); }
+  .faq-question {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px 24px; cursor: pointer; user-select: none;
+    font-family: var(--font-display); font-size: .95rem; font-weight: 700; color: var(--clr-text-primary);
+  }
+  .faq-question .q-num { font-family: var(--font-mono); font-size: .72rem; color: var(--clr-primary); font-weight: 500; flex-shrink: 0; }
+  .faq-question .q-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--clr-surface-2); border: 1px solid var(--clr-border); display: flex; align-items: center; justify-content: center; font-size: .75rem; color: var(--clr-text-muted); flex-shrink: 0; transition: var(--transition-base); }
+  .faq-item.open .q-icon { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; transform: rotate(45deg); }
+  .faq-answer { display: none; padding: 0 24px 20px; padding-left: 52px; font-size: .875rem; color: var(--clr-text-secondary); line-height: 1.8; }
+  .faq-item.open .faq-answer { display: block; }
+  .faq-cta { margin-top: 52px; background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: var(--radius-xl); padding: 40px; text-align: center; }
+  .faq-cta h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 10px; }
+  .faq-cta p { font-size: .875rem; color: var(--clr-text-secondary); margin-bottom: 24px; }
+  .faq-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 520px; margin: 0 auto; text-align: left; }
+  .faq-form .full { grid-column: 1/-1; }
+  .faq-form input, .faq-form textarea { background: var(--clr-surface-2); border: 1.5px solid var(--clr-border); border-radius: var(--radius-md); color: var(--clr-text-primary); padding: 11px 14px; font-size: .875rem; font-family: var(--font-body); outline: none; width: 100%; transition: var(--transition-base); }
+  .faq-form input:focus, .faq-form textarea:focus { border-color: var(--clr-primary); }
+  .faq-form textarea { height: 90px; resize: vertical; }
+  @media (max-width: 600px) { .faq-form { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+         <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+        <button class="navbar-toggler" onclick="document.getElementById('mySidePanel').style.left='0'"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
+        <button onclick="document.getElementById('mySidePanel').style.left='-320px'" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div><ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul></div>
+    </aside>
+  </header>
+</div>
+
+<main class="faq-page">
+  <div class="faq-container">
+    <div class="faq-hero">
+      <div class="faq-eyebrow"><i class="fa fa-question-circle"></i> Support</div>
+      <h1>Frequently Asked<br /><span style="color:var(--clr-primary);">Questions</span></h1>
+      <p>Everything you need to know about working with AdConnect. Can't find your answer? Ask us directly below.</p>
+    </div>
+
+    <div class="faq-list" id="faqList">
+      <!-- FAQs loaded from API or static below -->
+    </div>
+
+    <!-- Ask a question -->
+    <div class="faq-cta">
+      <h3>Still have questions?</h3>
+      <p>Our team responds within a few hours. Ask us anything below.</p>
+      <form class="faq-form" id="faqContactForm" onsubmit="submitFAQ(event)">
+        <div><input type="text" id="faqName" placeholder="Your Name *" required /></div>
+        <div><input type="email" id="faqEmail" placeholder="Your Email *" required /></div>
+        <div class="full"><input type="tel" id="faqPhone" placeholder="Phone Number" /></div>
+        <div class="full"><textarea id="faqQuestion" placeholder="Your question…" required></textarea></div>
+        <div class="full" style="text-align:center;">
+          <button type="submit" id="faqSubmitBtn" class="btn btn-primary" style="padding:12px 36px;">
+            <i class="fa fa-paper-plane"></i> Send Question
+          </button>
+        </div>
+      </form>
+      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(74,188,79,.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
+        <i class="fa fa-check-circle"></i> Thank you! We'll get back to you within 24 hours.
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-bottom">
+      <div class="social-icons">
+        <p class="footer-text-follow-us">Follow Us:</p>
+        <a href="https://www.facebook.com/profile.php?id=61567259036362"><i class="fa-brands fa-facebook"></i></a>
+        <a href="https://www.instagram.com/adconnect_digital/"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+      <p class="footer-text-copyright">© <span id="cy"></span> <a href="/index.html">AdConnect</a>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+//const DOMAIN = 'https://adconnect.co.ke/api/';
+const DOMAIN = 'http://localhost:3000/api/';
+document.getElementById('cy').textContent = new Date().getFullYear();
+
+const STATIC_FAQS = [
+  { q: 'How long before I see results with your services?', a: 'Every client is different, but our targeted strategies typically deliver noticeable improvements within the first 2–3 months. Some clients see results within weeks of launching. We focus on quick wins first, then build long-term compounding results.' },
+  { q: 'What platforms do you advertise on?', a: 'We run campaigns across Facebook, Instagram, TikTok, YouTube, Google Search, Google Display, and LinkedIn — whichever platforms your target audience uses most for real estate. We always recommend a platform mix based on your goals and budget.' },
+  { q: 'Do you offer ongoing support?', a: 'Absolutely! We\'re here for the long term. We provide continuous campaign optimization, monthly strategy reviews, detailed performance reports, and direct access to our team throughout our engagement.' },
+  { q: 'Is there a minimum contract length?', a: 'We offer flexible terms designed to fit your specific needs. We recommend a minimum of 3 months to see meaningful, compounding results — but we don\'t lock you into long-term contracts against your will.' },
+  { q: 'What is your pricing model?', a: 'Our pricing is custom-built for your situation and goals. Book a free consultation and we\'ll provide a transparent proposal based on the scope of work, ad spend, and expected results. We believe in fair, performance-focused pricing.' },
+  { q: 'Can you build our website as well?', a: 'Yes! We offer full-stack web development, mobile app development (Android), and UI/UX design services. Many of our clients combine marketing and tech services for a fully integrated digital presence.' },
+  { q: 'How do I get started?', a: 'Simply book a free consultation through our website. We\'ll review your current marketing, understand your goals, and walk you through exactly how we can help. No pressure, no obligations — just a strategic conversation.' },
+  { q: 'Do you work with businesses outside Kenya?', a: 'Yes! We currently serve clients in Kenya, Ethiopia, Rwanda, Uganda, Tanzania, and internationally. Digital marketing knows no borders, and our strategies are adaptable to any market.' },
+];
+
+function renderFAQs(list) {
+  const container = document.getElementById('faqList');
+  container.innerHTML = list.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <div class="faq-question" onclick="toggleFAQ(${i})">
+        <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+        <span style="flex:1;">${f.q}</span>
+        <span class="q-icon"><i class="fa fa-plus"></i></span>
+      </div>
+      <div class="faq-answer">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFAQ(i) {
+  const item = document.getElementById(`faq-${i}`);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+async function loadFAQs() {
+  try {
+    const res = await fetch(`${DOMAIN}site-settings/faqs`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.items && Array.isArray(JSON.parse(data.items))) {
+        renderFAQs(JSON.parse(data.items));
+        return;
+      }
+    }
+  } catch {}
+  renderFAQs(STATIC_FAQS);
+}
+
+async function submitFAQ(e) {
+  e.preventDefault();
+  const btn = document.getElementById('faqSubmitBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+  try {
+    await fetch(`${DOMAIN}contact-messages`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: document.getElementById('faqName').value, email: document.getElementById('faqEmail').value, phone: document.getElementById('faqPhone').value, subject: 'FAQ Question', message: document.getElementById('faqQuestion').value }),
+    });
+    document.getElementById('faqContactForm').reset();
+    document.getElementById('faqFormSuccess').style.display = 'block';
+  } catch {}
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fa fa-paper-plane"></i> Send Question'; }
+}
+
+loadFAQs();
+</script>
+</body>
+</html>

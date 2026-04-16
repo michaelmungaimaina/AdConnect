@@ -70,7 +70,7 @@
     "url": "https://adconnect.co.ke",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": { "@type": "EntryPoint", "urlTemplate": "https://adconnect.co.ke/search?q={search_term_string}" },
+      "target": { "@type": "EntryPoint", "urlTemplate": "https://www.adconnect.co.ke/search?q={search_term_string}" },
       "query-input": "required name=search_term_string"
     }
   }
@@ -99,8 +99,8 @@
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TCWSW8TT');</script>
 
   <!-- ── Favicon ── -->
-  <link rel="icon"               href="/resources/logo.png" type="image/x-icon" />
-  <link rel="apple-touch-icon"   href="/resources/logo.png" />
+  <link rel="icon"               href="resources/logo.png" type="image/x-icon" />
+  <link rel="apple-touch-icon"   href="resources/logo.png" />
 
   <!-- ── Preconnect for performance ── -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1082,6 +1082,51 @@
   .thanks-row { display: flex; align-items: center; gap: 12px; font-size: .875rem; }
   .thanks-row i { color: var(--clr-primary); width: 16px; text-align: center; }
 
+  .policy-container { max-width: 780px; margin: 0 auto; padding: 60px 24px 100px; }
+  .policy-hero { text-align: center; margin-bottom: 52px; }
+  .policy-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 5px 16px; background: var(--clr-primary-light); border: 1px solid var(--clr-primary); border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--clr-primary); margin-bottom: 18px; }
+  .policy-hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; margin-bottom: 12px; }
+  .policy-hero p { font-size: .9rem; color: var(--clr-text-muted); }
+  .policy-body { background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: var(--radius-xl); padding: 48px 48px; }
+  .policy-body h2 { font-family: var(--font-display); font-size: 1.1rem; color: var(--clr-primary); margin: 28px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .policy-body h2::before { content: ''; width: 3px; height: 18px; background: var(--clr-primary); border-radius: 2px; flex-shrink: 0; }
+  .policy-body p, .policy-body li { font-size: .9rem; color: var(--clr-text-secondary); line-height: 1.85; }
+  .policy-body ul { padding-left: 20px; margin: 8px 0 16px; }
+  .policy-body li { margin-bottom: 6px; }
+  .policy-body a { color: var(--clr-accent); }
+  .policy-date { display: inline-block; padding: 6px 14px; background: var(--clr-surface-2); border-radius: var(--radius-md); font-size: .78rem; color: var(--clr-primary); font-weight: 600; margin-bottom: 24px; }
+  @media (max-width: 600px) { .policy-body { padding: 28px 20px; } }
+
+
+  .faq-container { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
+  .faq-hero { text-align: center; margin-bottom: 52px; }
+  .faq-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 5px 16px; background: var(--clr-primary-light); border: 1px solid var(--clr-primary); border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--clr-primary); margin-bottom: 18px; }
+  .faq-hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+  .faq-hero p { font-size: .9rem; color: var(--clr-text-muted); max-width: 480px; margin: 0 auto; }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition-base); }
+  .faq-item:hover { border-color: var(--clr-primary); }
+  .faq-item.open { border-color: var(--clr-primary); }
+  .faq-question {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px 24px; cursor: pointer; user-select: none;
+    font-family: var(--font-display); font-size: .95rem; font-weight: 700; color: var(--clr-text-primary);
+  }
+  .faq-question .q-num { font-family: var(--font-mono); font-size: .72rem; color: var(--clr-primary); font-weight: 500; flex-shrink: 0; }
+  .faq-question .q-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--clr-surface-2); border: 1px solid var(--clr-border); display: flex; align-items: center; justify-content: center; font-size: .75rem; color: var(--clr-text-muted); flex-shrink: 0; transition: var(--transition-base); }
+  .faq-item.open .q-icon { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; transform: rotate(45deg); }
+  .faq-answer { display: none; padding: 0 24px 20px; padding-left: 52px; font-size: .875rem; color: var(--clr-text-secondary); line-height: 1.8; }
+  .faq-item.open .faq-answer { display: block; }
+  .faq-cta { margin-top: 52px; background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: var(--radius-xl); padding: 40px; text-align: center; }
+  .faq-cta h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 10px; }
+  .faq-cta p { font-size: .875rem; color: var(--clr-text-secondary); margin-bottom: 24px; }
+  .faq-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 520px; margin: 0 auto; text-align: left; }
+  .faq-form .full { grid-column: 1/-1; }
+  .faq-form input, .faq-form textarea { background: var(--clr-surface-2); border: 1.5px solid var(--clr-border); border-radius: var(--radius-md); color: var(--clr-text-primary); padding: 11px 14px; font-size: .875rem; font-family: var(--font-body); outline: none; width: 100%; transition: var(--transition-base); }
+  .faq-form input:focus, .faq-form textarea:focus { border-color: var(--clr-primary); }
+  .faq-form textarea { height: 90px; resize: vertical; }
+  @media (max-width: 600px) { .faq-form { grid-template-columns: 1fr; } }
+
   /* ── RESPONSIVE ──────────────────────────────── */
   @media (max-width: 1024px) {
     .hero-stats { display: none; }
@@ -1103,6 +1148,45 @@
     .steps-grid { grid-template-columns: 1fr; }
     .services-grid { grid-template-columns: 1fr; }
   }
+
+  .logo-wrap {
+  display: inline-block;
+  height: auto; /* allow vertical growth */
+  display: flex;
+  align-items: center;
+  background: #252320;
+  border-radius: 5px;
+  padding: 5px 15px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  border: 1px solid #3d3b39;
+}
+
+.logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center both lines */
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-top: -7px;
+}
+
+.logo-text .ad { color: #f65730; }
+.logo-text .connect { color: #ffffff; }
+
+.logo-tagline {
+  font-size: 12px;              /* smaller */
+  color: #4abc4f;               /* green */
+  margin-top: -6px;
+  white-space: nowrap;          /* keep in one line */
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.9px;
+}
   </style>
 </head>
 
@@ -1115,9 +1199,17 @@
   <header>
     <nav class="container navbar">
       <div class="container-nav flex">
-        <a href="/" class="navbar-logo" aria-label="AdConnect Home">
+        <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
           <img src="resources/logo.png" alt="AdConnect Logo" />
-        </a>
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
         <button id="navbarTogler" class="navbar-toggler" type="button" aria-label="Toggle navigation">
           <i class="fa fa-bars"></i>
         </button>
@@ -1519,65 +1611,137 @@
 </section>
 
 <!-- ════════════════ FOOTER ════════════════ -->
-<footer id="footerSection" class="footer" role="contentinfo">
-  <div class="footer-container">
-    <div class="footer-logo"><img src="resources/logo.png" alt="AdConnect" /></div>
-    <div class="top-items-footer">
-      <div class="consultation">
-        <!--i class="fa fa-phone" style="font-size:1.5rem;color:var(--clr-primary);margin-bottom:var(--space-3);"></i-->
-        <img src="resources/help.svg.svg" alt="" class="client-icon" style="margin-top: 30px; margin-bottom:var(--space-3);">
-        <p style="font-weight:600;color:var(--clr-text-primary);">Need Help? Call Us!</p>
-        <p style="font-size:.82rem;margin-top:4px;">+254 790 064 130</p>
-        <button id="footerConsultationBtn" class="btn_hover1 small-button" style="margin-top:12px;">Get Consultation</button>
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
       </div>
-      <div class="company-info">
-        <h5>Company</h5>
-        <ul>
-          <li><a href="aboutus.html">About Us</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="?privacy-policy=true">Privacy Policy</a></li>
-          <li><a href="blog.html">Blog Posts</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a href="careers.html">Careers</a></li>
-        </ul>
-      </div>
-      <div class="services">
-        <h5>Our Services</h5>
-        <ul>
-          <li><a href="our-services.html?adverts-service=true">Social Media Management</a></li>
-          <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
-          <li><a href="our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
-          <li><a href="our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
-          <li><a href="our-services.html?development-service=true">Web Design & Development</a></li>
-          <li><a href="our-services.html?development-service=true">Mobile Development (Android)</a></li>
-        </ul>
-      </div>
-      <div class="newsletter">
-        <h5>Newsletter</h5>
-        <input type="email" id="newsletterEmail" placeholder="your@email.com" aria-label="Newsletter email" />
-        <button onclick="subscribeNewsletter()" class="btn_hover1 small-button" style="margin-top:8px;width:100%;justify-content:center;">Subscribe</button>
-        <a href="?value-video-request=true" class="btn_hover1 small-button" style="margin-top:8px; width:100%;justify-content:center;">Watch Free Video</a>
-      </div>
-      <div class="footer-faq-section">
-        <h5>FAQs</h5>
-        <p>Need a clarification? Ask our agents for a quick, helpful answer.</p>
-        <button id="showFAQsSection" class="btn_hover1 small-button" style="margin-top:12px;">View FAQs</button>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="openPrivacyPolicy()">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html?adverts-service=true">Social Media Ads</a></li>
+        <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
+        <li><a href="our-services.html?adverts-service=true">Analytics & Reporting</a></li>
+        <li><a href="our-services.html?adverts-service=true">Facebook Campaigns</a></li>
+        <li><a href="our-services.html?development-service=true">Web Development</a></li>
+        <li><a href="our-services.html?development-service=true">Android Apps</a></li>
+        <li><a href="our-services.html?courses-service=true">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li>
+          <a href="javascript:void(0)" onclick="openFAQs()">FAQs</a>
+        </li>
+        <li>
+          <a href="?appointment-booking=true">Free Consultation</a>
+        </li>
+        <li>
+          <a href="?value-video-request=true">Watch Free Video</a>
+        </li>
+        <li>
+          <a href="our-services.html?development-service=true">UI/UX Design</a>
+        </li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
+        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
       </div>
     </div>
-    <div class="footer-bottom">
-      <div class="social-icons">
-        <p class="footer-text-follow-us">Follow Us:</p>
-        <a href="https://www.facebook.com/profile.php?id=61567259036362" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.instagram.com/adconnect_digital/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
       </div>
-      <p class="footer-text-copyright">
-        Copyright © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
+          <strong style="color:#f4f1ee;">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
       </p>
     </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="openPrivacyPolicy()">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="openFAQs()">FAQs</a>
+      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
+    </nav>
   </div>
+ 
 </footer>
 
 <!-- ═══════════════ OVERLAY SECTIONS ═══════════════ -->
@@ -1798,7 +1962,7 @@
           <textarea id="appointeeMessage" class="input-field" style="height:100px;padding:12px;" placeholder="Briefly describe what you'd like to discuss…"></textarea>
         </div>
 
-        <button class="appt-submit-btn" id="btnSubmitAppointment" onclick="submitAppointment(event)">
+        <button class="appt-submit-btn" id="btnSubmitAppointment">
           <i class="fa fa-calendar-check-o"></i> Confirm Booking
         </button>
       </div>
@@ -1829,71 +1993,228 @@
 </section>
 
 <!-- FAQ Modal -->
-<section id="faqsSection" class="modal-overlay" aria-label="FAQs" aria-modal="true" role="dialog">
+<section class="faq-page modal-overlay" id="faqsSection" aria-label="FAQs" aria-modal="true" role="dialog">
   <button class="btn-close" onclick="closeFAQs()" aria-label="Close"><i class="fa fa-times"></i></button>
-  <div class="modal-content">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
-      <div class="slash-rect"></div>
-      <h2 style="font-size:1.4rem;">Frequently Asked Questions</h2>
+  <div class="faq-container">
+    <div class="faq-hero">
+      <div class="faq-eyebrow"><i class="fa fa-question-circle"></i> Support</div>
+      <h1>Frequently Asked<br /><span style="color:var(--clr-primary);">Questions</span></h1>
+      <p>Everything you need to know about working with AdConnect. Can't find your answer? Ask us directly below.</p>
     </div>
-    <div id="faqList">
-      <div class="faq-item">
-        <div class="faq-q"><span class="q-badge">Q</span> How long before I see results?</div>
-        <div class="faq-a">Every client is different, but our targeted strategies deliver noticeable improvements within the first 2–3 months. Some clients see results within weeks.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span class="q-badge">Q</span> Do you offer ongoing support?</div>
-        <div class="faq-a">Absolutely! We provide continuous support, monthly reports, and ongoing campaign optimization for the life of our partnership.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span class="q-badge">Q</span> Is there a minimum contract length?</div>
-        <div class="faq-a">We offer flexible terms designed to fit your needs. We recommend a minimum of 3 months to see meaningful results, but we don't lock you in.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span class="q-badge">Q</span> What platforms do you advertise on?</div>
-        <div class="faq-a">We run campaigns on Facebook, Instagram, TikTok, YouTube, Google, and LinkedIn — whichever platforms your target audience uses most.</div>
-      </div>
+
+    <div class="faq-list" id="faqList">
+      <!-- FAQs loaded from API or static below -->
     </div>
-    <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--clr-border);">
-      <p style="font-size:.875rem;font-weight:700;margin-bottom:16px;">Got more questions? Ask us directly:</p>
-      <div class="faq-form-grid">
-        <input type="text"  class="input-field" placeholder="Your Name" id="faqName" />
-        <input type="email" class="input-field" placeholder="Your Email" id="faqEmail" />
+
+    <!-- Ask a question -->
+    <div class="faq-cta">
+      <h3>Still have questions?</h3>
+      <p>Our team responds within a few hours. Ask us anything below.</p>
+      <form class="faq-form" id="faqContactForm" onsubmit="submitFAQ(event)">
+        <div><input type="text" id="faqName" placeholder="Your Name *" required /></div>
+        <div><input type="email" id="faqEmail" placeholder="Your Email *" required /></div>
+        <div class="full"><input type="tel" id="faqPhone" placeholder="Phone Number" /></div>
+        <div class="full"><textarea id="faqQuestion" placeholder="Your question…" required></textarea></div>
+        <div class="full" style="text-align:center;">
+          <button type="submit" id="faqSubmitBtn" class="btn btn-primary" style="padding:12px 36px;">
+            <i class="fa fa-paper-plane"></i> Send Question
+          </button>
+        </div>
+      </form>
+      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(74,188,79,.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
+        <i class="fa fa-check-circle"></i> Thank you! We'll get back to you within 24 hours.
       </div>
-      <textarea class="input-field" style="height:90px;margin-top:12px;" placeholder="Your question…" id="faqQuestion"></textarea>
-      <button onclick="submitFAQsForm()" class="btn-hero-primary" style="width:100%;justify-content:center;margin-top:12px;">
-        <i class="fa fa-paper-plane"></i> Send Question
-      </button>
     </div>
   </div>
 </section>
 
-<!-- Privacy Policy Modal -->
-<section id="privacyPolicy" class="modal-overlay" aria-label="Privacy Policy" aria-modal="true" role="dialog">
+<!-- Privacy Policy Modal --> 
+<section id="privacyPolicy" class="policy-page modal-overlay" aria-label="Privacy Policy" aria-modal="true" role="dialog">
   <button class="btn-close" onclick="closePrivacyPolicy()" aria-label="Close"><i class="fa fa-times"></i></button>
-  <div class="modal-content privacy-body">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <div class="slash-rect"></div>
-      <h2 style="font-size:1.4rem;">Privacy Policy</h2>
+  <div class="policy-container">
+    <div class="policy-hero">
+      <div class="policy-eyebrow"><i class="fa fa-shield"></i> Legal</div>
+      <h1>Privacy Policy</h1>
+      <p>How we collect, use, and protect your personal information.</p>
     </div>
-    <p style="font-size:.75rem;color:var(--clr-primary);font-weight:600;margin-bottom:20px;">Effective: December 20th, 2024</p>
-    <p>At <a href="index.html">AdConnect</a>, your privacy is a priority. This policy explains how we collect, use, and protect your personal data when you engage with our services.</p>
-    <h6>1. Information We Collect</h6>
-    <p>We collect <b>Personal Information</b> (name, email, phone), <b>Usage Data</b> (IP, browser, browsing behaviour via cookies, Google Analytics, Facebook Pixel), and <b>Device Information</b> (device type, location if shared).</p>
-    <h6>2. How We Use Your Data</h6>
-    <p>To connect real estate companies with potential customers, analyse website performance, create targeted marketing campaigns, send service communications, and respond to inquiries.</p>
-    <h6>3. Sharing Your Data</h6>
-    <p>We may share data with marketing platforms (Facebook, Google) and service providers. We do not sell, rent, or trade your personal data with third parties for their own marketing purposes.</p>
-    <h6>4. Cookies & Tracking</h6>
-    <p>We use cookies to understand user behaviour, serve relevant ads, and measure campaign performance. You can manage cookie preferences through your browser settings.</p>
-    <h6>5. Data Retention</h6>
-    <p>We store personal data only for as long as necessary to fulfill the purposes in this policy, or as required by law.</p>
-    <h6>6. Your Rights</h6>
-    <p>You have the right to access, correct, delete your data, and opt out of marketing communications at any time by contacting us at <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a>.</p>
-    <h6>7. Contact Us</h6>
-    <p>Questions about this policy? <a href="contact.html">Contact AdConnect</a> or email <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a>.</p>
+    <div class="policy-body">
+      <div class="policy-date">Effective: December 20th, 2024</div>
+      <p>At <a href="index.html">AdConnect</a>, your privacy is a top priority. This Privacy Policy explains how we collect, use, and protect your personal data when you engage with our services, visit our website, or interact with our digital platforms.</p>
+
+      <h2>1. Information We Collect</h2>
+      <ul>
+        <li><strong>Personal Information:</strong> Name, email address, phone number, and details provided when filling out forms on our website.</li>
+        <li><strong>Usage Data:</strong> IP address, browser type, operating system, and browsing behaviour through cookies and tracking technologies (e.g., Google Analytics, Facebook Pixel).</li>
+        <li><strong>Device Information:</strong> Device type, screen resolution, and geographic location if shared.</li>
+      </ul>
+
+      <h2>2. How We Use Your Data</h2>
+      <ul>
+        <li>To connect real estate companies with potential local and international customers.</li>
+        <li>To analyse website performance and improve user experience.</li>
+        <li>To create targeted marketing campaigns through Facebook Pixel and similar tools.</li>
+        <li>To send updates, promotional offers, and service communications.</li>
+        <li>To respond to your enquiries or requests.</li>
+      </ul>
+
+      <h2>3. Sharing Your Data</h2>
+      <p>We may share your data with marketing platforms (Facebook, Google) and service providers used for email marketing, analytics, or lead management. We do <strong>not</strong> sell, rent, or trade your personal data with third parties for their own purposes.</p>
+
+      <h2>4. Cookies & Tracking Technologies</h2>
+      <p>We use cookies to understand user behaviour, serve relevant ads, and measure campaign performance. You can manage cookie preferences through your browser settings or via our cookie consent banner.</p>
+
+      <h2>5. Data Retention</h2>
+      <p>We store personal data only for as long as necessary to fulfill the purposes outlined in this policy, or as required by applicable law.</p>
+
+      <h2>6. Security</h2>
+      <p>We implement robust security measures to protect your personal information from unauthorized access, alteration, or misuse. However, no method of online transmission is completely secure.</p>
+
+      <h2>7. Your Rights</h2>
+      <ul>
+        <li><strong>Access:</strong> Request access to your personal data.</li>
+        <li><strong>Correction:</strong> Request corrections to inaccurate data.</li>
+        <li><strong>Deletion:</strong> Request deletion of your personal data.</li>
+        <li><strong>Opt-Out:</strong> Opt out of marketing communications at any time.</li>
+      </ul>
+
+      <h2>8. International Users</h2>
+      <p>If you are accessing our services from outside Kenya, your information may be transferred, stored, and processed in Kenya. By using our services, you consent to this transfer.</p>
+
+      <h2>9. Updates</h2>
+      <p>We may update this Privacy Policy periodically. Changes will be posted on this page with an updated effective date.</p>
+
+      <h2>10. Contact Us</h2>
+      <p>Questions about this Privacy Policy? Contact us at: <a href="mailto:info@adconnect.co.ke">info@adconnect.co.ke</a> or visit our <a href="/pages/contact.html">Contact page</a>.</p>
+    </div>
   </div>
 </section>
+
+
+<!-- Cookie Consent Banner -->
+<div id="cookieConsent" style="display:none;" role="dialog" aria-label="Cookie Consent">
+  <style>
+  #cookieConsent {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    width: calc(100% - 32px);
+    max-width: 680px;
+    background: var(--clr-surface-1, #252320);
+    border: 1.5px solid var(--clr-border, #3d3b39);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.55);
+    animation: cc-slide-up .4s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes cc-slide-up { from { opacity:0; transform: translateX(-50%) translateY(24px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+  .cc-inner { display: flex; align-items: flex-start; gap: 16px; }
+  .cc-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .cc-text { flex: 1; }
+  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: #F4F1EE; margin: 0 0 6px; }
+  .cc-text p { font-size: .78rem; color: #B8B4B0; line-height: 1.6; margin: 0; }
+  .cc-text a { color: #4ABC4F; text-decoration: none; }
+  .cc-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .cc-btn {
+    padding: 9px 20px; border-radius: 8px; font-size: .78rem; font-weight: 700;
+    cursor: pointer; border: none; font-family: inherit; transition: all .2s ease;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .cc-btn-accept  { background: #F65730; color: #fff; }
+  .cc-btn-accept:hover  { background: #d94522; }
+  .cc-btn-reject  { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-reject:hover  { border-color: #F65730; color: #F65730; }
+  .cc-btn-pref    { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-pref:hover    { border-color: #B8B4B0; color: #B8B4B0; }
+  /* Preferences modal */
+  .cc-modal-overlay {
+    position: fixed; inset: 0; z-index: 100000;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .cc-modal {
+    background: #252320; border: 1.5px solid #3d3b39; border-radius: 16px;
+    padding: 32px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
+  }
+  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: #F4F1EE; margin: 0 0 8px; }
+  .cc-modal p  { font-size: .82rem; color: #7a7874; margin: 0 0 20px; line-height: 1.6; }
+  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #3d3b39; }
+  .cc-toggle-row:last-child { border-bottom: none; }
+  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: #F4F1EE; margin-bottom: 3px; }
+  .cc-toggle-desc  { font-size: .75rem; color: #7a7874; line-height: 1.5; }
+  .cc-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 3px; }
+  .cc-switch input { opacity: 0; width: 0; height: 0; }
+  .cc-slider { position: absolute; inset: 0; background: #3d3b39; border-radius: 999px; cursor: pointer; transition: .3s; }
+  .cc-switch input:checked + .cc-slider { background: #F65730; }
+  .cc-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+  .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
+  .cc-switch input:disabled + .cc-slider { opacity: .6; cursor: not-allowed; }
+  .cc-modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  @media (max-width: 600px) {
+    #cookieConsent { bottom: 0; left: 0; transform: none; width: 100%; border-radius: 16px 16px 0 0; }
+    .cc-inner { flex-direction: column; gap: 10px; }
+    .cc-actions { justify-content: stretch; }
+    .cc-btn { flex: 1; text-align: center; }
+  }
+  </style>
+ 
+  <div class="cc-inner">
+    <span class="cc-icon">🍪</span>
+    <div class="cc-text">
+      <h4>We use cookies</h4>
+      <p>
+        We use cookies and similar technologies to improve your browsing experience, analyse traffic, and personalise content.
+        Read our <a href="privacy.html">Privacy Policy</a> to learn more.
+      </p>
+      <div class="cc-actions">
+        <button class="cc-btn cc-btn-accept" onclick="acceptCookies()">Accept All</button>
+        <button class="cc-btn cc-btn-pref"   onclick="openCookiePrefs()">Manage Preferences</button>
+        <button class="cc-btn cc-btn-reject"  onclick="rejectCookies()">Reject Non-essential</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Cookie Preferences Modal -->
+<div id="ccModal" class="cc-modal-overlay" style="display:none;">
+  <div class="cc-modal">
+    <h3>Cookie Preferences</h3>
+    <p>Choose which cookies you allow. You can change these settings at any time.</p>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Essential Cookies</div>
+        <div class="cc-toggle-desc">Required for the website to function. Cannot be disabled.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" checked disabled /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Analytics Cookies</div>
+        <div class="cc-toggle-desc">Help us understand how visitors interact with our website (Google Analytics, etc.).</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-analytics" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Marketing Cookies</div>
+        <div class="cc-toggle-desc">Used to deliver personalised ads on platforms like Facebook and Google.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-marketing" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Functional Cookies</div>
+        <div class="cc-toggle-desc">Enable enhanced features like chat widgets and embedded media.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-functional" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-modal-btns">
+      <button class="cc-btn cc-btn-accept" onclick="savePreferences()" style="flex:2;">Save Preferences</button>
+      <button class="cc-btn cc-btn-reject" onclick="closeCookiePrefs()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
 <script src="scripts/main.js" defer></script>

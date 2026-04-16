@@ -93,7 +93,10 @@
       <li id="nav-portfolio"><span onclick="navigate('portfolio')"><i class="fa fa-briefcase"></i> Portfolio</span></li>
       <li id="nav-homepage"><span onclick="navigate('homepage')"><i class="fa fa-home"></i> Homepage CMS</span></li>
       <li id="nav-testimonials"><span onclick="navigate('testimonials')"><i class="fa fa-quote-left"></i> Testimonials</span></li>
+      <li id="nav-faqs"><span onclick="navigate('faqs')"><i class="fa fa-question-circle"></i> FAQs</span></li>
     </ul>
+    <span class="nav-section-label">Assets</span>
+      <li id="nav-media"><span onclick="navigate('media')"><i class="fa fa-photo"></i> Media Library</span></li>
 
     <span class="nav-section-label">Recruitment</span>
 <ul>
@@ -248,7 +251,8 @@
 
 <!-- ── APPLICATION DETAIL MODAL ── -->
 <section id="appDetailPopup" class="background-tint-black">
-  <button onclick="closeModal('appDetailPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <button onclick="closeModal('appDetailPopup')" class="btn-close" style="position:fixed;top:70px;right:20px;z-index:10001;"><i class="fa fa-times"></i></button>
+  <!--button onclick="closeModal('appDetailPopup')" class="btn-close"><i class="fa fa-times"></i></button-->
   <div class="appointment-layout" style="max-width:680px;">
     <div class="modal-box">
       <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
@@ -550,6 +554,21 @@
           <div id="sourceList" style="margin-top:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3);"></div>
         </div>
       </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-5);margin-top:var(--space-5);">
+  <div class="chart-card">
+    <div class="chart-header"><span class="chart-title">Daily Page Views & Unique Visitors (30 days)</span></div>
+    <canvas id="visitsChart" height="140"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header"><span class="chart-title">Top Pages</span></div>
+    <div class="data-table-wrapper">
+      <table class="data-table" style="font-size:.78rem;">
+        <thead><tr><th>#</th><th>Page</th><th>Views</th><th>Unique</th></tr></thead>
+        <tbody id="topPagesTable"><tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
     </section>
 
     <!-- ── CONTENT MANAGEMENT PANEL ── -->
@@ -716,6 +735,247 @@
       </div>
     </section>
 
+    <!-- ── FAQs Panel ── -->
+<section id="panel-faqs" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title">
+      <i class="fa fa-question-circle" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>FAQ Management
+    </h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="fetchFAQs()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-accent btn-sm" onclick="openFAQForm()"><i class="fa fa-plus"></i> New FAQ</button>
+    </div>
+  </div>
+ 
+  <!-- Quick stats -->
+  <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;">
+    <div class="stat-card" style="--accent-color:var(--clr-primary);flex:1;min-width:140px;">
+      <div class="stat-label">Total FAQs</div>
+      <div class="stat-value" id="faqTotalCount">—</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--clr-accent);flex:1;min-width:140px;">
+      <div class="stat-label">Published</div>
+      <div class="stat-value" id="faqPublishedCount">—</div>
+    </div>
+    <div class="stat-card" style="--accent-color:var(--clr-info);flex:1;min-width:140px;">
+      <div class="stat-label">Categories</div>
+      <div class="stat-value" id="faqCategoryCount">—</div>
+    </div>
+  </div>
+ 
+  <!-- Filter bar -->
+  <div class="content-panel" style="padding:var(--space-4) var(--space-5);">
+    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;">
+      <select id="faqCatFilter" class="input-field" style="width:160px;height:36px;" onchange="renderFAQs()">
+        <option value="">All Categories</option>
+      </select>
+      <select id="faqStatusFilter" class="input-field" style="width:140px;height:36px;" onchange="renderFAQs()">
+        <option value="">All Statuses</option>
+        <option value="PUBLISHED">Published</option>
+        <option value="DRAFT">Draft</option>
+      </select>
+      <input id="faqSearch" type="text" class="input-field" style="flex:1;min-width:200px;height:36px;" placeholder="Search FAQs…" oninput="renderFAQs()" />
+    </div>
+  </div>
+ 
+  <!-- FAQ list (sortable cards) -->
+  <div class="content-panel" style="padding:0;">
+    <div id="faqListAdmin" style="display:flex;flex-direction:column;gap:0;">
+      <div style="padding:var(--space-8);text-align:center;color:var(--clr-text-muted);">Loading FAQs…</div>
+    </div>
+  </div>
+</section>
+ 
+ 
+<!-- ── FAQ Form Modal ── -->
+<section id="faqFormPopup" class="background-tint-black">
+  <button onclick="closeModal('faqFormPopup')" class="btn-close" style="position:fixed;top:70px;right:20px;z-index:10001;"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:640px;">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="faqFormTitle">Add FAQ</h3>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+        <div>
+          <label class="label">Question *</label>
+          <input id="faqQuestion" type="text" class="input-field" placeholder="e.g. How long does it take to see results from Facebook Ads?" />
+        </div>
+        <div>
+          <label class="label">Answer *</label>
+          <textarea id="faqAnswer" class="input-field" style="height:140px;" placeholder="Provide a clear, helpful answer…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+          <div>
+            <label class="label">Category</label>
+            <input id="faqCategory" type="text" class="input-field" placeholder="e.g. Pricing, Services, General" list="faqCategoryOptions" />
+            <datalist id="faqCategoryOptions"></datalist>
+          </div>
+          <div>
+            <label class="label">Status</label>
+            <select id="faqStatus" class="input-field">
+              <option value="PUBLISHED">Published</option>
+              <option value="DRAFT">Draft</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Sort Order</label>
+            <input id="faqOrder" type="number" class="input-field" min="0" value="0" placeholder="0" />
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:4px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;color:var(--clr-text-secondary);">
+              <input type="checkbox" id="faqFeatured" style="accent-color:var(--clr-primary);width:16px;height:16px;" />
+              Featured FAQ
+            </label>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-5);">
+        <button onclick="saveFAQ()" class="btn btn-accent" style="flex:1;"><i class="fa fa-save"></i> Save FAQ</button>
+        <button onclick="closeModal('faqFormPopup')" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="panel-media" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title">
+      <i class="fa fa-photo" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Media Library
+    </h2>
+    <div class="panel-actions">
+      <select id="mediaTypeFilter" class="input-field" style="width:160px;height:36px;" onchange="filterMedia()">
+        <option value="">All Types</option>
+        <option value="avatar">Avatars / Badges</option>
+        <option value="testimonial">Testimonial Icons</option>
+        <option value="background">Backgrounds</option>
+        <option value="thumbnail">Project Thumbnails</option>
+        <option value="logo">Logos</option>
+        <option value="general">General</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="fetchMedia()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-accent btn-sm" onclick="openMediaUpload()"><i class="fa fa-upload"></i> Upload Image</button>
+    </div>
+  </div>
+ 
+  <!-- Upload Drop Zone -->
+  <div id="mediaUploadZone" style="display:none;">
+    <div class="content-panel" style="padding:var(--space-6);">
+      <div class="panel-header" style="margin-bottom:var(--space-5);">
+        <h3 style="font-family:var(--font-display);font-size:1rem;">Upload New Image</h3>
+        <button onclick="document.getElementById('mediaUploadZone').style.display='none'" class="btn btn-ghost btn-sm"><i class="fa fa-times"></i> Close</button>
+      </div>
+      <div id="mediaDropZone"
+           style="border:2px dashed var(--clr-border);border-radius:var(--radius-xl);padding:48px 24px;text-align:center;cursor:pointer;transition:var(--transition-base);position:relative;"
+           ondragover="handleMediaDragOver(event)" ondragleave="handleMediaDragLeave(event)" ondrop="handleMediaDrop(event)">
+        <input type="file" id="mediaFileInput" accept="image/*" multiple
+               style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
+               onchange="handleMediaFileSelect(event)" />
+        <i class="fa fa-cloud-upload" style="font-size:2.5rem;color:var(--clr-primary);display:block;margin-bottom:16px;"></i>
+        <p style="font-size:1rem;font-weight:600;color:var(--clr-text-primary);margin-bottom:6px;">Drop images here or click to browse</p>
+        <p style="font-size:.8rem;color:var(--clr-text-muted);">PNG, JPG, WebP, SVG · Max 5MB per file · Multiple files supported</p>
+      </div>
+      <!-- Upload metadata -->
+      <div id="mediaUploadMeta" style="display:none;margin-top:var(--space-5);">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-4);">
+          <div>
+            <label class="label">Image Type / Category *</label>
+            <select id="mediaUploadType" class="input-field">
+              <option value="general">General</option>
+              <option value="avatar">Avatar / User Badge</option>
+              <option value="testimonial">Testimonial Icon</option>
+              <option value="background">Background Image</option>
+              <option value="thumbnail">Project Thumbnail</option>
+              <option value="logo">Logo / Brand</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Alt Text (SEO)</label>
+            <input id="mediaUploadAlt" type="text" class="input-field" placeholder="Describe the image…" />
+          </div>
+          <div>
+            <label class="label">Tags (comma-separated)</label>
+            <input id="mediaUploadTags" type="text" class="input-field" placeholder="hero, dark, real-estate" />
+          </div>
+        </div>
+        <!-- Preview queue -->
+        <div id="mediaPreviewQueue" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:var(--space-4);"></div>
+        <button onclick="submitMediaUpload()" class="btn btn-accent"><i class="fa fa-upload"></i> Upload <span id="mediaUploadCount">0</span> Image(s)</button>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Search bar -->
+  <div class="content-panel" style="padding:var(--space-4) var(--space-5);">
+    <input id="mediaSearch" type="text" class="input-field" style="height:36px;max-width:340px;" placeholder="Search by filename, tag, type…" oninput="filterMedia()" />
+  </div>
+ 
+  <!-- Media grid -->
+  <div class="content-panel">
+    <div id="mediaGrid" style="
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+      gap:var(--space-4);
+      padding:var(--space-5);
+      min-height:200px;
+    ">
+      <div style="grid-column:1/-1;text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">
+        <i class="fa fa-photo" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+        Loading media library…
+      </div>
+    </div>
+    <div style="padding:0 var(--space-5) var(--space-5);display:flex;justify-content:center;">
+      <button id="mediaLoadMoreBtn" onclick="loadMoreMedia()" class="btn btn-ghost btn-sm" style="display:none;">Load More</button>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── Media Preview / Detail Modal ── -->
+<section id="mediaDetailPopup" class="background-tint-black">
+  <button onclick="closeModal('mediaDetailPopup')" class="btn-close" style="position:fixed;top:70px;right:20px;z-index:10001;"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout" style="max-width:700px;">
+    <div class="modal-box">
+      <div style="display:flex;gap:var(--space-6);">
+        <!-- Image preview -->
+        <div style="flex:1;min-width:0;">
+          <img id="mediaDetailImg" src="" alt="" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--clr-border);object-fit:contain;max-height:320px;background:var(--clr-surface-2);" />
+        </div>
+        <!-- Metadata -->
+        <div style="width:260px;flex-shrink:0;">
+          <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:var(--space-4);color:var(--clr-text-primary);">Image Details</div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+            <div><div class="label">Filename</div><div id="mediaDetailName" style="font-family:var(--font-mono);font-size:.75rem;color:var(--clr-text-secondary);word-break:break-all;"></div></div>
+            <div><div class="label">Type</div><span id="mediaDetailType" class="badge badge-info"></span></div>
+            <div><div class="label">Size</div><span id="mediaDetailSize" style="font-size:.8rem;color:var(--clr-text-secondary);"></span></div>
+            <div><div class="label">Uploaded</div><span id="mediaDetailDate" style="font-size:.8rem;color:var(--clr-text-secondary);"></span></div>
+            <div>
+              <label class="label">Alt Text</label>
+              <input id="mediaDetailAlt" type="text" class="input-field" style="margin-top:4px;" />
+            </div>
+            <div>
+              <label class="label">Tags</label>
+              <input id="mediaDetailTags" type="text" class="input-field" style="margin-top:4px;" />
+            </div>
+            <!-- Copy URL -->
+            <div>
+              <label class="label">URL</label>
+              <div style="display:flex;gap:6px;margin-top:4px;">
+                <input id="mediaDetailUrl" type="text" class="input-field" readonly style="font-size:.7rem;font-family:var(--font-mono);" />
+                <button onclick="copyMediaUrl()" class="btn btn-secondary btn-sm btn-icon" title="Copy URL"><i class="fa fa-copy"></i></button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:var(--space-5);">
+            <button onclick="saveMediaMeta()" class="btn btn-accent btn-sm"><i class="fa fa-save"></i> Save Changes</button>
+            <a id="mediaDetailDownload" href="#" download class="btn btn-secondary btn-sm" style="text-align:center;"><i class="fa fa-download"></i> Download</a>
+            <button onclick="deleteMedia()" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
     <!-- ── USERS PANEL (SUPER_ADMIN only) ── -->
     <section id="panel-users" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
       <div class="panel-header">
@@ -737,6 +997,19 @@
           </table>
         </div>
       </div>
+
+      <div class="content-panel" style="margin-top:var(--space-6);">
+  <div class="panel-header">
+    <span class="panel-title">👥 Team Members</span>
+    <button class="btn btn-accent btn-sm" onclick="openAddTeamMember()"><i class="fa fa-plus"></i> Add Member</button>
+  </div>
+  <div class="data-table-wrapper">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Company Role</th><th>Department</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="teamMembersTbody"><tr><td colspan="7" style="text-align:center;padding:var(--space-6);color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
     </section>
 
     <!-- ── SETTINGS PANEL ── -->
@@ -768,6 +1041,83 @@
           </div>
         </div>
       </div>
+      <div class="content-panel" style="margin-bottom:var(--space-5);">
+  <div class="panel-header"><span class="panel-title">📍 Location & Contact</span></div>
+  <div style="padding:var(--space-6);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+    <div><label class="label">Site Name</label><input id="settingSiteName" type="text" class="input-field" /></div>
+    <div><label class="label">Timezone</label>
+      <select id="settingTimezone" class="input-field">
+        <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
+        <option value="UTC">UTC</option>
+        <option value="Africa/Lagos">Africa/Lagos (WAT)</option>
+      </select>
+    </div>
+    <div><label class="label">Contact Email</label><input id="settingContactEmail" type="email" class="input-field" /></div>
+    <div><label class="label">Phone Number</label><input id="settingPhone" type="text" class="input-field" /></div>
+    <div><label class="label">WhatsApp (digits, with code)</label><input id="settingWhatsapp" type="text" class="input-field" /></div>
+    <div><label class="label">City</label><input id="settingCity" type="text" class="input-field" /></div>
+    <div><label class="label">Country</label><input id="settingCountry" type="text" class="input-field" /></div>
+    <div style="grid-column:1/-1;"><label class="label">Full Address</label><input id="settingAddress" type="text" class="input-field" /></div>
+    <div style="grid-column:1/-1;"><label class="label">Google Maps Embed URL</label><input id="settingMapUrl" type="url" class="input-field" placeholder="https://www.google.com/maps/embed?pb=…" /></div>
+  </div>
+</div>
+ 
+<div class="content-panel" style="margin-bottom:var(--space-5);">
+  <div class="panel-header"><span class="panel-title">📧 Email / SMTP Configuration</span></div>
+  <div style="padding:var(--space-6);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+    <div><label class="label">SMTP Host</label><input id="settingSmtpHost" type="text" class="input-field" placeholder="mail.adconnect.co.ke" /></div>
+    <div><label class="label">SMTP Port</label><input id="settingSmtpPort" type="text" class="input-field" placeholder="465" /></div>
+    <div><label class="label">SMTP Username / Email</label><input id="settingSmtpUser" type="email" class="input-field" /></div>
+    <div><label class="label">SMTP Password <span style="font-size:.65rem;color:var(--clr-text-muted);font-weight:400;">(leave blank to keep current)</span></label><input id="settingSmtpPassword" type="password" class="input-field" placeholder="••••••••" /></div>
+    <div><label class="label">From Name</label><input id="settingEmailFromName" type="text" class="input-field" placeholder="AdConnect Team" /></div>
+    <div><label class="label">Admin Notification Email</label><input id="settingAdminEmail" type="email" class="input-field" /></div>
+    <div style="grid-column:1/-1;display:flex;gap:var(--space-3);">
+      <button class="btn btn-accent btn-sm" onclick="sendTestEmail()"><i class="fa fa-envelope"></i> Send Test Email</button>
+    </div>
+  </div>
+</div>
+ 
+<div class="content-panel" style="margin-bottom:var(--space-5);">
+  <div class="panel-header"><span class="panel-title">🔐 Google OAuth — Meet Link Generation</span></div>
+  <div style="padding:var(--space-6);">
+    <p style="font-size:.85rem;color:var(--clr-text-secondary);margin-bottom:var(--space-4);line-height:1.7;">
+      Since your site is on TrueHost shared hosting (no terminal access), use this panel to authorize Google Calendar access and refresh the token when it expires. Google Meet links will only generate if the token is valid.
+    </p>
+    <div id="googleTokenStatus" style="margin-bottom:var(--space-5);padding:16px;background:var(--clr-surface-2);border-radius:var(--radius-md);border:1px solid var(--clr-border);">
+      Checking token status…
+    </div>
+    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="initiateGoogleAuth()"><i class="fa fa-google"></i> Re-authorize Google</button>
+      <button class="btn btn-secondary btn-sm" onclick="refreshGoogleToken()"><i class="fa fa-refresh"></i> Refresh Token</button>
+    </div>
+    <div style="margin-top:var(--space-4);padding:14px 16px;background:var(--clr-surface-2);border-radius:var(--radius-md);border-left:3px solid var(--clr-warning);">
+      <p style="font-size:.78rem;color:var(--clr-text-muted);margin:0;line-height:1.6;">
+        <strong style="color:var(--clr-warning);">How it works on shared hosting:</strong><br/>
+        Click "Re-authorize Google" → a popup opens Google's consent page → you approve access → this panel detects the new token and saves it automatically. The token refreshes itself automatically; only re-authorize if it expires or is revoked.
+      </p>
+    </div>
+  </div>
+</div>
+ 
+<div class="content-panel" style="margin-bottom:var(--space-5);">
+  <div class="panel-header"><span class="panel-title">⏱ Session & Security</span></div>
+  <div style="padding:var(--space-6);">
+    <div style="display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap;">
+      <div>
+        <label class="label">Auto Sign-out After Inactivity</label>
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-top:6px;">
+          <input id="settingAutoSignout" type="number" min="1" max="120" class="input-field" style="width:100px;" value="10" />
+          <span style="font-size:.85rem;color:var(--clr-text-muted);">minutes</span>
+        </div>
+        <p style="font-size:.72rem;color:var(--clr-text-muted);margin-top:4px;">A warning appears 1 minute before sign-out. Minimum: 1 min. Maximum: 120 min.</p>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<div style="text-align:right;padding:var(--space-4);">
+  <button class="btn btn-accent btn-lg" onclick="saveAllSettings()"><i class="fa fa-save"></i> Save All Settings</button>
+</div>
     </section>
 
     <!-- ── ACCESS DENIED ── -->
@@ -819,6 +1169,47 @@
         </div>
         <div><label class="label">Password *</label><input id="userPassword" type="password" class="input-field" placeholder="Min 6 chars, upper+lower+num" /></div>
         <button id="submitButton" onclick="userRegistrationOrUpdate(event)" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Team Member Modal -->
+<section id="teamMemberPopup" class="background-tint-black">
+  <button onclick="closeModal('teamMemberPopup')" class="btn-close"><i class="fa fa-times"></i></button>
+  <div class="appointment-layout">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);">
+        <div class="slash-rect"></div>
+        <h3 class="panel-title" id="teamMemberModalTitle">Add Team Member</h3>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div><label class="label">Full Name *</label><input id="tmName" type="text" class="input-field" placeholder="Misgina Fitwi" /></div>
+        <div><label class="label">Company Role *</label><input id="tmRole" type="text" class="input-field" placeholder="Digital Marketing Specialist" /></div>
+        <div><label class="label">Department</label>
+          <select id="tmDept" class="input-field">
+            <option value="">Select…</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Design">Design</option>
+            <option value="Management">Management</option>
+            <option value="Sales">Sales</option>
+          </select>
+        </div>
+        <div><label class="label">Email</label><input id="tmEmail" type="email" class="input-field" /></div>
+        <div><label class="label">Phone</label><input id="tmPhone" type="tel" class="input-field" /></div>
+        <div style="display:flex;align-items:center;gap:8px;align-self:end;">
+          <input type="checkbox" id="tmIsActive" style="accent-color:var(--clr-primary);width:16px;height:16px;" checked />
+          <label for="tmIsActive" style="font-size:.85rem;color:var(--clr-text-secondary);cursor:pointer;">Active (shows on website)</label>
+        </div>
+        <div style="grid-column:1/-1;"><label class="label">Bio</label><textarea id="tmBio" class="input-field" style="height:80px;" placeholder="Brief bio for the team page…"></textarea></div>
+        <div style="grid-column:1/-1;">
+          <label class="label">Profile Photo</label>
+          <input type="file" id="tmPhoto" accept=".png,.jpg,.jpeg,.webp" style="color:var(--clr-text-secondary);font-size:.85rem;" />
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-6);">
+        <button onclick="saveTeamMember()" class="btn btn-accent" style="flex:1;">Save Member</button>
+        <button onclick="closeModal('teamMemberPopup')" class="btn btn-ghost">Cancel</button>
       </div>
     </div>
   </div>

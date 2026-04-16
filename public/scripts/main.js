@@ -4,9 +4,10 @@
  */
 'use strict';
 
+
 /* ── Config ─────────────────────────────────── */
 //const DOMAIN = 'https://adconnect.co.ke/api/';
- const DOMAIN = 'http://127.0.0.1:3000/api/';
+ const DOMAIN = 'http://localhost:3000/api/';
 
 /* ── State ───────────────────────────────────── */
 const AppState = {
@@ -27,7 +28,7 @@ const STEP_FIELDS = ['firstNameInput','lastNameInput','emailAddressInput','phone
 
 /* ── Patterns ────────────────────────────────── */
 const RE = {
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  email: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
   phone: /^(?:\+254|0)(7|1)\d{8}$/,
   twoWords: /^\S+\s+\S+/,
 };
@@ -56,12 +57,23 @@ const TIME_SLOTS = [
 
 /* ── Static testimonials (fallback) ─────────── */
 const STATIC_TESTIMONIALS = [
-  { name:'Irene Nyokabi', company:'Elixir Salon & Spa', photo:'/resources/elixir.png', stars:5, text:'"AdConnect has been instrumental in helping us reach our target audience and generate high-quality leads. Their team is professional, responsive, and always delivers on time. Our bookings increased by 180% within the first 3 months!"' },
-  { name:'Eng. James', company:'Ricosam Engineering', photo:'/resources/ricosam.PNG', stars:5, text:'"Our project involved integrating multiple third-party APIs, which was tricky. AdConnect handled it flawlessly and also optimised the process to ensure fast load times. Their technical expertise is truly impressive."' },
-  { name:'John Kamau', company:'Songa Real Estate', photo:'/resources/pic-back.png', stars:4, text:'"Our company required a custom web application to streamline internal operations, and AdConnect delivered beyond expectations. Their developers were thorough, responsive, and the application is intuitive and scalable."' },
-  { name:'Dr. Sam Smith', company:'Smith Properties', photo:'/resources/pic-back.png', stars:4, text:'"Their digital marketing campaigns transformed my real estate business. From Google Ads to social media, their strategies brought measurable results. My business saw a 200% increase in qualified leads within 6 months."' },
-  { name:'Ladybird', company:'Nuloft Salon & Spa', photo:'/resources/pic-back.png', stars:5, text:'"What I love most about AdConnect is their reliability. They don\'t just finish a project and disappear — they provide ongoing support and guidance long after going live. Maintenance and updates have kept my site flawless."' },
-  { name:'Michael Maina', company:'Oriss Company', photo:'/resources/pic-back.png', stars:5, text:'"I was skeptical about SEO at first, but AdConnect changed my perspective. Within four months, my website ranked on the first page of Google for several key search terms, directly translating into more inquiries and sales."' },
+  { name:'Irene Nyokabi', company:'Elixir Salon & Spa', photo:'resources/elixir.png', stars:5, text:'"AdConnect has been instrumental in helping us reach our target audience and generate high-quality leads. Their team is professional, responsive, and always delivers on time. Our bookings increased by 180% within the first 3 months!"' },
+  { name:'Eng. James', company:'Ricosam Engineering', photo:'resources/ricosam.PNG', stars:5, text:'"Our project involved integrating multiple third-party APIs, which was tricky. AdConnect handled it flawlessly and also optimised the process to ensure fast load times. Their technical expertise is truly impressive."' },
+  { name:'John Kamau', company:'Songa Real Estate', photo:'resources/pic-back.png', stars:4, text:'"Our company required a custom web application to streamline internal operations, and AdConnect delivered beyond expectations. Their developers were thorough, responsive, and the application is intuitive and scalable."' },
+  { name:'Dr. Sam Smith', company:'Smith Properties', photo:'resources/pic-back.png', stars:4, text:'"Their digital marketing campaigns transformed my real estate business. From Google Ads to social media, their strategies brought measurable results. My business saw a 200% increase in qualified leads within 6 months."' },
+  { name:'Ladybird', company:'Nuloft Salon & Spa', photo:'resources/pic-back.png', stars:5, text:'"What I love most about AdConnect is their reliability. They don\'t just finish a project and disappear — they provide ongoing support and guidance long after going live. Maintenance and updates have kept my site flawless."' },
+  { name:'Michael Maina', company:'Oriss Company', photo:'resources/pic-back.png', stars:5, text:'"I was skeptical about SEO at first, but AdConnect changed my perspective. Within four months, my website ranked on the first page of Google for several key search terms, directly translating into more inquiries and sales."' },
+];
+
+const STATIC_FAQS = [
+  { q: 'How long before I see results with your services?', a: 'Every client is different, but our targeted strategies typically deliver noticeable improvements within the first 2–3 months. Some clients see results within weeks of launching. We focus on quick wins first, then build long-term compounding results.' },
+  { q: 'What platforms do you advertise on?', a: 'We run campaigns across Facebook, Instagram, TikTok, YouTube, Google Search, Google Display, and LinkedIn — whichever platforms your target audience uses most for real estate. We always recommend a platform mix based on your goals and budget.' },
+  { q: 'Do you offer ongoing support?', a: 'Absolutely! We\'re here for the long term. We provide continuous campaign optimization, monthly strategy reviews, detailed performance reports, and direct access to our team throughout our engagement.' },
+  { q: 'Is there a minimum contract length?', a: 'We offer flexible terms designed to fit your specific needs. We recommend a minimum of 3 months to see meaningful, compounding results — but we don\'t lock you into long-term contracts against your will.' },
+  { q: 'What is your pricing model?', a: 'Our pricing is custom-built for your situation and goals. Book a free consultation and we\'ll provide a transparent proposal based on the scope of work, ad spend, and expected results. We believe in fair, performance-focused pricing.' },
+  { q: 'Can you build our website as well?', a: 'Yes! We offer full-stack web development, mobile app development (Android), and UI/UX design services. Many of our clients combine marketing and tech services for a fully integrated digital presence.' },
+  { q: 'How do I get started?', a: 'Simply book a free consultation through our website. We\'ll review your current marketing, understand your goals, and walk you through exactly how we can help. No pressure, no obligations — just a strategic conversation.' },
+  { q: 'Do you work with businesses outside Kenya?', a: 'Yes! We currently serve clients in Kenya, Ethiopia, Rwanda, Uganda, Tanzania, and internationally. Digital marketing knows no borders, and our strategies are adaptable to any market.' },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -88,6 +100,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadVideoContent(),
   ]);
 
+  loadFAQs
+
   // Render testimonials carousel
   renderTestimonialsCarousel(AppState.testimonials.length ? AppState.testimonials : STATIC_TESTIMONIALS);
 
@@ -110,6 +124,91 @@ document.addEventListener('DOMContentLoaded', async () => {
   const footerConsult = document.getElementById('footerConsultationBtn');
   if (footerConsult) footerConsult.addEventListener('click', () => openUrl('?lead-capture-form=true'));
 });
+
+(function() {
+  'use strict';
+  const PREF_KEY = 'ac_cookie_prefs';
+  const stored = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+  if (!stored) {
+    // Show after 1s
+    setTimeout(() => {
+      document.getElementById('cookieConsent').style.display = 'block';
+    }, 1000);
+  } else {
+    applyConsent(stored);
+  }
+ 
+  window.acceptCookies = function() {
+    const prefs = { essential:true, analytics:true, marketing:true, functional:true, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.rejectCookies = function() {
+    const prefs = { essential:true, analytics:false, marketing:false, functional:false, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.openCookiePrefs = function() {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+    document.getElementById('cc-analytics').checked  = p.analytics  || false;
+    document.getElementById('cc-marketing').checked  = p.marketing  || false;
+    document.getElementById('cc-functional').checked = p.functional || false;
+    document.getElementById('ccModal').style.display = 'flex';
+  };
+  window.closeCookiePrefs = function() { document.getElementById('ccModal').style.display='none'; };
+  window.savePreferences = function() {
+    const prefs = {
+      essential: true,
+      analytics:  document.getElementById('cc-analytics').checked,
+      marketing:  document.getElementById('cc-marketing').checked,
+      functional: document.getElementById('cc-functional').checked,
+      ts: Date.now(),
+    };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    closeCookiePrefs();
+    hideBanner();
+  };
+  
+ 
+  function trackVisit(prefs) {
+  if (!prefs.analytics) return;
+
+  let sessionId = localStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2);
+    localStorage.setItem('session_id', sessionId);
+  }
+
+  fetch(`${DOMAIN}analytics/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page_name: document.title,
+      page_path: location.pathname,
+      session_id: sessionId,
+      referrer: document.referrer || null
+    }),
+  }).catch(() => {});
+}
+ 
+  function applyConsent(prefs) {
+    // Load GTM only if analytics & marketing accepted
+    if (prefs.analytics && prefs.marketing && typeof window.dataLayer === 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      // GTM already loaded in page head, just push consent
+    }
+    if (prefs.analytics) trackVisit(prefs);
+    // Dispatch event for other scripts to listen
+    window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { detail: prefs }));
+  }
+ 
+  function saveToStorage(prefs) { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }
+  function hideBanner() { const el = document.getElementById('cookieConsent'); if (el) { el.style.animation='cc-slide-up .3s ease reverse'; setTimeout(()=>el.style.display='none',280); } }
+})();
+
 
 /* ── URL Params ──────────────────────────────── */
 function handleUrlParams() {
@@ -181,6 +280,67 @@ async function loadHeroContent() {
     if (data.result_3)          setText('res3', data.result_3);
     if (data.result_4)          setText('res4', data.result_4);
   } catch (e) { /* silently use defaults */ }
+}
+
+function renderFAQs(list) {
+  const container = document.getElementById('faqList');
+  container.innerHTML = list.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <div class="faq-question" onclick="toggleFAQ(${i})">
+        <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+        <span style="flex:1;">${f.q}</span>
+        <span class="q-icon"><i class="fa fa-plus"></i></span>
+      </div>
+      <div class="faq-answer">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFAQ(i) {
+  const item = document.getElementById(`faq-${i}`);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+async function loadFAQs() {
+  try {
+    const res = await fetch(`${DOMAIN}faqs`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.items && Array.isArray(JSON.parse(data.items))) {
+        renderFAQs(JSON.parse(data.items));
+        return;
+      }
+    }
+  } catch {}
+  renderFAQs(STATIC_FAQS);
+}
+
+async function submitFAQ(e) {
+  e.preventDefault();
+  const btn = document.getElementById('faqSubmitBtn');
+  btn.disabled = true; 
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+  
+  try {
+    await fetch(`${DOMAIN}faq-submission`, {
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        name: document.getElementById('faqName').value, 
+        email: document.getElementById('faqEmail').value, 
+        question: document.getElementById('faqQuestion').value 
+      }),
+    });
+    document.getElementById('faqContactForm').reset();
+    document.getElementById('faqFormSuccess').style.display = 'block';
+  } catch(error) {
+    console.error('Submission error:', error);  
+  }
+  finally { 
+    btn.disabled = false; 
+    btn.innerHTML = '<i class="fa fa-paper-plane"></i> Send Question'; 
+  }
 }
 
 async function loadVideoContent() {
@@ -351,9 +511,9 @@ async function openAppointmentBooking() { setH('appointmentView','100%'); pushUr
 function closeAppointmentView()    { setH('appointmentView','0%'); pushUrl(''); }
 function openAppointmentBookingThankYouPage() { setH('appointmentThanksView','100%'); pushUrl('thank-you-for-booking=true'); }
 function closeAppointmentThanksView() { setH('appointmentThanksView','0%'); pushUrl(''); }
-function openFAQs()                { setH('faqsSection','100%'); pushUrl('faqs=true'); }
+function openFAQs()                { setH('faqsSection','100%'); pushUrl('faqs=true'); loadFAQs(); }
 function closeFAQs()               { setH('faqsSection','0%'); pushUrl(''); }
-function openPrivacyPolicy()       { setH('privacyPolicy','100%'); pushUrl('privacy-policy=true'); }
+function openPrivacyPolicy() { setH('privacyPolicy', '100%'); pushUrl('privacy-policy=true'); }
 function closePrivacyPolicy()      { setH('privacyPolicy','0%'); pushUrl(''); }
 function openUrl(param)            { openLeadCaptureSection(); }
 
@@ -630,8 +790,10 @@ function showApptErr(msg) {
   setTimeout(() => el.style.display='none', 4000);
 }
 
-async function submitAppointment(e) {
-  if (e) e.preventDefault();
+const btn = document.getElementById('btnSubmitAppointment');
+btn.addEventListener('click', submitAppointment);
+async function submitAppointment() {
+  //if (e) e.preventDefault();
   const errEl = document.getElementById('appointmentErrorMessage');
 
   const name    = getValue('appointeeName');
@@ -641,12 +803,12 @@ async function submitAppointment(e) {
   const msg     = getValue('appointeeMessage');
   const loc     = getValue('appointeeLocation') || 'Online';
 
-  if (!name)                { showApptErr('Full name is required.'); return; }
-  if (!RE.email.test(email)){ showApptErr('Please enter a valid email.'); return; }
-  if (!RE.phone.test(phone)){ showApptErr('Please enter a valid phone number.'); return; }
-  if (!date)                { showApptErr('Please select a date.'); return; }
-  if (!AppState.selectedTime){ showApptErr('Please select a time slot.'); return; }
-  if (!msg)                 { showApptErr('Please add a brief meeting note.'); return; }
+  if (!name)                { toast('Full name is required.', 'error'); document.getElementById('appointeeName').focus(); return; }
+  if (!RE.email.test(email)){ toast('Please enter a valid email.', 'error'); document.getElementById('appointeeEmail').focus(); return; }
+  if (!RE.phone.test(phone)){ toast('Please enter a valid phone number.', 'error'); document.getElementById('appointeePhone').focus(); return; }
+  if (!date)                { toast('Please select a date.', 'error'); document.getElementById('appointeeDate').focus(); return; }
+  if (!AppState.selectedTime){ toast('Please select a time slot.', 'error'); return; }
+  if (!msg)                 { toast('Please add a brief meeting note.', 'error'); document.getElementById('appointeeMessage').focus(); return; }
 
   const btn = document.getElementById('btnSubmitAppointment');
   if (btn) { btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Booking…'; }
@@ -711,9 +873,6 @@ function to24(str) {
 }
 
 /* ── FAQ Form ────────────────────────────────── */
-function openFAQsForm() {
-  // Already inline in the FAQ modal
-}
 
 async function submitFAQsForm() {
   const name     = getValue('faqName');
@@ -725,10 +884,19 @@ async function submitFAQsForm() {
   setValue('faqName',''); setValue('faqEmail',''); setValue('faqQuestion','');
 }
 
+document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
 /* ── Newsletter ──────────────────────────────── */
 async function subscribeNewsletter() {
-  const email = getValue('newsletterEmail');
+  const email = getValue('footerNewsletterEmail');
   if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+
+  fetch(`${DOMAIN}newsletter-subscribe`, { 
+    method:'POST', 
+    headers:{'Content-Type':'application/json'}, 
+    body:JSON.stringify({ 
+      email 
+    }), 
+  }).catch(() => { /* ignore errors */ });
   toast('Subscribed! Thanks for joining our newsletter.', 'success');
   setValue('newsletterEmail','');
 }

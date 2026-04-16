@@ -280,6 +280,27 @@ CREATE TABLE IF NOT EXISTS career_applications (
     INDEX idx_email  (email)
 );
 
+==═══════════════════════════════════════════════════════════════════════
+-- New Table: Page Views (for Analytics)
+-- This table will store page view events for analytics purposes.
+-- It captures the page name, path, session ID, IP address, user agent, referrer, UTM parameters, and timestamp.
+-- This will allow us to analyze user behavior, traffic sources, and campaign performance.
+-- Note: In a production environment, consider data privacy and compliance when storing IP addresses and user agents.
+--═══════════════════════════════════════════════════════════════════════
+CREATE TABLE page_views (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    page_name VARCHAR(255) NOT NULL,
+    page_path VARCHAR(255),
+    session_id VARCHAR(100),
+    ip_address VARCHAR(45),         -- supports IPv4 + IPv6
+    user_agent TEXT,
+    referrer TEXT,
+    utm_source VARCHAR(100),
+    utm_medium VARCHAR(100),
+    utm_campaign VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ════════════════════════════════════════════════════════════════════════
 -- 2. ALTER EXISTING TABLES — ADD MISSING COLUMNS IF NOT EXIST
 -- (Idempotent via stored procedure)
@@ -550,6 +571,128 @@ INSERT IGNORE INTO career_listings (id,title,department,type,location,mode,salar
  'Build and maintain client websites and the AdConnect platform.',
  JSON_ARRAY('New'),'OPEN');
 
+-- FAQs
+CREATE TABLE IF NOT EXISTS faqs (
+  id         VARCHAR(20)  PRIMARY KEY,
+  question   TEXT         NOT NULL,
+  answer     TEXT         NOT NULL,
+  category   VARCHAR(100),
+  status     ENUM('PUBLISHED','DRAFT') DEFAULT 'PUBLISHED',
+  sort_order INT          DEFAULT 0,
+  featured   TINYINT(1)   DEFAULT 0,
+  created_at DATETIME,
+  updated_at DATETIME,
+  INDEX idx_status   (status),
+  INDEX idx_category (category)
+);
+ 
+-- FAQ Submissions (from public form)
+CREATE TABLE IF NOT EXISTS faq_submissions (
+  id         VARCHAR(20) PRIMARY KEY,
+  name       VARCHAR(100),
+  email      VARCHAR(255),
+  question   TEXT NOT NULL,
+  created_at DATETIME
+);
+ 
+-- Media Library
+CREATE TABLE IF NOT EXISTS media_library (
+  id            VARCHAR(20)  PRIMARY KEY,
+  filename      VARCHAR(300) NOT NULL,
+  original_name VARCHAR(300),
+  type          VARCHAR(50)  DEFAULT 'general',
+  alt           VARCHAR(500),
+  tags          JSON,
+  size          INT,
+  width         INT,
+  height        INT,
+  mime_type     VARCHAR(100),
+  created_at    DATETIME,
+  INDEX idx_type (type)
+);
+ 
+-- Site Analytics
+CREATE TABLE IF NOT EXISTS site_analytics (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  date       DATE         NOT NULL,
+  page       VARCHAR(500),
+  ip_hash    VARCHAR(64),
+  referrer   VARCHAR(500),
+  visits     INT          DEFAULT 1,
+  created_at DATETIME,
+  updated_at DATETIME,
+  INDEX idx_date (date),
+  INDEX idx_ip   (ip_hash)
+);
+ 
+-- Newsletter
+CREATE TABLE IF NOT EXISTS newsletter (
+  id         VARCHAR(20)  PRIMARY KEY,
+  email      VARCHAR(255) UNIQUE NOT NULL,
+  status     ENUM('ACTIVE','UNSUBSCRIBED') DEFAULT 'ACTIVE',
+  created_at DATETIME
+);
+ 
+-- Team Members
+CREATE TABLE IF NOT EXISTS team_members (
+  id           VARCHAR(20)  PRIMARY KEY,
+  full_name    VARCHAR(200) NOT NULL,
+  email        VARCHAR(255),
+  phone        VARCHAR(30),
+  company_role VARCHAR(200),
+  department   VARCHAR(100),
+  user_role    VARCHAR(50),
+  bio          TEXT,
+  linkedin     VARCHAR(500),
+  photo        VARCHAR(300),
+  is_active    TINYINT(1) DEFAULT 1,
+  created_at   DATETIME,
+  updated_at   DATETIME,
+  INDEX idx_active (is_active)
+);
+ 
+-- Seed sample FAQs
+INSERT IGNORE INTO faqs (id, question, answer, category, status, sort_order, featured) VALUES
+('fq001', 'How long does it take to see results from Facebook Ads?', 'Most clients start seeing measurable results within 2–4 weeks of launching their campaigns. The first week is typically used for audience learning and optimization.', 'Advertising', 'PUBLISHED', 1, 1),
+('fq002', 'What is your minimum advertising budget?', 'We recommend a minimum monthly budget of KES 30,000 for advertising spend. This ensures enough data for the algorithms to optimize effectively.', 'Pricing', 'PUBLISHED', 2, 1),
+('fq003', 'Do you work with real estate companies outside Kenya?', 'Yes! We work with real estate businesses across East Africa and beyond. All consultations can be conducted online.', 'General', 'PUBLISHED', 3, 0),
+('fq004', 'Can you build a website for my real estate company?', 'Absolutely. Our development team builds modern, fast, and conversion-focused websites for real estate businesses using the latest technologies.', 'Services', 'PUBLISHED', 4, 0);
+
+
+-- Email Sequence Queue
+CREATE TABLE IF NOT EXISTS email_sequence_queue (
+  id           VARCHAR(20)  PRIMARY KEY,
+  email        VARCHAR(255) NOT NULL,
+  sequence_day INT          NOT NULL,
+  subject      VARCHAR(500),
+  category     VARCHAR(50),
+  scheduled_at DATETIME     NOT NULL,
+  sent_at      DATETIME,
+  status       ENUM('PENDING','SENT','FAILED','PAUSED','SKIPPED','SKIPPED_PREF','CANCELLED') DEFAULT 'PENDING',
+  retry_count  INT DEFAULT 0,
+  created_at   DATETIME,
+  UNIQUE KEY uq_email_day (email, sequence_day),
+  INDEX idx_status_sched (status, scheduled_at),
+  INDEX idx_email (email)
+);
+ 
+-- Email Preferences
+CREATE TABLE IF NOT EXISTS email_preferences (
+  id          VARCHAR(20)  PRIMARY KEY,
+  email       VARCHAR(255) NOT NULL UNIQUE,
+  preferences JSON,
+  updated_at  DATETIME,
+  INDEX idx_email (email)
+);
+ 
+-- Unsubscribe Log
+CREATE TABLE IF NOT EXISTS unsubscribe_log (
+  id         VARCHAR(20)  PRIMARY KEY,
+  email      VARCHAR(255) NOT NULL,
+  reason     VARCHAR(100),
+  created_at DATETIME,
+  INDEX idx_email (email)
+);
 -- ════════════════════════════════════════════════════════════════════════
 -- 4. CLEANUP
 -- ════════════════════════════════════════════════════════════════════════

@@ -2,450 +2,1234 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Our Services</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Services — AdConnect</title>
 
-    <!-- Logo Icon-->
-    <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
 
-    <!-- link css -->
-    <link rel="stylesheet" href="css/theme.css" />
+  <!-- Theme CSS (unchanged) -->
+  <link rel="stylesheet" href="css/theme.css" />
 
-    <!-- Scroll cdn -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <!-- AOS -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
-    <!-- Font awesome cdn -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
-        integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css"
+    integrity="sha512-9xKTRVabjVeZmc+GUW8GgSmcREDunMM+Dt/GrzchfN8tkwHizc5RP4Ok/MXFFy5rIjJjzhndFScTceq5e6GvVQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Font Oregano -->
-    <link href="https://fonts.googleapis.com/css2?family=Oregano&display=swap" rel="stylesheet" />
-    <!-- Font DM Sans  sans-serif -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-    <!-- Font IBM Plex Sans Hebrew sans-serif -->
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;700&display=swap"
-        rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Page-level layout additions (no overrides to theme.css) ── */
+
+    /* Hero banner */
+    .services-hero {
+      padding-top: calc(var(--header-h) + var(--space-16));
+      padding-bottom: var(--space-16);
+      background-image:
+        linear-gradient(135deg, rgba(26,25,23,.97) 0%, rgba(77,76,75,.6) 100%),
+        url(resources/background-image.jpeg);
+      background-position: center;
+      background-size: cover;
+      text-align: center;
+    }
+    .services-hero .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: var(--clr-primary-light);
+      border: 1px solid var(--clr-primary);
+      color: var(--clr-primary);
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill);
+      margin-bottom: var(--space-5);
+    }
+    .services-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: var(--clr-text-primary);
+      max-width: 700px;
+      margin: 0 auto var(--space-5);
+      line-height: 1.15;
+    }
+    .services-hero h1 span { color: var(--clr-primary); }
+    .services-hero .hero-sub {
+      font-size: 1rem;
+      color: var(--clr-text-secondary);
+      max-width: 540px;
+      margin: 0 auto var(--space-8);
+    }
+    .hero-cta-row {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Quick-jump pills */
+    .services-nav {
+      background: var(--clr-surface-1);
+      border-bottom: 1px solid var(--clr-border);
+      position: sticky;
+      top: var(--header-h);
+      z-index: 50;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .services-nav::-webkit-scrollbar { display: none; }
+    .services-nav-inner {
+      display: flex;
+      gap: var(--space-1);
+      padding: var(--space-3) var(--space-5);
+      max-width: 1100px;
+      margin: 0 auto;
+      white-space: nowrap;
+    }
+    .snav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .3px;
+      color: var(--clr-text-secondary);
+      background: var(--clr-surface-2);
+      border: 1.5px solid var(--clr-border);
+      cursor: pointer;
+      transition: var(--transition-base);
+      text-decoration: none;
+    }
+    .snav-pill:hover,
+    .snav-pill.active {
+      background: var(--clr-primary);
+      border-color: var(--clr-primary);
+      color: #fff;
+    }
+    .snav-pill i { font-size: .8rem; }
+
+    /* Sections wrapper */
+    .services-body {
+      background-image:
+        linear-gradient(135deg, rgba(26,25,23,.97) 0%, rgba(77,76,75,.5) 100%),
+        url(resources/background-image.jpeg);
+      background-position: center;
+      background-size: cover;
+      background-attachment: fixed;
+      padding: var(--space-12) 0 var(--space-16);
+    }
+    .services-section {
+      max-width: 1100px;
+      margin: 0 auto var(--space-16);
+      padding: 0 var(--space-5);
+      scroll-margin-top: calc(var(--header-h) + 60px);
+    }
+    .services-section:last-child { margin-bottom: 0; }
+
+    /* Section header */
+    .sec-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+    .sec-icon-box {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      background: var(--clr-primary-light);
+      border: 1.5px solid var(--clr-primary);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--clr-primary);
+    }
+    .sec-header-text h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--clr-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .sec-header-text p {
+      font-size: .9rem;
+      color: var(--clr-text-secondary);
+    }
+
+    /* ─── Advertising Section ─────────────────────── */
+    .advert-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5);
+    }
+    @media (max-width: 720px) { .advert-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      background: var(--clr-surface-1);
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      transition: var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--clr-primary);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s ease;
+    }
+    .feature-card:hover { border-color: var(--clr-primary); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card .fc-icon {
+      width: 44px; height: 44px;
+      background: var(--clr-primary-light);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      color: var(--clr-primary);
+      margin-bottom: var(--space-4);
+    }
+    .feature-card h5 {
+      font-size: 1rem;
+      font-family: var(--font-display);
+      color: var(--clr-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .feature-card p { font-size: .85rem; line-height: 1.6; }
+
+    /* Lead gen sub-cards */
+    .lead-sub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    @media (max-width: 520px) { .lead-sub-grid { grid-template-columns: 1fr; } }
+
+    .lead-sub-card {
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+    }
+    .lead-sub-card .lsc-dot {
+      width: 8px; height: 8px;
+      background: var(--clr-primary);
+      border-radius: 50%;
+      margin-bottom: var(--space-3);
+    }
+    .lead-sub-card h6 {
+      font-size: .82rem;
+      font-family: var(--font-display);
+      color: var(--clr-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .lead-sub-card p { font-size: .78rem; color: var(--clr-text-muted); }
+
+    /* Analytics banner */
+    .analytics-banner {
+      background: linear-gradient(135deg, var(--clr-surface-2), var(--clr-surface-1));
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+      margin-top: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .analytics-banner .ab-icon {
+      font-size: 3rem;
+      color: var(--clr-primary);
+      flex-shrink: 0;
+    }
+    .analytics-banner h4 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--clr-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .analytics-banner p { font-size: .875rem; max-width: 520px; }
+
+    /* Platforms row */
+    .platforms-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-top: var(--space-4);
+    }
+    .platform-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-pill);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--clr-text-secondary);
+      font-family: var(--font-display);
+    }
+    .platform-pill i { color: var(--clr-primary); font-size: .85rem; }
+
+    /* ─── Courses Section ─────────────────────────── */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+    }
+    @media (max-width: 768px) { .courses-grid { grid-template-columns: 1fr; } }
+
+    .course-card {
+      background: var(--clr-surface-1);
+      border: 1.5px dashed var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--space-4);
+      transition: var(--transition-base);
+      position: relative;
+    }
+    .course-card:hover { border-color: var(--clr-primary); border-style: solid; }
+    .course-card .cc-top {
+      width: 64px; height: 64px;
+      background: var(--clr-primary-light);
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--clr-primary);
+    }
+    .course-card h5 {
+      font-size: .95rem;
+      font-family: var(--font-display);
+      color: var(--clr-text-primary);
+    }
+    .course-card p { font-size: .82rem; color: var(--clr-text-secondary); line-height: 1.6; }
+    .course-steps {
+      display: flex;
+      gap: var(--space-1);
+      align-items: center;
+      font-size: .72rem;
+      font-family: var(--font-mono);
+      color: var(--clr-text-muted);
+    }
+    .course-steps .step { color: var(--clr-primary); font-weight: 700; }
+    .course-steps .sep { color: var(--clr-border); }
+    .cs-badge {
+      background: var(--clr-primary);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: var(--space-1) var(--space-4);
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      font-family: var(--font-display);
+    }
+    .cc-lock {
+      font-size: 1.5rem;
+      color: var(--clr-surface-4);
+    }
+
+    /* ─── Development Section ─────────────────────── */
+    .dev-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+    }
+    @media (max-width: 1024px) { .dev-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .dev-grid { grid-template-columns: 1fr; } }
+
+    .dev-card {
+      background: var(--clr-surface-1);
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      transition: var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .dev-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--clr-primary), var(--clr-accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s ease;
+    }
+    .dev-card:hover { border-color: var(--clr-primary); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .dev-card:hover::after { transform: scaleX(1); }
+    .dev-card .dc-icon {
+      font-size: 1.6rem;
+      color: var(--clr-primary);
+    }
+    .dev-card h4 {
+      font-family: var(--font-display);
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--clr-text-primary);
+    }
+    .dev-card .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+    .tech-tag {
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: 2px var(--space-2);
+      font-size: .68rem;
+      font-family: var(--font-mono);
+      color: var(--clr-text-muted);
+    }
+    .dev-card p { font-size: .82rem; line-height: 1.6; flex: 1; }
+    .dev-card .star-row {
+      display: flex;
+      gap: 2px;
+    }
+    .dev-card .star-row i { font-size: .75rem; color: var(--clr-primary); }
+    .dev-card .dc-badge {
+      font-size: .7rem;
+      font-family: var(--font-mono);
+      color: var(--clr-text-muted);
+      letter-spacing: .3px;
+    }
+    .dev-card .btn_hover1 {
+      margin-top: auto;
+      width: 100%;
+      justify-content: center;
+      font-size: .78rem;
+    }
+
+    /* ─── Responsive tweaks ────────────────────────── */
+    @media (max-width: 880px) {
+      .analytics-banner { flex-direction: column; }
+      .sec-header { flex-direction: column; gap: var(--space-3); }
+    }
+    @media (max-width: 480px) {
+      .services-hero h1 { font-size: 1.8rem; }
+      .sec-header-text h2 { font-size: 1.3rem; }
+    }
+
+    /* Divider */
+    .section-divider {
+      width: 40px;
+      height: 3px;
+      background: var(--clr-primary);
+      border-radius: var(--radius-pill);
+      margin-bottom: var(--space-6);
+    }
+  </style>
 </head>
 
 <body id="ourServicePage">
-    <div class="site-wrapper">
-        <div class="headerindex">
-            <!-- Header Section -->
-            <header>
-                <nav class="container navbar">
-                    <div class="container-nav flex">
-                        <!-- Site Logo-->
-                        <a href="/" class="navbar-logo">
-                            <img src="resources/logo.png" alt="" />
-                        </a>
-                        <button id="navbarTogler" class="navbar-toggler" type="button">
-                            <span class="fa fa-bars" aria-hidden="true"></span>
-                        </button>
-                        <!-- Menu -->
-                        <ul class="navbar-nav flex">
-                            <li><a href="index.html" class="nav-link">Home</a></li>
-                            <li><a href="aboutus.html" class="nav-link">About Us</a></li>
-                            <li><a href="blog.html" class="nav-link">Blog</a></li>
-                            <li>
-                                <a href="contact.html" class="nav-link">Contact Us</a>
-                            </li>
-                            <li class="dropdown">
-                                <a href="our-services.html" class="nav-link dropdown-toggle active">Our
-                                    Services
-                                    <i class="fa fa-caret-down"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="our-services.html?adverts-service=true" class="dropdown-item active">Social Media
-                                            Advertising</a></li>
-                                    <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics &
-                                            Reporting</a></li>
-                                    <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design &
-                                            Development</a></li>
-                                    <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="careers.html" class="nav-link">Careers</a></li>
-                        </ul>
-                        <!--div id="searchBar" onclick="openSearch()" class="search-bar">
-              <i id="searchBarIcon" onclick="openSearch()" class="fa-solid fa-magnifying-glass"></i>
-            </div-->
-                    </div>
-                </nav>
-                <!-- sidebar -->
-                <aside id="mySidePanel" class="sidepanel">
-                    <div class="sidebar flex">
-                        <a href=""> <img src="resources/logo.png" alt="logo" /> </a>
-                        <button id="sidePanelCloseBtn" type="button" class="closebtn btn-hover">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                    <!-- Side Menus -->
-                    <div>
-                        <ul>
-                            <li><a href="index.html" class="nav-link">Home</a></li>
-                            <li><a href="aboutus.html" class="nav-link">About Us</a></li>
-                            <li><a href="contact.html" class="nav-link">Contact Us</a></li>
-                            <li class="collapse-btn">
-                                <a href="javascript:void(0);" class="nav-link dropdown-trigger active">
-                                    Our Services
-                                    <i class="fa-solid fa-caret-down"></i>
-                                </a>
-                                <div class="collapse" id="services">
-                                    <ul>
-                                        <li><a href="our-services.html?adverts-service=true" class="dropdown-item active">Social
-                                                Media Advertising</a></li>
-                                        <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics &
-                                                Reporting</a></li>
-                                        <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design &
-                                                Development</a></li>
-                                        <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li><a href="blog.html" class="nav-link">Blog</a></li>
-                            <li><a href="careers.html" class="nav-link">Careers</a></li>
-                        </ul>
-                    </div>
-                </aside>
-
-                <!-- Searchbar -->
-                <div id="searchbar">
-                    <div class="btn_hover1">
-                        <i id="btnCloseSearch" onclick="closeSearch()" class="fa-solid fa-xmark"></i>
-                    </div>
-                    <form action="#" method="search">
-                        <input type="search" required placeholder="Search ..." />
-                        <button type="submit" class="btn_hover1 search_button">
-                            Search
-                        </button>
-                    </form>
-                </div>
-            </header>
+<div class="site-wrapper">
+  <div class="headerindex">
+    <header>
+      <nav class="container navbar">
+        <div class="container-nav flex">
+           <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
         </div>
+          <button id="navbarTogler" class="navbar-toggler" type="button">
+            <span class="fa fa-bars" aria-hidden="true"></span>
+          </button>
+          <ul class="navbar-nav flex">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+            <li class="dropdown">
+              <a href="our-services.html" class="nav-link dropdown-toggle active">
+                Our Services <i class="fa fa-caret-down"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="our-services.html?adverts-service=true" class="dropdown-item active">Social Media Advertising</a></li>
+                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+              </ul>
+            </li>
+            <li><a href="careers.html" class="nav-link">Careers</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <aside id="mySidePanel" class="sidepanel">
+        <div class="sidebar flex">
+          <a href=""><img src="resources/logo.png" alt="logo" /></a>
+          <button id="sidePanelCloseBtn" type="button" class="closebtn btn-hover">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div>
+          <ul>
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+            <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+            <li class="collapse-btn">
+              <a href="javascript:void(0);" class="nav-link dropdown-trigger active">
+                Our Services <i class="fa-solid fa-caret-down"></i>
+              </a>
+              <div class="collapse" id="services">
+                <ul>
+                  <li><a href="our-services.html?adverts-service=true" class="dropdown-item active">Social Media Advertising</a></li>
+                  <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
+                  <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+                  <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+                </ul>
+              </div>
+            </li>
+            <li><a href="blog.html" class="nav-link">Blog</a></li>
+            <li><a href="careers.html" class="nav-link">Careers</a></li>
+          </ul>
+        </div>
+      </aside>
+    </header>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="services-hero" data-aos="fade-up">
+  <div class="container" style="max-width:860px;">
+    <div class="hero-eyebrow">
+      <i class="fa-solid fa-bolt"></i>
+      What We Do
     </div>
-
-    <!-------------------------------- Hero Section --------------------------------------->
-
-    <section id="ourServiceSection">
-        <div id="mediaService" class="outer-container our-service-container">
-            <div id="headerText" class="header-text-layout">
-                <div class="slash-rect"></div>
-                <h4 id="socialMediatHeader" class="header-text">
-                    Comprehensive Social Media Advertising Solutions for Real Estate
-                </h4>
-            </div>
-            <img id="elipsis" src="resources/elipsis-line.png" alt="elipsis-line" />
-            <div class="v-layout">
-                <div id="service" class="header-text-layout">
-                    <img src="resources/checked.png" alt="">
-                    <h5 class='styled-text'>Social Media Advertising</h5>
-                </div>
-                <img id="base-line" src="resources/base-line.png" alt="">
-                <div class="inner-container">
-                    <p>We create customized advertising campaigns across
-                        multiple social media platforms, including Facebook,
-                        Instagram, TikTok, YouTube, and more. Our strategies
-                        include:
-                    </p>
-                    <div class="h-layout">
-                        <div class="header-text-layout">
-                            <img src="resources/checked.png" alt="">
-                            <h5 class='styled-text'>Ad Creative Design</h5>
-                        </div>
-                        <p>Eye-catching graphics and compelling copy tailored
-                            for each platform.
-                        </p>
-                    </div>
-                    <div class="h-layout">
-                        <div class="header-text-layout">
-                            <img src="resources/checked.png" alt="">
-                            <h5 class='styled-text'>Audience Targeting</h5>
-                        </div>
-                        <p>Precise targeting based on demographics, interests,
-                            and behaviors on each platform.
-                        </p>
-                    </div>
-                    <div class="h-layout">
-                        <div class="header-text-layout">
-                            <img src="resources/checked.png" alt="">
-                            <h5 class='styled-text'>Budget Management</h5>
-                        </div>
-                        <p>Efficient use of your advertising budget to
-                            maximize reach and conversions across all platforms.
-                        </p>
-                    </div>
-                    <div class="h-layout">
-                        <div class="header-text-layout">
-                            <img src="resources/checked.png" alt="">
-                            <h5 class='styled-text'>Lead Generation Strategies</h5>
-                        </div>
-                        <div class="v-layout">
-                            <p>Our proven techniques will help you capture high-quality
-                                leads through:
-                            </p>
-                            <div class="h-layout">
-                                <div class="header-text-layout">
-                                    <img src="resources/checked.png" alt="">
-                                    <h5 class='styled-text'>Landing Pages</h5>
-                                </div>
-                                <p>Optimized pages designed for conversion.</p>
-                            </div>
-                            <div class="h-layout">
-                                <div class="header-text-layout">
-                                    <img src="resources/checked.png" alt="">
-                                    <h5 class='styled-text'>Lead Magnets</h5>
-                                </div>
-                                <p>Free resources to entice potential clients.</p>
-                            </div>
-                            <div class="h-layout">
-                                <div class="header-text-layout">
-                                    <img src="resources/checked.png" alt="">
-                                    <h5 class='styled-text'>Follow-Up Campaigns</h5>
-                                </div>
-                                <p>Automated email sequences to nurture leads.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="service" class="header-text-layout">
-                    <img src="resources/checked.png" alt="">
-                    <h5 class='styled-text'>Analytics & Reporting</h5>
-                </div>
-                <img id="base-line" src="resources/base-line.png" alt="">
-                <div class="inner-container">
-                    <p>We provide in-depth analytics and reports to track your
-                        campaign's performance, ensuring you understand your
-                        ROI and the effectiveness of your ads.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div id="courses" class="outer-container our-service-container">
-            <div class="header-text-layout">
-                <div class="slash-rect"></div>
-                <h4 id="socialMediatHeader" class="header-text">
-                    Your Coaching Programs
-                </h4>
-            </div>
-            <img id="elipsis" src="resources/elipsis-line.png" alt="elipsis-line" />
-            <div class="h-layout">
-                <div class="v-layout">
-                    <div class="top-item">
-                        <img src="resources/gear-one.png" alt="">
-                    </div>
-                    <p>Choose - learn - start - grow</p>
-                    <img src="resources/lock-one.png" alt="">
-                    <p id="p">Everything you need to know to get started with your online business!</p>
-                    <div class="bottom-item">
-                        <p>Coming Soon!</p>
-                    </div>
-                </div>
-                <div class="v-layout">
-                    <div class="top-item">
-                        <img src="resources/gear-one.png" alt="">
-                    </div>
-                    <p>Choose - learn - start - grow</p>
-                    <img src="resources/lock-one.png" alt="">
-                    <p id="p">Everything you need to know to get started with your online business!</p>
-                    <div class="bottom-item">
-                        <p>Coming Soon!</p>
-                    </div>
-                </div>
-                <div class="v-layout">
-                    <div class="top-item">
-                        <img src="resources/gear-one.png" alt="">
-                    </div>
-                    <p>Choose - learn - start - grow</p>
-                    <img src="resources/lock-one.png" alt="">
-                    <p id="p">Everything you need to know to get started with your online business!</p>
-                    <div class="bottom-item">
-                        <p>Coming Soon!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="development" class="outer-container our-service-container">
-            <div class="header-text-layout">
-                <div class="slash-rect"></div>
-                <h4 id="socialMediatHeader" class="header-text">
-                    Programming & Development
-                </h4>
-            </div>
-            <img id="elipsis" src="resources/elipsis-line.png" alt="elipsis-line" />
-            <div class="h-layout">
-                <div class="v-layout">
-                    <div class="top-item">
-                        <h4>Mobile & Web Design (UI/UX)</h4>
-                        <p>with Figma</p>
-                    </div>
-                    <p>Build intuitive Designs that are human centered, designed with user and for people.</p>
-                    <div>
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                    </div>
-                    <p id="p">Simple-Flexible-Agile</p>
-                    <div class="bottom-item">
-                        <p>Apply for Service!</p>
-                    </div>
-                </div>
-                <div class="v-layout">
-                    <div class="top-item">
-                        <h4>Web Development</h4>
-                        <p>Vue-Node-Express-JS-HTML-CSS</p>
-                        <p>Mongo-SQL-Maria-Firebase-Oracle</p>
-                    </div>
-                    <p>Build interactive website that suits your development need..</p>
-                    <div>
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                    </div>
-                    <p id="p">Simple-Robust-Scalable-Agile</p>
-                    <div class="bottom-item">
-                        <p>Apply for Service!</p>
-                    </div>
-                </div>
-                <div class="v-layout">
-                    <div class="top-item">
-                        <h4>Android Development</h4>
-                        <p>Java-Kotlin-Compose-XML</p>
-                        <p>SQlite-Firebase</p>
-                    </div>
-                    <p>Build interactive Android Apps for Company or Personal use.</p>
-                    <div>
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                    </div>
-                    <p id="p">Simple-Robust-Scalable-Agile</p>
-                    <div class="bottom-item">
-                        <p>Apply for Service!</p>
-                    </div>
-                </div>
-                <div class="v-layout">
-                    <div class="top-item">
-                        <h4>Software Development</h4>
-                        <p>JavaFX-Jarkata-Java-Spring</p>
-                        <p>MySQl-Oracle</p>
-                    </div>
-                    <p>Build interactive Web or Desktop Applications for Company.</p>
-                    <div>
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                        <img src="resources/starr.png" alt="">
-                    </div>
-                    <p id="p">Simple-Robust-Scalable-Agile</p>
-                    <div class="bottom-item">
-                        <p>Apply for Service!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-------------------------------------- Footer Section ------------------------------------------>
-    <footer id="footerSection" class="footer" role="contentinfo">
-  <div class="footer-container">
-    <div class="footer-logo"><img src="resources/logo.png" alt="AdConnect" /></div>
-    <div class="top-items-footer">
-      <div class="consultation">
-        <!--i class="fa fa-phone" style="font-size:1.5rem;color:var(--clr-primary);margin-bottom:var(--space-3);"></i-->
-        <img src="resources/help.svg.svg" alt="" class="client-icon" style="margin-top: 30px; margin-bottom:var(--space-3);">
-        <p style="font-weight:600;color:var(--clr-text-primary);">Need Help? Call Us!</p>
-        <p style="font-size:.82rem;margin-top:4px;">+254 790 064 130</p>
-        <button id="footerConsultationBtn" class="btn_hover1 small-button" style="margin-top:12px;">Get Consultation</button>
-      </div>
-      <div class="company-info">
-        <h5>Company</h5>
-        <ul>
-          <li><a href="aboutus.html">About Us</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="?privacy-policy=true">Privacy Policy</a></li>
-          <li><a href="blog.html">Blog Posts</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a href="careers.html">Careers</a></li>
-        </ul>
-      </div>
-      <div class="services">
-        <h5>Our Services</h5>
-        <ul>
-          <li><a href="our-services.html?adverts-service=true">Social Media Management</a></li>
-          <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
-          <li><a href="our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
-          <li><a href="our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
-          <li><a href="our-services.html?development-service=true">Web Design & Development</a></li>
-          <li><a href="our-services.html?development-service=true">Mobile Development (Android)</a></li>
-        </ul>
-      </div>
-      <div class="newsletter">
-        <h5>Newsletter</h5>
-        <input type="email" id="newsletterEmail" placeholder="your@email.com" aria-label="Newsletter email" />
-        <button onclick="subscribeNewsletter()" class="btn_hover1 small-button" style="margin-top:8px;width:100%;justify-content:center;">Subscribe</button>
-        <a href="?value-video-request=true" class="btn_hover1 small-button" style="margin-top:8px; width:100%;justify-content:center;">Watch Free Video</a>
-      </div>
-      <div class="footer-faq-section">
-        <h5>FAQs</h5>
-        <p>Need a clarification? Ask our agents for a quick, helpful answer.</p>
-        <button id="showFAQsSection" class="btn_hover1 small-button" style="margin-top:12px;">View FAQs</button>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="social-icons">
-        <p class="footer-text-follow-us">Follow Us:</p>
-        <a href="https://www.facebook.com/profile.php?id=61567259036362" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.instagram.com/adconnect_digital/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-      </div>
-      <p class="footer-text-copyright">
-        Copyright © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
-      </p>
+    <h1>Services that <span>grow your</span> real estate business</h1>
+    <p class="hero-sub">
+      From precision social media campaigns to full-stack web development — we build the digital engine behind your growth.
+    </p>
+    <div class="hero-cta-row">
+      <a href="contact.html" class="btn_hover1">Get a Free Consultation</a>
+      <a href="#advertising" class="btn_hover1" style="background:transparent;color:var(--clr-primary);">Explore Services</a>
     </div>
   </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STICKY NAV
+══════════════════════════════════════════ -->
+<nav class="services-nav" aria-label="Service sections">
+  <div class="services-nav-inner">
+    <a href="#advertising" class="snav-pill active"><i class="fa-brands fa-meta"></i> Advertising</a>
+    <a href="#analytics" class="snav-pill"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+    <a href="#courses" class="snav-pill"><i class="fa-solid fa-graduation-cap"></i> Courses</a>
+    <a href="#development" class="snav-pill"><i class="fa-solid fa-code"></i> Development</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     BODY
+══════════════════════════════════════════ -->
+<div class="services-body">
+
+  <!-- ── Social Media Advertising ── -->
+  <section id="advertising" class="services-section" data-aos="fade-up">
+    <div class="sec-header">
+      <div class="sec-icon-box"><i class="fa-solid fa-bullhorn"></i></div>
+      <div class="sec-header-text">
+        <h2>Comprehensive Social Media Advertising</h2>
+        <p>Precision campaigns across every major platform, built for real estate professionals.</p>
+      </div>
+    </div>
+
+    <!-- Platforms -->
+    <div class="platforms-row" style="margin-bottom:var(--space-6);" data-aos="fade-up" data-aos-delay="100">
+      <span class="platform-pill"><i class="fa-brands fa-facebook"></i> Facebook</span>
+      <span class="platform-pill"><i class="fa-brands fa-instagram"></i> Instagram</span>
+      <span class="platform-pill"><i class="fa-brands fa-tiktok"></i> TikTok</span>
+      <span class="platform-pill"><i class="fa-brands fa-youtube"></i> YouTube</span>
+      <span class="platform-pill"><i class="fa-brands fa-google"></i> Google</span>
+    </div>
+
+    <div class="advert-grid">
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="fc-icon"><i class="fa-solid fa-palette"></i></div>
+        <h5>Ad Creative Design</h5>
+        <p>Eye-catching graphics and compelling copy tailored for each platform — designed to stop the scroll and spark action.</p>
+      </div>
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+        <div class="fc-icon"><i class="fa-solid fa-crosshairs"></i></div>
+        <h5>Audience Targeting</h5>
+        <p>Precise targeting based on demographics, interests, and behaviours to reach buyers and sellers in your market.</p>
+      </div>
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+        <div class="fc-icon"><i class="fa-solid fa-wallet"></i></div>
+        <h5>Budget Management</h5>
+        <p>Efficient use of your advertising spend to maximise reach and conversions across all platforms — no wasted dollars.</p>
+      </div>
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="240">
+        <div class="fc-icon"><i class="fa-solid fa-magnet"></i></div>
+        <h5>Lead Generation Strategies</h5>
+        <p>Proven techniques to capture high-quality leads at every stage of the funnel.</p>
+        <div class="lead-sub-grid">
+          <div class="lead-sub-card">
+            <div class="lsc-dot"></div>
+            <h6>Landing Pages</h6>
+            <p>Optimised pages built for conversion.</p>
+          </div>
+          <div class="lead-sub-card">
+            <div class="lsc-dot"></div>
+            <h6>Lead Magnets</h6>
+            <p>Free resources that attract clients.</p>
+          </div>
+          <div class="lead-sub-card">
+            <div class="lsc-dot"></div>
+            <h6>Follow-Up Campaigns</h6>
+            <p>Automated sequences that nurture leads.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Analytics & Reporting ── -->
+  <section id="analytics" class="services-section" data-aos="fade-up">
+    <div class="sec-header">
+      <div class="sec-icon-box"><i class="fa-solid fa-chart-pie"></i></div>
+      <div class="sec-header-text">
+        <h2>Analytics &amp; Reporting</h2>
+        <p>Know exactly what's working — and why.</p>
+      </div>
+    </div>
+
+    <div class="analytics-banner" data-aos="fade-up" data-aos-delay="100">
+      <i class="fa-solid fa-chart-line ab-icon"></i>
+      <div>
+        <h4>In-depth campaign performance reporting</h4>
+        <p>We deliver clear, actionable analytics so you always understand your ROI and the real effectiveness of every ad — no guesswork, no fluff.</p>
+        <div class="platforms-row" style="margin-top:var(--space-4);">
+          <span class="platform-pill"><i class="fa-solid fa-bullseye"></i> ROI Tracking</span>
+          <span class="platform-pill"><i class="fa-solid fa-users"></i> Audience Insights</span>
+          <span class="platform-pill"><i class="fa-solid fa-funnel-dollar"></i> Funnel Analysis</span>
+          <span class="platform-pill"><i class="fa-solid fa-file-chart-column"></i> Monthly Reports</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Courses ── -->
+  <section id="courses" class="services-section" data-aos="fade-up">
+    <div class="sec-header">
+      <div class="sec-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+      <div class="sec-header-text">
+        <h2>Your Coaching Programs</h2>
+        <p>Step-by-step programs to launch and scale your online business — launching soon.</p>
+      </div>
+    </div>
+
+    <div class="courses-grid">
+      <!-- Card 1 -->
+      <div class="course-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="cc-top"><i class="fa-solid fa-rocket"></i></div>
+        <div class="course-steps">
+          <span class="step">Choose</span><span class="sep">→</span>
+          <span class="step">Learn</span><span class="sep">→</span>
+          <span class="step">Start</span><span class="sep">→</span>
+          <span class="step">Grow</span>
+        </div>
+        <i class="fa-solid fa-lock cc-lock"></i>
+        <h5>Online Business Foundations</h5>
+        <p>Everything you need to get started and build momentum with your online business — from zero to launch.</p>
+        <span class="cs-badge">Coming Soon</span>
+      </div>
+      <!-- Card 2 -->
+      <div class="course-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="cc-top"><i class="fa-solid fa-store"></i></div>
+        <div class="course-steps">
+          <span class="step">Choose</span><span class="sep">→</span>
+          <span class="step">Learn</span><span class="sep">→</span>
+          <span class="step">Start</span><span class="sep">→</span>
+          <span class="step">Grow</span>
+        </div>
+        <i class="fa-solid fa-lock cc-lock"></i>
+        <h5>Real Estate Marketing Mastery</h5>
+        <p>Platform-specific strategies, ad frameworks, and lead capture systems for real estate professionals.</p>
+        <span class="cs-badge">Coming Soon</span>
+      </div>
+      <!-- Card 3 -->
+      <div class="course-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="cc-top"><i class="fa-solid fa-chart-bar"></i></div>
+        <div class="course-steps">
+          <span class="step">Choose</span><span class="sep">→</span>
+          <span class="step">Learn</span><span class="sep">→</span>
+          <span class="step">Start</span><span class="sep">→</span>
+          <span class="step">Grow</span>
+        </div>
+        <i class="fa-solid fa-lock cc-lock"></i>
+        <h5>Analytics &amp; Growth Systems</h5>
+        <p>Understand your data, improve your campaigns, and build repeatable revenue systems.</p>
+        <span class="cs-badge">Coming Soon</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Development ── -->
+  <section id="development" class="services-section" data-aos="fade-up">
+    <div class="sec-header">
+      <div class="sec-icon-box"><i class="fa-solid fa-code"></i></div>
+      <div class="sec-header-text">
+        <h2>Programming &amp; Development</h2>
+        <p>Simple. Flexible. Agile. Built to scale with your business.</p>
+      </div>
+    </div>
+
+    <div class="dev-grid">
+      <!-- UI/UX -->
+      <div class="dev-card" data-aos="fade-up" data-aos-delay="0">
+        <i class="fa-solid fa-pen-ruler dc-icon"></i>
+        <h4>Mobile &amp; Web Design (UI/UX)</h4>
+        <div class="tech-stack">
+          <span class="tech-tag">Figma</span>
+        </div>
+        <p>Intuitive, human-centred designs built for people — beautiful on every screen.</p>
+        <div class="star-row">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span class="dc-badge">Simple · Flexible · Agile</span>
+        <a href="contact.html" class="btn_hover1">Apply for Service</a>
+      </div>
+
+      <!-- Web Dev -->
+      <div class="dev-card" data-aos="fade-up" data-aos-delay="80">
+        <i class="fa-solid fa-globe dc-icon"></i>
+        <h4>Web Development</h4>
+        <div class="tech-stack">
+          <span class="tech-tag">Vue</span>
+          <span class="tech-tag">Node</span>
+          <span class="tech-tag">Express</span>
+          <span class="tech-tag">JS</span>
+          <span class="tech-tag">HTML/CSS</span>
+          <span class="tech-tag">Mongo</span>
+          <span class="tech-tag">SQL</span>
+          <span class="tech-tag">Firebase</span>
+        </div>
+        <p>Interactive, scalable websites tailored to your development needs.</p>
+        <div class="star-row">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span class="dc-badge">Simple · Robust · Scalable</span>
+        <a href="contact.html" class="btn_hover1">Apply for Service</a>
+      </div>
+
+      <!-- Android -->
+      <div class="dev-card" data-aos="fade-up" data-aos-delay="160">
+        <i class="fa-brands fa-android dc-icon"></i>
+        <h4>Android Development</h4>
+        <div class="tech-stack">
+          <span class="tech-tag">Java</span>
+          <span class="tech-tag">Kotlin</span>
+          <span class="tech-tag">Compose</span>
+          <span class="tech-tag">XML</span>
+          <span class="tech-tag">SQLite</span>
+          <span class="tech-tag">Firebase</span>
+        </div>
+        <p>Interactive Android apps for company or personal use — polished and performant.</p>
+        <div class="star-row">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span class="dc-badge">Simple · Robust · Scalable</span>
+        <a href="contact.html" class="btn_hover1">Apply for Service</a>
+      </div>
+
+      <!-- Software -->
+      <div class="dev-card" data-aos="fade-up" data-aos-delay="240">
+        <i class="fa-solid fa-laptop-code dc-icon"></i>
+        <h4>Software Development</h4>
+        <div class="tech-stack">
+          <span class="tech-tag">JavaFX</span>
+          <span class="tech-tag">Jakarta</span>
+          <span class="tech-tag">Spring</span>
+          <span class="tech-tag">MySQL</span>
+          <span class="tech-tag">Oracle</span>
+        </div>
+        <p>Robust web or desktop applications built for enterprise-grade company needs.</p>
+        <div class="star-row">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span class="dc-badge">Simple · Robust · Scalable</span>
+        <a href="contact.html" class="btn_hover1">Apply for Service</a>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /services-body -->
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html?adverts-service=true">Social Media Ads</a></li>
+        <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
+        <li><a href="our-services.html?adverts-service=true">Analytics & Reporting</a></li>
+        <li><a href="our-services.html?adverts-service=true">Facebook Campaigns</a></li>
+        <li><a href="our-services.html?development-service=true">Web Development</a></li>
+        <li><a href="our-services.html?development-service=true">Android Apps</a></li>
+        <li><a href="our-services.html?courses-service=true">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li>
+          <a href="javascript:void(0)" >FAQs</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('appointment-booking')">Free Consultation</a>
+        </li>
+        <li>
+          <a href="?value-video-request=true">Watch Free Video</a>
+        </li>
+        <li>
+          <a href="our-services.html?development-service=true">UI/UX Design</a>
+        </li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
+        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      </div>
+    </div>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
+      </div>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
+          <strong style="color:#f4f1ee;">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
+      </p>
+    </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
+      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
+    </nav>
+  </div>
+ 
 </footer>
 
-    <!-- Scroll animation Lib -->
-    <script src="https://unpkg.com/aos@next/dist/aos.css"></script>
-    <script>
-        AOS.init({
-            offset: 150,
-            duration: 1250,
-            once: true,
-        });
-    </script>
+<!-- Cookie Consent Banner -->
+<div id="cookieConsent" style="display:none;" role="dialog" aria-label="Cookie Consent">
+  <style>
+  #cookieConsent {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    width: calc(100% - 32px);
+    max-width: 680px;
+    background: var(--clr-surface-1, #252320);
+    border: 1.5px solid var(--clr-border, #3d3b39);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.55);
+    animation: cc-slide-up .4s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes cc-slide-up { from { opacity:0; transform: translateX(-50%) translateY(24px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+  .cc-inner { display: flex; align-items: flex-start; gap: 16px; }
+  .cc-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .cc-text { flex: 1; }
+  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: #F4F1EE; margin: 0 0 6px; }
+  .cc-text p { font-size: .78rem; color: #B8B4B0; line-height: 1.6; margin: 0; }
+  .cc-text a { color: #4ABC4F; text-decoration: none; }
+  .cc-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .cc-btn {
+    padding: 9px 20px; border-radius: 8px; font-size: .78rem; font-weight: 700;
+    cursor: pointer; border: none; font-family: inherit; transition: all .2s ease;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .cc-btn-accept  { background: #F65730; color: #fff; }
+  .cc-btn-accept:hover  { background: #d94522; }
+  .cc-btn-reject  { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-reject:hover  { border-color: #F65730; color: #F65730; }
+  .cc-btn-pref    { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-pref:hover    { border-color: #B8B4B0; color: #B8B4B0; }
+  /* Preferences modal */
+  .cc-modal-overlay {
+    position: fixed; inset: 0; z-index: 100000;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .cc-modal {
+    background: #252320; border: 1.5px solid #3d3b39; border-radius: 16px;
+    padding: 32px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
+  }
+  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: #F4F1EE; margin: 0 0 8px; }
+  .cc-modal p  { font-size: .82rem; color: #7a7874; margin: 0 0 20px; line-height: 1.6; }
+  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #3d3b39; }
+  .cc-toggle-row:last-child { border-bottom: none; }
+  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: #F4F1EE; margin-bottom: 3px; }
+  .cc-toggle-desc  { font-size: .75rem; color: #7a7874; line-height: 1.5; }
+  .cc-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 3px; }
+  .cc-switch input { opacity: 0; width: 0; height: 0; }
+  .cc-slider { position: absolute; inset: 0; background: #3d3b39; border-radius: 999px; cursor: pointer; transition: .3s; }
+  .cc-switch input:checked + .cc-slider { background: #F65730; }
+  .cc-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+  .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
+  .cc-switch input:disabled + .cc-slider { opacity: .6; cursor: not-allowed; }
+  .cc-modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  @media (max-width: 600px) {
+    #cookieConsent { bottom: 0; left: 0; transform: none; width: 100%; border-radius: 16px 16px 0 0; }
+    .cc-inner { flex-direction: column; gap: 10px; }
+    .cc-actions { justify-content: stretch; }
+    .cc-btn { flex: 1; text-align: center; }
+  }
+  </style>
+ 
+  <div class="cc-inner">
+    <span class="cc-icon">🍪</span>
+    <div class="cc-text">
+      <h4>We use cookies</h4>
+      <p>
+        We use cookies and similar technologies to improve your browsing experience, analyse traffic, and personalise content.
+        Read our <a href="/pages/privacy.html">Privacy Policy</a> to learn more.
+      </p>
+      <div class="cc-actions">
+        <button class="cc-btn cc-btn-accept" onclick="acceptCookies()">Accept All</button>
+        <button class="cc-btn cc-btn-pref"   onclick="openCookiePrefs()">Manage Preferences</button>
+        <button class="cc-btn cc-btn-reject"  onclick="rejectCookies()">Reject Non-essential</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Cookie Preferences Modal -->
+<div id="ccModal" class="cc-modal-overlay" style="display:none;">
+  <div class="cc-modal">
+    <h3>Cookie Preferences</h3>
+    <p>Choose which cookies you allow. You can change these settings at any time.</p>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Essential Cookies</div>
+        <div class="cc-toggle-desc">Required for the website to function. Cannot be disabled.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" checked disabled /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Analytics Cookies</div>
+        <div class="cc-toggle-desc">Help us understand how visitors interact with our website (Google Analytics, etc.).</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-analytics" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Marketing Cookies</div>
+        <div class="cc-toggle-desc">Used to deliver personalised ads on platforms like Facebook and Google.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-marketing" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Functional Cookies</div>
+        <div class="cc-toggle-desc">Enable enhanced features like chat widgets and embedded media.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-functional" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-modal-btns">
+      <button class="cc-btn cc-btn-accept" onclick="savePreferences()" style="flex:2;">Save Preferences</button>
+      <button class="cc-btn cc-btn-reject" onclick="closeCookiePrefs()">Cancel</button>
+    </div>
+  </div>
+</div>
 
-    <!-- jquery js cdn -->
+<script>
+(function() {
+  'use strict';
+  const PREF_KEY = 'ac_cookie_prefs';
+  //const DOMAIN = 'https://adconnect.co.ke/api/';
+  const DOMAIN = 'http://localhost:3000/api/';
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
-        integrity="sha512-+k1pnlgt4F1H8L7t329503/KO+078INEcXTbno3Q/F2VqDVhwoaiVml/0EHv9HsVgxUaVW+IbiZPUJQFF/YxZw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  const stored = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+  if (!stored) {
+    // Show after 1s
+    setTimeout(() => {
+      document.getElementById('cookieConsent').style.display = 'block';
+    }, 1000);
+  } else {
+    applyConsent(stored);
+  }
+ 
+  window.acceptCookies = function() {
+    const prefs = { essential:true, analytics:true, marketing:true, functional:true, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.rejectCookies = function() {
+    const prefs = { essential:true, analytics:false, marketing:false, functional:false, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.openCookiePrefs = function() {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+    document.getElementById('cc-analytics').checked  = p.analytics  || false;
+    document.getElementById('cc-marketing').checked  = p.marketing  || false;
+    document.getElementById('cc-functional').checked = p.functional || false;
+    document.getElementById('ccModal').style.display = 'flex';
+  };
+  window.closeCookiePrefs = function() { document.getElementById('ccModal').style.display='none'; };
+  window.savePreferences = function() {
+    const prefs = {
+      essential: true,
+      analytics:  document.getElementById('cc-analytics').checked,
+      marketing:  document.getElementById('cc-marketing').checked,
+      functional: document.getElementById('cc-functional').checked,
+      ts: Date.now(),
+    };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    closeCookiePrefs();
+    hideBanner();
+  };
+ 
+  // Track visit (analytics)
+  function trackVisit(prefs) {
+  if (!prefs.analytics) return;
 
-    <!-- jquery min js cdn-->
+  let sessionId = localStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2);
+    localStorage.setItem('session_id', sessionId);
+  }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVTBEE2iyI610V8e6M8PP2/4hpQINQ/g="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  fetch(`${DOMAIN}analytics/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page_name: document.title,
+      page_path: location.pathname,
+      session_id: sessionId,
+      referrer: document.referrer || null
+    }),
+  }).catch(() => {});
+}
+ 
+  function applyConsent(prefs) {
+    // Load GTM only if analytics & marketing accepted
+    if (prefs.analytics && prefs.marketing && typeof window.dataLayer === 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      // GTM already loaded in page head, just push consent
+    }
+    if (prefs.analytics) trackVisit(prefs);
+    // Dispatch event for other scripts to listen
+    window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { detail: prefs }));
+  }
+ 
+  function saveToStorage(prefs) { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }
+  function hideBanner() { const el = document.getElementById('cookieConsent'); if (el) { el.style.animation='cc-slide-up .3s ease reverse'; setTimeout(()=>el.style.display='none',280); } }
+})();
+</script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+  AOS.init({ offset: 120, duration: 900, once: true, easing: 'ease-out-quart' });
 
-    <!-- slick carousel min js cdn -->
-    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
-        integrity="sha256-DHF4zGyjT760MP8wpeehwoey18z8uiz9864PRu2lVBA=" crossorigin="anonymous"></script>
+  // Year
+  document.getElementById('current-year').textContent = new Date().getFullYear();
 
-    <!-- Custom JS-->
-    <script type="module" src="../scripts/main.js"></script>
+  // Sticky nav active pill
+  const pills = document.querySelectorAll('.snav-pill');
+  const sections = ['advertising','analytics','courses','development'].map(id => document.getElementById(id));
+
+  function updateActivePill() {
+    const scrollY = window.scrollY + 120;
+    let active = 0;
+    sections.forEach((sec, i) => { if (sec && sec.offsetTop <= scrollY) active = i; });
+    pills.forEach((p, i) => p.classList.toggle('active', i === active));
+  }
+  window.addEventListener('scroll', updateActivePill, { passive: true });
+
+  // Navbar toggler
+  const toggler = document.getElementById('navbarTogler');
+  const sidePanel = document.getElementById('mySidePanel');
+  const closeBtn = document.getElementById('sidePanelCloseBtn');
+  if (toggler) toggler.addEventListener('click', () => sidePanel.style.left = '0');
+  if (closeBtn) closeBtn.addEventListener('click', () => sidePanel.style.left = '-320px');
+
+  // Sidebar collapse
+  document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const collapse = trigger.nextElementSibling;
+      if (collapse) collapse.classList.toggle('show');
+    });
+  });
+
+  document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
+
+async function subscribeNewsletter() {
+  const email = getValue('newsletterEmail');
+  if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+  toast('Subscribed! Thanks for joining our newsletter.', 'success');
+  setValue('newsletterEmail','');
+}
+const getValue = id => document.getElementById(id)?.value.trim() || '';
+
+/* ── Toast Notifications ─────────────────────── */
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="fa fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.animation='slideInRight .3s ease reverse', 3000);
+  setTimeout(() => t.remove(), 3400);
+}
+
+function footerModal(param) {
+  const isHome = window.location.pathname === '/' 
+              || window.location.pathname.endsWith('index.html');
+
+  if (isHome) {
+    // Already on home — just call the function directly
+    const map = {
+      'faqs':                openFAQs,
+      'privacy-policy':      openPrivacyPolicy,
+      'appointment-booking': openAppointmentBooking,
+      'value-video-request': openValueVideo,
+    };
+    if (map[param]) map[param]();
+  } else {
+    // On another page — redirect home with the param
+    window.location.href = `/public/index.html?${param}=true`;
+  }
+}
+</script>
 </body>
-
 </html>

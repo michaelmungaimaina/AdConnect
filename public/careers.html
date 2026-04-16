@@ -462,6 +462,71 @@
     .dept-filter-row { gap: 6px; }
     .dept-pill { font-size: .72rem; padding: 5px 12px; }
   }
+
+  #cookieConsent {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    width: calc(100% - 32px);
+    max-width: 680px;
+    background: var(--clr-surface-1, #252320);
+    border: 1.5px solid var(--clr-border, #3d3b39);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.55);
+    animation: cc-slide-up .4s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes cc-slide-up { from { opacity:0; transform: translateX(-50%) translateY(24px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+  .cc-inner { display: flex; align-items: flex-start; gap: 16px; }
+  .cc-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
+  .cc-text { flex: 1; }
+  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: #F4F1EE; margin: 0 0 6px; }
+  .cc-text p { font-size: .78rem; color: #B8B4B0; line-height: 1.6; margin: 0; }
+  .cc-text a { color: #4ABC4F; text-decoration: none; }
+  .cc-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .cc-btn {
+    padding: 9px 20px; border-radius: 8px; font-size: .78rem; font-weight: 700;
+    cursor: pointer; border: none; font-family: inherit; transition: all .2s ease;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .cc-btn-accept  { background: #F65730; color: #fff; }
+  .cc-btn-accept:hover  { background: #d94522; }
+  .cc-btn-reject  { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-reject:hover  { border-color: #F65730; color: #F65730; }
+  .cc-btn-pref    { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
+  .cc-btn-pref:hover    { border-color: #B8B4B0; color: #B8B4B0; }
+  /* Preferences modal */
+  .cc-modal-overlay {
+    position: fixed; inset: 0; z-index: 100000;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .cc-modal {
+    background: #252320; border: 1.5px solid #3d3b39; border-radius: 16px;
+    padding: 32px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
+  }
+  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: #F4F1EE; margin: 0 0 8px; }
+  .cc-modal p  { font-size: .82rem; color: #7a7874; margin: 0 0 20px; line-height: 1.6; }
+  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #3d3b39; }
+  .cc-toggle-row:last-child { border-bottom: none; }
+  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: #F4F1EE; margin-bottom: 3px; }
+  .cc-toggle-desc  { font-size: .75rem; color: #7a7874; line-height: 1.5; }
+  .cc-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 3px; }
+  .cc-switch input { opacity: 0; width: 0; height: 0; }
+  .cc-slider { position: absolute; inset: 0; background: #3d3b39; border-radius: 999px; cursor: pointer; transition: .3s; }
+  .cc-switch input:checked + .cc-slider { background: #F65730; }
+  .cc-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+  .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
+  .cc-switch input:disabled + .cc-slider { opacity: .6; cursor: not-allowed; }
+  .cc-modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  @media (max-width: 600px) {
+    #cookieConsent { bottom: 0; left: 0; transform: none; width: 100%; border-radius: 16px 16px 0 0; }
+    .cc-inner { flex-direction: column; gap: 10px; }
+    .cc-actions { justify-content: stretch; }
+    .cc-btn { flex: 1; text-align: center; }
+  }
   </style>
 </head>
 
@@ -472,23 +537,42 @@
   <header>
     <nav class="container navbar">
       <div class="container-nav flex">
-        <a href="/" class="navbar-logo"><img src="resources/logo.png" alt="AdConnect" /></a>
-        <button id="navbarTogler" class="navbar-toggler" type="button"><i class="fa fa-bars"></i></button>
-        <ul class="navbar-nav flex">
-          <li><a href="index.html" class="nav-link">Home</a></li>
+         <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+        <button id="navbarTogler" class="navbar-toggler" type="button" aria-label="Toggle navigation">
+          <i class="fa fa-bars"></i>
+        </button>
+        <ul class="navbar-nav flex" role="navigation" aria-label="Main Navigation">
+          <li><a href="index.html" class="nav-link" aria-current="page">Home</a></li>
           <li><a href="aboutus.html" class="nav-link">About Us</a></li>
           <li><a href="blog.html" class="nav-link">Blog</a></li>
           <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
-          <li><a href="careers.html" class="nav-link active">Careers</a></li>
           <li><a href="contact.html" class="nav-link">Contact</a></li>
           <li class="dropdown">
-            <a href="our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
-            <ul class="dropdown-menu">
-              <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
-              <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+            <a href="our-services.html" class="nav-link dropdown-toggle">
+              Services <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Social Media Advertising</a></li>
+              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Analytics & Reporting</a></li>
+              <li><a href="our-services.html?development-service=true" class="dropdown-item" role="menuitem">Web Design & Development</a></li>
+              <li><a href="our-services.html?courses-service=true" class="dropdown-item" role="menuitem">Courses</a></li>
             </ul>
           </li>
+          <li><a href="careers.html" class="nav-link active">Careers</a></li>
         </ul>
+        <!--button id="searchBarBtn" class="btn btn-ghost btn-icon btn-sm" onclick="openSearch()" aria-label="Search" style="margin-left:var(--space-3);">
+          <i class="fa fa-search"></i>
+        </button-->
       </div>
     </nav>
     <aside id="mySidePanel" class="sidepanel">
@@ -719,73 +803,206 @@
   </div>
 </div>
 
-<!-- ── FOOTER ── -->
-<footer id="footerSection" class="footer" role="contentinfo">
-  <div class="footer-container">
-    <div class="footer-logo"><img src="resources/logo.png" alt="AdConnect" /></div>
-    <div class="top-items-footer">
-      <div class="consultation">
-        <!--i class="fa fa-phone" style="font-size:1.5rem;color:var(--clr-primary);margin-bottom:var(--space-3);"></i-->
-        <img src="resources/help.svg.svg" alt="" class="client-icon" style="margin-top: 30px; margin-bottom:var(--space-3);">
-        <p style="font-weight:600;color:var(--clr-text-primary);">Need Help? Call Us!</p>
-        <p style="font-size:.82rem;margin-top:4px;">+254 790 064 130</p>
-        <button id="footerConsultationBtn" class="btn_hover1 small-button" style="margin-top:12px;">Get Consultation</button>
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
       </div>
-      <div class="company-info">
-        <h5>Company</h5>
-        <ul>
-          <li><a href="aboutus.html">About Us</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="?privacy-policy=true">Privacy Policy</a></li>
-          <li><a href="blog.html">Blog Posts</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a href="careers.html">Careers</a></li>
-        </ul>
-      </div>
-      <div class="services">
-        <h5>Our Services</h5>
-        <ul>
-          <li><a href="our-services.html?adverts-service=true">Social Media Management</a></li>
-          <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
-          <li><a href="our-services.html?adverts-service=true">Facebook & Google Campaigns</a></li>
-          <li><a href="our-services.html?adverts-service=true">Analytics & Pixel Setup</a></li>
-          <li><a href="our-services.html?development-service=true">Web Design & Development</a></li>
-          <li><a href="our-services.html?development-service=true">Mobile Development (Android)</a></li>
-        </ul>
-      </div>
-      <div class="newsletter">
-        <h5>Newsletter</h5>
-        <input type="email" id="newsletterEmail" placeholder="your@email.com" aria-label="Newsletter email" />
-        <button onclick="subscribeNewsletter()" class="btn_hover1 small-button" style="margin-top:8px;width:100%;justify-content:center;">Subscribe</button>
-        <a href="?value-video-request=true" class="btn_hover1 small-button" style="margin-top:8px; width:100%;justify-content:center;">Watch Free Video</a>
-      </div>
-      <div class="footer-faq-section">
-        <h5>FAQs</h5>
-        <p>Need a clarification? Ask our agents for a quick, helpful answer.</p>
-        <button id="showFAQsSection" class="btn_hover1 small-button" style="margin-top:12px;">View FAQs</button>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html?adverts-service=true">Social Media Ads</a></li>
+        <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
+        <li><a href="our-services.html?adverts-service=true">Analytics & Reporting</a></li>
+        <li><a href="our-services.html?adverts-service=true">Facebook Campaigns</a></li>
+        <li><a href="our-services.html?development-service=true">Web Development</a></li>
+        <li><a href="our-services.html?development-service=true">Android Apps</a></li>
+        <li><a href="our-services.html?courses-service=true">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li>
+          <a href="javascript:void(0)" >FAQs</a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('appointment-booking')">Free Consultation</a>
+        </li>
+        <li>
+          <a href="?value-video-request=true">Watch Free Video</a>
+        </li>
+        <li>
+          <a href="our-services.html?development-service=true">UI/UX Design</a>
+        </li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
+        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
       </div>
     </div>
-    <div class="footer-bottom">
-      <div class="social-icons">
-        <p class="footer-text-follow-us">Follow Us:</p>
-        <a href="https://www.facebook.com/profile.php?id=61567259036362" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.instagram.com/adconnect_digital/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
       </div>
-      <p class="footer-text-copyright">
-        Copyright © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
+          <strong style="color:#f4f1ee;">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
       </p>
     </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
+      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
+    </nav>
   </div>
+ 
 </footer>
 
+<!-- Cookie Consent Banner -->
+<div id="cookieConsent" style="display:none;" role="dialog" aria-label="Cookie Consent">
+  <div class="cc-inner">
+    <span class="cc-icon">🍪</span>
+    <div class="cc-text">
+      <h4>We use cookies</h4>
+      <p>
+        We use cookies and similar technologies to improve your browsing experience, analyse traffic, and personalise content.
+        Read our <a href="privacy.html">Privacy Policy</a> to learn more.
+      </p>
+      <div class="cc-actions">
+        <button class="cc-btn cc-btn-accept" onclick="acceptCookies()">Accept All</button>
+        <button class="cc-btn cc-btn-pref"   onclick="openCookiePrefs()">Manage Preferences</button>
+        <button class="cc-btn cc-btn-reject"  onclick="rejectCookies()">Reject Non-essential</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Cookie Preferences Modal -->
+<div id="ccModal" class="cc-modal-overlay" style="display:none;">
+  <div class="cc-modal">
+    <h3>Cookie Preferences</h3>
+    <p>Choose which cookies you allow. You can change these settings at any time.</p>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Essential Cookies</div>
+        <div class="cc-toggle-desc">Required for the website to function. Cannot be disabled.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" checked disabled /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Analytics Cookies</div>
+        <div class="cc-toggle-desc">Help us understand how visitors interact with our website (Google Analytics, etc.).</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-analytics" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Marketing Cookies</div>
+        <div class="cc-toggle-desc">Used to deliver personalised ads on platforms like Facebook and Google.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-marketing" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-toggle-row">
+      <div>
+        <div class="cc-toggle-label">Functional Cookies</div>
+        <div class="cc-toggle-desc">Enable enhanced features like chat widgets and embedded media.</div>
+      </div>
+      <label class="cc-switch"><input type="checkbox" id="cc-functional" /><span class="cc-slider"></span></label>
+    </div>
+    <div class="cc-modal-btns">
+      <button class="cc-btn cc-btn-accept" onclick="savePreferences()" style="flex:2;">Save Preferences</button>
+      <button class="cc-btn cc-btn-reject" onclick="closeCookiePrefs()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  'use strict';
 //const DOMAIN = 'https://adconnect.co.ke/api/';
 const DOMAIN = 'http://localhost:3000/api/';
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RE_PHONE = /^(?:\+254|0)(7|1)\d{8}$/;
+const PREF_KEY = 'ac_cookie_prefs';
 let allJobs = [], currentJobId = null, selectedFile = null;
 
 /* ── Init ── */
@@ -793,7 +1010,127 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('current-year').textContent = new Date().getFullYear();
   wireNav();
   await loadJobs();
+  await loadDataJobs();
 });
+
+document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
+
+async function subscribeNewsletter() {
+  const email = getValue('newsletterEmail');
+  if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+  toast('Subscribed! Thanks for joining our newsletter.', 'success');
+  setValue('newsletterEmail','');
+}
+const getValue = id => document.getElementById(id)?.value.trim() || '';
+
+/* ── Toast Notifications ─────────────────────── */
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="fa fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.animation='slideInRight .3s ease reverse', 3000);
+  setTimeout(() => t.remove(), 3400);
+}
+
+function footerModal(param) {
+  const isHome = window.location.pathname === '/' 
+              || window.location.pathname.endsWith('index.html');
+
+  if (isHome) {
+    // Already on home — just call the function directly
+    const map = {
+      'faqs':                openFAQs,
+      'privacy-policy':      openPrivacyPolicy,
+      'appointment-booking': openAppointmentBooking,
+      'value-video-request': openValueVideo,
+    };
+    if (map[param]) map[param]();
+  } else {
+    // On another page — redirect home with the param
+    window.location.href = `/public/index.html?${param}=true`;
+  }
+}
+
+  const stored = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+  if (!stored) {
+    // Show after 1s
+    setTimeout(() => {
+      document.getElementById('cookieConsent').style.display = 'block';
+    }, 1000);
+  } else {
+    applyConsent(stored);
+  }
+ 
+  window.acceptCookies = function() {
+    const prefs = { essential:true, analytics:true, marketing:true, functional:true, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.rejectCookies = function() {
+    const prefs = { essential:true, analytics:false, marketing:false, functional:false, ts: Date.now() };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    hideBanner();
+  };
+  window.openCookiePrefs = function() {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+    document.getElementById('cc-analytics').checked  = p.analytics  || false;
+    document.getElementById('cc-marketing').checked  = p.marketing  || false;
+    document.getElementById('cc-functional').checked = p.functional || false;
+    document.getElementById('ccModal').style.display = 'flex';
+  };
+  window.closeCookiePrefs = function() { document.getElementById('ccModal').style.display='none'; };
+  window.savePreferences = function() {
+    const prefs = {
+      essential: true,
+      analytics:  document.getElementById('cc-analytics').checked,
+      marketing:  document.getElementById('cc-marketing').checked,
+      functional: document.getElementById('cc-functional').checked,
+      ts: Date.now(),
+    };
+    saveToStorage(prefs);
+    applyConsent(prefs);
+    closeCookiePrefs();
+    hideBanner();
+  };
+ 
+  // Track visit (analytics)
+   function trackVisit(prefs) {
+  if (!prefs.analytics) return;
+
+  let sessionId = localStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2);
+    localStorage.setItem('session_id', sessionId);
+  }
+
+  fetch(`${DOMAIN}analytics/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page_name: document.title,
+      page_path: location.pathname,
+      session_id: sessionId,
+      referrer: document.referrer || null
+    }),
+  }).catch(() => {});
+}
+ 
+  function applyConsent(prefs) {
+    // Load GTM only if analytics & marketing accepted
+    if (prefs.analytics && prefs.marketing && typeof window.dataLayer === 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      // GTM already loaded in page head, just push consent
+    }
+    if (prefs.analytics) trackVisit(prefs);
+    // Dispatch event for other scripts to listen
+    window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { detail: prefs }));
+  }
+ 
+  function saveToStorage(prefs) { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }
+  function hideBanner() { const el = document.getElementById('cookieConsent'); if (el) { el.style.animation='cc-slide-up .3s ease reverse'; setTimeout(()=>el.style.display='none',280); } }
 
 /* ── Nav ── */
 function wireNav() {
@@ -815,7 +1152,7 @@ async function loadJobs() {
   document.getElementById('jobCount').textContent = allJobs.length;
 }
 
-/* ── Demo jobs (fallback) ── */
+/* ── Demo jobs (fallback) ── /
 function getDemoJobs() {
   return [
     { id:'j001', title:'Digital Marketing Specialist', department:'Marketing', type:'Full-time', location:'Nairobi', mode:'Hybrid', deadline:'2025-06-30', description:'Drive high-ROI Facebook and Google campaigns for real estate clients. Own ad strategy, creative direction, and performance optimization across multiple accounts.', tags:['New','Urgent'], salary:'KES 80,000 – 120,000/mo', status:'OPEN' },
@@ -824,7 +1161,7 @@ function getDemoJobs() {
     { id:'j004', title:'UI/UX Designer', department:'Design', type:'Full-time', location:'Nairobi / Remote', mode:'Hybrid', deadline:'2025-06-25', description:'Create stunning Figma designs for web and mobile applications. You\'ll work closely with developers and clients to translate briefs into beautiful, functional interfaces.', tags:['New'], salary:'KES 70,000 – 110,000/mo', status:'OPEN' },
     { id:'j005', title:'Content Creator & Copywriter', department:'Marketing', type:'Part-time', location:'Remote', mode:'Remote', deadline:'2025-06-30', description:'Write compelling ad copy, social media content, blog posts, and email campaigns for real estate brands across Africa.', tags:[], salary:'KES 40,000 – 60,000/mo', status:'OPEN' },
   ];
-}
+}*/
 
 /* ── Dept Filters ── */
 function buildDeptFilters() {
@@ -854,15 +1191,36 @@ function filterJobs() {
   renderJobs(filtered);
 }
 
-/* ── Render Jobs ── */
+// When you load jobs, store them in the global variable
+async function loadDataJobs() {
+  const jobs = await fetchJobs(); // existing fetch logic
+  allJobs = jobs; // Store in global variable
+  renderJobs(jobs);
+}
+
+/*async function fetchJobs() {
+  try {
+    const res = await fetch(`${DOMAIN}careers?status=OPEN`);
+    if (!res.ok) throw new Error('Failed to fetch jobs');
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    //return getDemoJobs(); // Fallback to demo jobs on error
+  }
+}*/
+
+// Then update renderJobs to use the stored data
 function renderJobs(jobs) {
-  const grid  = document.getElementById('jobsGrid');
+  const grid = document.getElementById('jobsGrid');
   const empty = document.getElementById('jobsEmpty');
   empty.style.display = jobs.length ? 'none' : 'block';
-  if (!jobs.length) { grid.innerHTML = ''; return; }
+  if (!jobs.length) { 
+    grid.innerHTML = ''; 
+    return; 
+  }
 
   grid.innerHTML = jobs.map(j => `
-    <div class="job-card" onclick="openApply('${j.id}')">
+    <div class="job-card" data-job-id="${j.id}">
       <div>
         <div class="job-title-row">
           <span class="job-title">${esc(j.title)}</span>
@@ -879,9 +1237,20 @@ function renderJobs(jobs) {
       </div>
       <div class="job-cta">
         ${j.deadline ? `<div class="job-deadline"><i class="fa fa-calendar-o"></i> Closes ${formatDeadline(j.deadline)}</div>` : ''}
-        <button class="job-apply-btn" onclick="openApply('${j.id}');event.stopPropagation()">Apply Now</button>
+        <button class="job-apply-btn" onclick="event.stopPropagation(); openApply('${j.id}')">Apply Now</button>
       </div>
     </div>`).join('');
+    
+  // Add click handlers to cards
+  document.querySelectorAll('.job-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Don't trigger if clicking on button
+      if (!e.target.closest('.job-apply-btn')) {
+        const jobId = card.dataset.jobId;
+        openApply(jobId);
+      }
+    });
+  });
 }
 
 const tagClass  = t => ({ 'New':'tag-new', 'Urgent':'tag-urgent', 'Hot':'tag-urgent' }[t] || 'tag-fulltime');
@@ -891,22 +1260,38 @@ const formatDeadline = d => new Date(d).toLocaleDateString('en-KE',{day:'numeric
 
 /* ── Apply Modal ── */
 function openApply(jobId) {
-  const job = allJobs.find(j => j.id === jobId);
-  if (!job) return;
+  console.log('Opening apply for job:', jobId); // Debug log
+  
+  // Use allJobs from global scope
+  //const job = allJobs.find(j => j.id === jobId);
+  const job = allJobs.find(j => String(j.id) === String(jobId));
+  if (!job) {
+    console.error('Job not found:', jobId);
+    return;
+  }
+  
   currentJobId = jobId;
   document.getElementById('applyJobTitle').textContent = job.title;
-  document.getElementById('applyJobDept').textContent  = job.department + ' · ' + (job.type||'Full-time') + ' · ' + (job.location||'Nairobi');
+  document.getElementById('applyJobDept').textContent = job.department + ' · ' + (job.type||'Full-time') + ' · ' + (job.location||'Nairobi');
+  
   // Reset form
   document.getElementById('applyFormBody').style.display = 'block';
   document.getElementById('applySuccess').classList.remove('show');
-  ['applyFName','applyLName','applyEmail','applyPhone','applyCurrentRole','applyMotivation','applyPortfolio'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['applyFName','applyLName','applyEmail','applyPhone','applyCurrentRole','applyMotivation','applyPortfolio'].forEach(id => { 
+    const el = document.getElementById(id); 
+    if(el) el.value = ''; 
+  });
   document.getElementById('applyExperience').selectedIndex = 0;
   document.getElementById('applyPrivacy').checked = false;
   document.getElementById('applyAlert').className = 'apply-alert';
-  removeFile();
+  
+  if (typeof removeFile === 'function') removeFile();
+  
   const ov = document.getElementById('applyOverlay');
-  ov.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  if (ov) {
+    ov.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
 }
 function closeApply() {
   document.getElementById('applyOverlay').classList.remove('open');
@@ -953,14 +1338,14 @@ async function submitApplication() {
   const motivation = document.getElementById('applyMotivation')?.value.trim();
   const privacy    = document.getElementById('applyPrivacy')?.checked;
 
-  if (!fName)                        { showApplyAlert('error','First name is required.'); return; }
-  if (!lName)                        { showApplyAlert('error','Last name is required.'); return; }
-  if (!email || !RE_EMAIL.test(email)){ showApplyAlert('error','Please enter a valid email address.'); return; }
-  if (!phone || !RE_PHONE.test(phone)){ showApplyAlert('error','Please enter a valid Kenyan phone number.'); return; }
-  if (!experience)                   { showApplyAlert('error','Please select your years of experience.'); return; }
-  if (!motivation || motivation.length < 20) { showApplyAlert('error','Please tell us why you want to work here (at least 20 characters).'); return; }
-  if (!selectedFile)                 { showApplyAlert('error','Please upload your CV as a PDF.'); return; }
-  if (!privacy)                      { showApplyAlert('error','Please agree to the Privacy Policy to continue.'); return; }
+  if (!fName)                        { toast('First name is required.', 'error'); document.getElementById('applyFName').focus(); return; }
+  if (!lName)                        { toast('Last name is required.', 'error'); document.getElementById('applyLName').focus(); return; }
+  if (!email || !RE_EMAIL.test(email)){ toast('Please enter a valid email address.', 'error'); document.getElementById('applyEmail').focus(); return; }
+  if (!phone || !RE_PHONE.test(phone)){ toast('Please enter a valid Kenyan phone number.', 'error'); document.getElementById('applyPhone').focus(); return; }
+  if (!experience)                   { toast('Please select your years of experience.', 'error'); return; }
+  if (!motivation || motivation.length < 20) { toast('Please tell us why you want to work here (at least 20 characters).', 'error'); document.getElementById('applyMotivation').focus(); return; }
+  if (!selectedFile)                 { toast('Please upload your CV as a PDF.', 'error'); return; }
+  if (!privacy)                      { toast('Please agree to the Privacy Policy to continue.', 'error'); return; }
 
   const btn = document.getElementById('applySubmitBtn');
   btn.disabled = true;

@@ -14,6 +14,8 @@ const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 const rateLimit = require('express-rate-limit'); // npm install express-rate-limit
 const helmet    = require('helmet');  
+const EMAIL_SEQUENCE = require('./public/scripts/email-sequence.js');
+const cron       = require('node-cron'); 
 
 const app = express();
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -103,6 +105,289 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
+
+// ─── Storage for media uploads ──────────────────────────────
+const mediaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, 'uploads', 'media');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext  = path.extname(file.originalname).toLowerCase();
+    const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g,'_');
+    cb(null, `${clientID()}_${safe}`);
+  },
+});
+const mediaUpload = multer({
+  storage: mediaStorage,
+  limits:  { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (/image\/(jpeg|png|webp|svg\+xml|gif)/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Only image files accepted'));
+  },
+});
+app.use('/api/media/files', require('express').static(path.join(__dirname, 'uploads', 'media')));
+ 
+ 
+// ══════════════════════════════════════════════════════════════
+// FAQs ENDPOINTS
+// ══════════════════════════════════════════════════════════════
+ 
+app.get('/api/faqs', (req, res) => {
+  const { status, category, featured } = req.query;
+  let sql = 'SELECT * FROM faqs WHERE 1=1';
+  const params = [];
+  if (status)   { sql += ' AND status = ?';   params.push(status); }
+  if (category) { sql += ' AND category = ?'; params.push(category); }
+  if (featured) { sql += ' AND featured = ?'; params.push(featured === 'true' ? 1 : 0); }
+  sql += ' ORDER BY sort_order ASC, created_at ASC';
+  db.query(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json(rows);
+  });
+});
+ 
+app.get('/api/faqs/:id', (req, res) => {
+  db.query('SELECT * FROM faqs WHERE id = ?', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (!rows.length) return res.status(404).json({ error: 'FAQ not found' });
+    res.status(200).json(rows[0]);
+  });
+});
+ 
+app.post('/api/faqs', (req, res) => {
+  const { question, answer, category, status, sort_order, featured } = req.body;
+  if (!question || !answer) return res.status(400).json({ error: 'question and answer are required' });
+  db.query(
+    `INSERT INTO faqs (id, question, answer, category, status, sort_order, featured, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [clientID(), question, answer, category||null, status||'PUBLISHED',
+     sort_order||0, featured?1:0, createdAt(), createdAt()],
+    (err) => {
+      if (err) { console.error(err); return res.status(500).json({ error: 'Database error' }); }
+      res.status(201).json({ message: 'FAQ created successfully' });
+    }
+  );
+});
+ 
+app.put('/api/faqs/:id', (req, res) => {
+  const { question, answer, category, status, sort_order, featured } = req.body;
+  db.query(
+    `UPDATE faqs SET question=?, answer=?, category=?, status=?, sort_order=?, featured=?, updated_at=? WHERE id=?`,
+    [question, answer, category||null, status||'PUBLISHED', sort_order||0, featured?1:0, createdAt(), req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.status(200).json({ message: 'FAQ updated' });
+    }
+  );
+});
+ 
+app.put('/api/faqs/:id/status', (req, res) => {
+  const { status } = req.body;
+  if (!['PUBLISHED','DRAFT'].includes(status)) return res.status(400).json({ error: 'Invalid status' });
+  db.query('UPDATE faqs SET status=?, updated_at=? WHERE id=?', [status, createdAt(), req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json({ message: 'Status updated' });
+  });
+});
+ 
+app.delete('/api/faqs/:id', (req, res) => {
+  db.query('DELETE FROM faqs WHERE id = ?', [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json({ message: 'FAQ deleted' });
+  });
+});
+ 
+// Public FAQ submission (from website contact form)
+app.post('/api/faq-submission', (req, res) => {
+  const { name, email, question } = req.body;
+  if (!question) return res.status(400).json({ error: 'Question is required' });
+  db.query(
+    `INSERT INTO faq_submissions (id, name, email, question, created_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    [clientID(), name||'Anonymous', email||null, question, createdAt()],
+    (err) => {
+      if (err) { console.error(err); return res.status(500).json({ error: 'Database error' }); }
+      res.status(201).json({ message: 'Question submitted. We\'ll add it to our FAQs!' });
+    }
+  );
+});
+ 
+app.get('/api/faq-submissions', (req, res) => {
+  db.query('SELECT * FROM faq_submissions ORDER BY created_at DESC', (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json(rows);
+  });
+});
+ 
+ 
+// ══════════════════════════════════════════════════════════════
+// MEDIA LIBRARY ENDPOINTS
+// ══════════════════════════════════════════════════════════════
+ 
+app.get('/api/media', (req, res) => {
+  const { type, q, page = 1, limit = 40 } = req.query;
+  const offset = (parseInt(page)-1) * parseInt(limit);
+  let sql = 'SELECT * FROM media_library WHERE 1=1';
+  const params = [];
+  if (type) { sql += ' AND type = ?'; params.push(type); }
+  if (q)    { sql += ' AND (filename LIKE ? OR alt LIKE ? OR tags LIKE ?)'; params.push(`%${q}%`,`%${q}%`,`%${q}%`); }
+ 
+  db.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params, (err, countRows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    const total      = countRows[0]?.total || 0;
+    const totalPages = Math.ceil(total / parseInt(limit));
+ 
+    db.query(`${sql} ORDER BY created_at DESC LIMIT ? OFFSET ?`, [...params, parseInt(limit), offset], (err2, rows) => {
+      if (err2) return res.status(500).json({ error: 'Database error' });
+      const base = `${process.env.APP_API_URL}api/media/files/`;
+      const items = rows.map(r => ({
+        ...r,
+        url:  r.filename ? `${base}${r.filename}` : null,
+        tags: tryParseJSON(r.tags, []),
+      }));
+      res.status(200).json({ items, total, totalPages, page: parseInt(page) });
+    });
+  });
+});
+ 
+app.post('/api/media', mediaUpload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Image file is required' });
+  const { type, alt, tags } = req.body;
+  const tagsJSON = JSON.stringify(
+    (tags || '').split(',').map(t => t.trim()).filter(Boolean)
+  );
+ 
+  // Get image dimensions
+  let width = null, height = null;
+  try {
+    const meta = await sharp(req.file.path).metadata();
+    width  = meta.width;
+    height = meta.height;
+  } catch { /* non-critical */ }
+ 
+  db.query(
+    `INSERT INTO media_library (id, filename, original_name, type, alt, tags, size, width, height, mime_type, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [clientID(), req.file.filename, req.file.originalname, type||'general',
+     alt||req.file.originalname, tagsJSON, req.file.size, width, height, req.file.mimetype, createdAt()],
+    (err) => {
+      if (err) { console.error(err); return res.status(500).json({ error: 'Upload failed' }); }
+      const url = `${process.env.APP_API_URL}api/media/files/${req.file.filename}`;
+      res.status(201).json({ message: 'Uploaded', url, filename: req.file.filename });
+    }
+  );
+});
+ 
+app.put('/api/media/:id', (req, res) => {
+  const { alt, tags } = req.body;
+  const tagsJSON = JSON.stringify(Array.isArray(tags) ? tags : (tags||'').split(',').map(t=>t.trim()).filter(Boolean));
+  db.query('UPDATE media_library SET alt=?, tags=? WHERE id=?', [alt, tagsJSON, req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json({ message: 'Updated' });
+  });
+});
+ 
+app.delete('/api/media/:id', (req, res) => {
+  db.query('SELECT filename FROM media_library WHERE id=?', [req.params.id], (err, rows) => {
+    if (err || !rows.length) return res.status(404).json({ error: 'Not found' });
+    const filePath = path.join(__dirname, 'uploads', 'media', rows[0].filename);
+    if (fs.existsSync(filePath)) {
+      try { fs.unlinkSync(filePath); } catch { /* ignore */ }
+    }
+    db.query('DELETE FROM media_library WHERE id=?', [req.params.id], (err2) => {
+      if (err2) return res.status(500).json({ error: 'Database error' });
+      res.status(200).json({ message: 'Deleted' });
+    });
+  });
+});
+ 
+ 
+// ══════════════════════════════════════════════════════════════
+// ANALYTICS ENDPOINTS
+// ══════════════════════════════════════════════════════════════
+ 
+// Record a visit (called from client JS after cookie consent)
+app.post('/api/analytics/record-visit', (req, res) => {
+  const ip       = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+                 || req.connection?.remoteAddress
+                 || 'unknown';
+  const { page, referrer } = req.body;
+  const today    = new Date().toISOString().slice(0, 10);
+ 
+  // Upsert daily aggregation
+  db.query(
+    `INSERT INTO site_analytics (date, page, ip_hash, referrer, visits, created_at)
+     VALUES (?, ?, SHA2(?, 256), ?, 1, ?)
+     ON DUPLICATE KEY UPDATE visits = visits + 1, updated_at = ?`,
+    [today, page||'/', ip, referrer||'direct', createdAt(), createdAt()],
+    (err) => {
+      if (err) console.error('Analytics insert error:', err);
+    }
+  );
+  res.status(200).json({ ok: true });
+});
+ 
+// Analytics summary — unique IPs per day + aggregated stats
+app.get('/api/analytics/unique-ips', (req, res) => {
+  const { days = 14 } = req.query;
+ 
+  const queries = {
+    total:   'SELECT SUM(visits) as total FROM site_analytics',
+    today:   'SELECT SUM(visits) as count FROM site_analytics WHERE date = CURDATE()',
+    week:    'SELECT SUM(visits) as count FROM site_analytics WHERE date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)',
+    uniqAll: 'SELECT COUNT(DISTINCT ip_hash) as count FROM site_analytics',
+    daily:   `SELECT date, SUM(visits) as visits, COUNT(DISTINCT ip_hash) as unique_ips
+              FROM site_analytics
+              WHERE date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+              GROUP BY date ORDER BY date ASC`,
+    refs:    `SELECT referrer, COUNT(*) as count FROM site_analytics
+              WHERE referrer IS NOT NULL AND referrer != 'direct'
+              GROUP BY referrer ORDER BY count DESC LIMIT 10`,
+  };
+ 
+  db.query(queries.total, (e1, r1) => {
+  db.query(queries.today, (e2, r2) => {
+  db.query(queries.week,  (e3, r3) => {
+  db.query(queries.uniqAll,(e4,r4) => {
+  db.query(queries.daily, [parseInt(days)], (e5, r5) => {
+  db.query(queries.refs,  (e6, r6) => {
+    if (e1||e2||e3||e4||e5||e6) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json({
+      totalVisits: r1[0]?.total   || 0,
+      todayVisits: r2[0]?.count   || 0,
+      weekVisits:  r3[0]?.count   || 0,
+      uniqueIPs:   r4[0]?.count   || 0,
+      dailyVisits: r5 || [],
+      referrers:   r6 || [],
+    });
+  }); }); }); }); }); });
+});
+ 
+ 
+// ══════════════════════════════════════════════════════════════
+// NEWSLETTER SUBSCRIBE
+// ══════════════════════════════════════════════════════════════
+ 
+app.post('/api/newsletter-subscribe', (req, res) => {
+  const { email } = req.body;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Valid email required' });
+  }
+  db.query('SELECT id FROM newsletter WHERE email = ?', [email], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (rows.length) return res.status(200).json({ message: "You're already subscribed!" });
+    db.query(
+      'INSERT INTO newsletter (id, email, created_at) VALUES (?, ?, ?)',
+      [clientID(), email, createdAt()],
+      (err2) => {
+        if (err2) return res.status(500).json({ error: 'Subscribe failed' });
+        res.status(201).json({ message: 'Subscribed successfully!' });
+      }
+    );
+  });
+});
 
 
 // Function to handle user creation (register a new user)
@@ -223,6 +508,121 @@ app.delete('/api/users/:id', (req, res) => {
     });
 });
 
+app.post('/api/analytics/track', async (req, res) => {
+  const { page_name, page_path, session_id, referrer,
+          utm_source, utm_medium, utm_campaign } = req.body;
+          console.log("BODY:", req.body);
+  if (!page_name) return res.status(400).json({ error: 'page_name required' });
+
+  try {
+    await db.execute(
+      `INSERT INTO page_views
+        (page_name, page_path, session_id, ip_address, user_agent, referrer,
+         utm_source, utm_medium, utm_campaign)
+       VALUES (?,?,?,?,?,?,?,?,?)`,
+      [page_name, page_path||'', session_id||null, req.ip,
+       req.headers['user-agent']||'', referrer||'',
+       utm_source||null, utm_medium||null, utm_campaign||null]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
+// GET /api/analytics/track - Retrieve analytics data
+app.get('/api/analytics/track', async (req, res) => {
+  const { 
+    limit = 100,
+    offset = 0,
+    page_name,
+    session_id,
+    start_date,
+    end_date,
+    utm_source
+  } = req.query;
+
+  try {
+    let query = `SELECT * FROM page_views WHERE 1=1`;
+    const params = [];
+
+    // Apply filters
+    if (page_name) {
+      query += ` AND page_name = ?`;
+      params.push(page_name);
+    }
+
+    if (session_id) {
+      query += ` AND session_id = ?`;
+      params.push(session_id);
+    }
+
+    if (utm_source) {
+      query += ` AND utm_source = ?`;
+      params.push(utm_source);
+    }
+
+    if (start_date) {
+      query += ` AND created_at >= ?`;
+      params.push(start_date);
+    }
+
+    if (end_date) {
+      query += ` AND created_at <= ?`;
+      params.push(end_date);
+    }
+
+    // Add pagination
+    query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    params.push(parseInt(limit), parseInt(offset));
+
+    const [rows] = await db.execute(query, params);
+
+    // Get total count for pagination
+    let countQuery = `SELECT COUNT(*) as total FROM page_views WHERE 1=1`;
+    const countParams = [];
+    
+    if (page_name) {
+      countQuery += ` AND page_name = ?`;
+      countParams.push(page_name);
+    }
+    if (session_id) {
+      countQuery += ` AND session_id = ?`;
+      countParams.push(session_id);
+    }
+    if (utm_source) {
+      countQuery += ` AND utm_source = ?`;
+      countParams.push(utm_source);
+    }
+    if (start_date) {
+      countQuery += ` AND created_at >= ?`;
+      countParams.push(start_date);
+    }
+    if (end_date) {
+      countQuery += ` AND created_at <= ?`;
+      countParams.push(end_date);
+    }
+
+    const [countResult] = await db.execute(countQuery, countParams);
+    const total = countResult[0].total;
+
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        total_pages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (err) {
+    console.error('DB error:', err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
 // Format timestamp for EAT
 /**
  * Function for getting the current date & time
@@ -294,6 +694,8 @@ app.post('/api/clients', (req, res) => {
                 createdAt
             },
         });
+        // Enqueue the email sequence for the new client
+        enqueueEmailSequence(clientEmail);
     });
 });
 
@@ -913,7 +1315,7 @@ app.put('/api/rescheduleMeeting', (req, res) => {
         const updateQuery = `
             UPDATE appointments
             SET clientId = ?, name = ?, email = ?, phone = ?, location = ?, appointmentDate = ?,
-                appointmentTime = ?, appointmentType = ?, status = ?, notes = ?, meetingLink = ?, created_at = ?
+                appointmentTime = ?, appointmentType = ?, appointmentStatus = ?, appointmentNotes = ?, meetingLink = ?, created_at = ?
             WHERE clientId = ?
         `;
 
@@ -926,7 +1328,7 @@ app.put('/api/rescheduleMeeting', (req, res) => {
 
             // Send Email Notification
             sendRescheduleEmail(name.split(' ')[0], email, appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
-            sendBookingReactionEmail(name.split(' ')[0], appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
+            sendBookingReactionEmail(name.split(' ')[0], email, appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
 
             // Respond with a success message
             console.log('Meeting Rescheduled successfully');
@@ -975,7 +1377,6 @@ app.put('/api/reminder-email', (req, res) => {
 
         // Send Email Notification
         sendReminderEmail(fname, email, appointmentDate, appointmentTime, location, appointmentNotes, meetingLink);
-
         // Respond with a success message
         console.log('Reminder Sent successfully');
         res.status(200).json({
@@ -1725,89 +2126,104 @@ async function sendWelcomeEmail(clientName, clientEmail) {
         to: clientEmail, // Recipient email
         subject: 'Welcome to Adconnect – Your Partner in Real Estate Marketing Success 🎉',
         html: `
-           <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
-    <div style="
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(to right, #4d4c4b, #646464);
-      border-radius: 10px;
-    ">
-        <p style="line-height: 1.5;">
-            Hello <span style="font-weight: bold;">${clientName},</span> Misgina Fitwi Here,
-        </p>
-        <p style="line-height: 1.5;">
-            Welcome to <a href="https://www.adconnect.co.ke" style="color: #4abc4f;
-            font-weight: bold;
-            font-size: large;
-            transition: color 0.3s ease;
-            text-decoration: none;">Adconnect!</a> We’re
-            thrilled to have you on board 🎉.
-        </p>
-        <p style="line-height: 1.5;">
-            Our mission is simple: to help real estate companies like yours succeed
-            through powerful, targeted ads, professional social media management, and
-            more. At <a href="https://adconnect.co.ke" style="color: #4abc4f;
-            font-weight: bold;
-            font-size: large;
-            transition: color 0.3s ease;
-            text-decoration: none;">AdConnect</a>, we
-            know that your success is our success ❤️.
-        </p>
-        <p style="line-height: 1.5;">Here's what you can expect:</p>
-        <ul>
-            <li>
-                ✔️ Proven strategies to attract and convert leads through Facebook and
-                social media advertising.
-            </li>
-            <li>
-                🔧 Expert support from our experienced developers, content editors, and
-                marketing professionals.
-            </li>
-            <li>
-                💡 Ongoing guidance to keep your digital marketing at the cutting edge.
-            </li>
-        </ul>
-        <p style="line-height: 1.5;">We’re here to take the complexity out of digital marketing for you.</p>
-        <p style="line-height: 1.5;">
-            <a href="https://adconnect.co.ke/index.html?value-video-opt-in=true" style="display: inline-block;
-            padding: 5px 30px;
-            background-color: #f65730;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;">
-                Book a Free Consultation Today
-            </a>
-        </p>
-        <p style="line-height: 1.5;">Looking forward to helping you grow!</p>
-        <p style="line-height: 1.5;">Warm regards,<br /></p>
-        <p style="line-height: 1.5;">
-            Misgina Fitwi<br />
-            <a href="https://adconnect.co.ke" style="color: #4abc4f;
-        text-decoration: none;">Adconnect Team</a><br />
-            Phone: 0790064130
-        </p>
-        <footer style="text-align: center;
-        margin-top: 30px;
-        color: #fff;
-        font-size: 14px;">
-            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
-                Powered By <br /><span style="color: #4abc4f;
-                font-weight: bold;
-                font-size: large;
-                transition: color 0.3s ease;
-                text-decoration: none;">AdConnect</span>
-            </p>
-            <p style="line-height: 1.5;">
-                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
-                text-decoration: none;
-                margin-top: -10px;">Unsubscribe</a>
-            </p>
-        </footer>
-    </div>
+           <head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Welcome to AdConnect</title>
+</head>
+<body style="margin:0;padding:0;background:#0e0e0e;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e0e0e;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+ 
+  <!-- Logo -->
+  <tr><td style="background:#1a1917;border-radius:16px 16px 0 0;padding:28px 40px;border-bottom:1px solid #2a2826;text-align:center;">
+    <img src="https://adconnect.co.ke/resources/logo.png" alt="AdConnect" width="130" style="display:block;margin:0 auto;border-radius:8px;"/>
+  </td></tr>
+ 
+  <!-- Hero -->
+  <tr><td style="background:linear-gradient(135deg,#F65730,#c43d1a,#1a1917);padding:44px 40px 48px;text-align:center;">
+    <div style="font-size:42px;margin-bottom:14px;">🎉</div>
+    <h1 style="margin:0 0 10px;font-size:30px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.15;">Welcome to AdConnect!</h1>
+    <p style="margin:0;font-size:15px;color:rgba(255,255,255,.82);line-height:1.65;">You've just taken the first step towards transforming your real estate marketing.</p>
+  </td></tr>
+ 
+  <!-- Body -->
+  <tr><td style="background:#1a1917;padding:36px 40px 32px;">
+    <p style="margin:0 0 18px;font-size:15px;color:#B8B4B0;line-height:1.8;">Hello <strong style="color:#fff;">${clientName}</strong>,</p>
+    <p style="margin:0 0 18px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      I'm <strong style="color:#F65730;">Misgina Fitwi</strong>, and on behalf of the entire AdConnect team — welcome aboard! We're genuinely excited to partner with you and help your real estate business thrive in the digital space.
+    </p>
+    <p style="margin:0 0 28px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      Our mission is straightforward: help real estate companies like yours generate high-quality leads, reduce ad costs, and close more deals through powerful, data-driven campaigns.
+    </p>
+ 
+    <!-- Feature cards -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#252320;border-radius:12px;padding:24px;border:1px solid #3d3b39;">
+        <p style="margin:0 0 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#F65730;">What you can expect</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="46" valign="top" style="padding-right:14px;padding-bottom:18px;">
+              <div style="width:38px;height:38px;background:rgba(246,87,48,.12);border:1px solid rgba(246,87,48,.3);border-radius:9px;text-align:center;line-height:38px;font-size:17px;">📣</div>
+            </td>
+            <td valign="top" style="padding-bottom:18px;border-bottom:1px solid #2a2826;">
+              <p style="margin:0 0 3px;font-size:14px;font-weight:700;color:#fff;">Targeted Advertising That Converts</p>
+              <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">High-ROI campaigns on Facebook, Instagram, TikTok, and Google — built specifically for real estate audiences.</p>
+            </td>
+          </tr>
+          <tr>
+            <td width="46" valign="top" style="padding-right:14px;padding-top:16px;padding-bottom:18px;">
+              <div style="width:38px;height:38px;background:rgba(74,188,79,.12);border:1px solid rgba(74,188,79,.3);border-radius:9px;text-align:center;line-height:38px;font-size:17px;">🔧</div>
+            </td>
+            <td valign="top" style="padding-top:16px;padding-bottom:18px;border-bottom:1px solid #2a2826;">
+              <p style="margin:0 0 3px;font-size:14px;font-weight:700;color:#fff;">Expert Support, Always Available</p>
+              <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">Our experienced developers, content creators, and marketing specialists are in your corner every step of the way.</p>
+            </td>
+          </tr>
+          <tr>
+            <td width="46" valign="top" style="padding-right:14px;padding-top:16px;">
+              <div style="width:38px;height:38px;background:rgba(52,152,219,.12);border:1px solid rgba(52,152,219,.3);border-radius:9px;text-align:center;line-height:38px;font-size:17px;">📈</div>
+            </td>
+            <td valign="top" style="padding-top:16px;">
+              <p style="margin:0 0 3px;font-size:14px;font-weight:700;color:#fff;">Performance Tracking & Insights</p>
+              <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">Regular analytics reports and strategy calls to continuously optimize your campaigns for maximum ROI.</p>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+    </table>
+ 
+    <p style="margin:0 0 28px;font-size:15px;color:#B8B4B0;line-height:1.8;">We're here to take the complexity out of digital marketing so you can focus on what you do best — building your real estate business.</p>
+ 
+    <!-- CTA Button -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+      <tr><td align="center">
+        <a href="https://adconnect.co.ke/?appointment-booking=true" style="display:inline-block;padding:14px 36px;background:#F65730;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;letter-spacing:0.3px;">
+          Book Your Free Consultation →
+        </a>
+      </td></tr>
+    </table>
+ 
+    <p style="margin:0 0 4px;font-size:15px;color:#B8B4B0;">Looking forward to helping you grow!</p>
+    <p style="margin:4px 0 2px;font-size:15px;font-weight:700;color:#fff;">Misgina Fitwi</p>
+    <p style="margin:0;font-size:13px;color:#7a7874;">
+      <a href="https://www.adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">AdConnect Team</a> &nbsp;·&nbsp; <a href="tel:+254790064130" style="color:#7a7874;text-decoration:none;">+254 790 064 130</a>
+    </p>
+  </td></tr>
+ 
+  <!-- Footer -->
+  <tr><td style="background:#111110;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #2a2826;text-align:center;">
+    <p style="margin:0 0 8px;font-size:11px;color:#555;line-height:1.6;">You're receiving this because you signed up at <a href="https://adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">adconnect.co.ke</a></p>
+    <p style="margin:0;font-size:11px;color:#444;">
+      © 2025 AdConnect · Nairobi, Kenya &nbsp;·&nbsp;
+      <a href="https://adconnect.co.ke/unsubscribe.html" style="color:#F65730;text-decoration:none;">Unsubscribe</a> &nbsp;·&nbsp;
+      <a href="https://adconnect.co.ke/privacy.html" style="color:#555;text-decoration:none;">Privacy Policy</a>
+    </p>
+  </td></tr>
+ 
+</table>
+</td></tr>
+</table>
 </body>
       `,
     };
@@ -1832,69 +2248,87 @@ async function sendBookingEmail(clientName, clientEmail, meetingDate, meetingTim
         to: clientEmail, // Recipient email
         subject: 'Meeting Confirmation: Consultation with Adconnect Team',
         html: `
-           <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
-    <div style="
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(to right, #4d4c4b, #646464);
-      border-radius: 10px;
-    ">
-        <p style="line-height: 1.5;">
-            Dear <span style="font-weight: bold;">${clientName},</span>
-        </p>
-        <p style="line-height: 1.5;">
-            We are writing to confirm that you have scheduled a consultation meeting with us as follows:.
-        </p>
-        <p style="line-height: 1.5;"> <br>
-            <b>Date: </b> ${meetingDate}. <br>
-            <b>Time: </b> ${meetingTime} EAT. <br>
-            <b>Location: </b> ${meetingLocation}. <br>
-            <b>Agenda: </b> ${meetingAgenda}. <br>
-            <br>
-        </p>
-        <p style="line-height: 1.5;">
-            <a href='${meetingLink}' style="display: inline-block;
-            padding: 5px 30px;
-            background-color: #f65730;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;">
-                Proceed to Meeting
-            </a>
-            </p>
-        <p style="line-height: 1.5;">If you have any questions or need to reschedule, don't hesitate to contact the undersigned.</p>
-       
-        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
-
-        <p style="line-height: 1.5;">Warm regards,<br /></p>
-        <p style="line-height: 1.5;">
-            Misgina Fitwi<br />
-            <a href="https://adconnect.co.ke" style="color: #4abc4f;
-        text-decoration: none;">Adconnect Team</a><br />
-            Phone: 0790064130
-        </p>
-        <footer style="text-align: center;
-        margin-top: 30px;
-        color: #fff;
-        font-size: 14px;">
-            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
-                Powered By <br /><span style="color: #4abc4f;
-                font-weight: bold;
-                font-size: large;
-                transition: color 0.3s ease;
-                text-decoration: none;">AdConnect</span>
-            </p>
-            <p style="line-height: 1.5;">
-                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
-                text-decoration: none;
-                margin-top: -10px;"></a>
-            </p>
-        </footer>
-    </div>
+           <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>Booking Confirmed — AdConnect</title></head>
+<body style="margin:0;padding:0;background:#0e0e0e;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e0e0e;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+ 
+  <!-- Logo -->
+  <tr><td style="background:#1a1917;border-radius:16px 16px 0 0;padding:28px 40px;border-bottom:1px solid #2a2826;text-align:center;">
+    <img src="https://adconnect.co.ke/resources/logo.png" alt="AdConnect" width="130" style="display:block;margin:0 auto;border-radius:8px;"/>
+  </td></tr>
+ 
+  <!-- Hero — green accent for confirmation -->
+  <tr><td style="background:linear-gradient(135deg,#1a4a1c,#2d7a30,#1a1917);padding:40px 40px 44px;text-align:center;">
+    <div style="width:64px;height:64px;background:rgba(74,188,79,.2);border:2px solid #4ABC4F;border-radius:50%;text-align:center;line-height:64px;font-size:28px;margin:0 auto 16px;">✅</div>
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.3px;">Booking Confirmed!</h1>
+    <p style="margin:0;font-size:15px;color:rgba(255,255,255,.8);line-height:1.65;">Your consultation with AdConnect is all set.</p>
+  </td></tr>
+ 
+  <!-- Body -->
+  <tr><td style="background:#1a1917;padding:36px 40px 32px;">
+    <p style="margin:0 0 20px;font-size:15px;color:#B8B4B0;line-height:1.8;">Dear <strong style="color:#fff;">${clientName}</strong>,</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      We're looking forward to meeting with you! Your consultation session has been confirmed with the following details:
+    </p>
+ 
+    <!-- Booking Details Card -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#252320;border-radius:12px;padding:24px 28px;border:1px solid #3d3b39;">
+        <p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#4ABC4F;">Meeting Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;width:120px;">📅 Date</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingDate}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">🕐 Time</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingTime} EAT</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">📍 Location</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;color:#B8B4B0;">${meetingLocation}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;color:#7a7874;font-size:13px;vertical-align:top;">💬 Agenda</td>
+            <td style="padding:10px 0;font-size:14px;color:#B8B4B0;line-height:1.6;">${meetingAgenda}</td>
+          </tr>
+        </table>
+      </td></tr>
+    </table>
+ 
+    <!-- Join Button -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td align="center">
+        <a href="${meetingLink}" style="display:inline-block;padding:14px 40px;background:#F65730;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;">
+          🎥 Join Meeting
+        </a>
+      </td></tr>
+    </table>
+ 
+    <!-- Preparation tip -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#1e1c1a;border-radius:10px;border-left:3px solid #F65730;padding:16px 20px;">
+        <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#F65730;">How to Prepare</p>
+        <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">Feel free to bring any questions, current ad performance data, or examples of your current marketing efforts. The more we know upfront, the more value we can deliver in your session.</p>
+      </td></tr>
+    </table>
+ 
+    <p style="margin:0 0 20px;font-size:14px;color:#7a7874;line-height:1.8;">Need to reschedule? Reply to this email or call us at <a href="tel:+254790064130" style="color:#F65730;text-decoration:none;">+254 790 064 130</a>.</p>
+    <p style="margin:0 0 4px;font-size:15px;color:#B8B4B0;">Looking forward to connecting with you,</p>
+    <p style="margin:4px 0 2px;font-size:15px;font-weight:700;color:#fff;">Misgina Fitwi</p>
+    <p style="margin:0;font-size:13px;color:#7a7874;"><a href="https://adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">AdConnect Team</a> &nbsp;·&nbsp; <a href="tel:+254790064130" style="color:#7a7874;text-decoration:none;">+254 790 064 130</a></p>
+  </td></tr>
+ 
+  <!-- Footer -->
+  <tr><td style="background:#111110;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #2a2826;text-align:center;">
+    <p style="margin:0;font-size:11px;color:#444;">© 2025 AdConnect · Nairobi, Kenya &nbsp;·&nbsp; <a href="https://adconnect.co.ke/privacy.html" style="color:#555;text-decoration:none;">Privacy Policy</a></p>
+  </td></tr>
+ 
+</table>
+</td></tr>
+</table>
 </body>
       `,
     };
@@ -1939,69 +2373,65 @@ async function sendRescheduleEmail(clientName, clientEmail, meetingDate, meeting
         to: clientEmail, // Recipient email
         subject: 'Meeting Reschedule: Consultation with Adconnect',
         html: `
-        <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
-    <div style="
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(to right, #4d4c4b, #646464);
-      border-radius: 10px;
-    ">
-        <p style="line-height: 1.5;">
-            Dear <span style="font-weight: bold;">${clientName},</span>
-        </p>
-        <p style="line-height: 1.5;">
-            This is to inform you that your consultation meeting has been rescheduled as follows:
-        </p>
-        <p style="line-height: 1.5;"> <br>
-            <b>Date: </b> ${meetingDate}. <br>
-            <b>Time: </b> ${meetingTime} EAT. <br>
-            <b>Location: </b> ${meetingLocation}. <br>
-            <b>Agenda: </b> ${meetingAgenda}. <br>
-            <br>
-        </p>
-        <p style="line-height: 1.5;">
-            <a href='${meetingLink}' style="display: inline-block;
-            padding: 5px 30px;
-            background-color: #f65730;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;">
-                Proceed to Meeting
-            </a>
-            </p>
-        <p style="line-height: 1.5;">If you have any questions or need to reschedule, don't hesitate to contact the undersigned.</p>
-       
-        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
-
-        <p style="line-height: 1.5;">Warm regards,<br /></p>
-        <p style="line-height: 1.5;">
-            Misgina Fitwi<br />
-            <a href="https://adconnect.co.ke" style="color: #4abc4f;
-        text-decoration: none;">Adconnect Team</a><br />
-            Phone: 0790064130
-        </p>
-        <footer style="text-align: center;
-        margin-top: 30px;
-        color: #fff;
-        font-size: 14px;">
-            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
-                Powered By <br /><span style="color: #4abc4f;
-                font-weight: bold;
-                font-size: large;
-                transition: color 0.3s ease;
-                text-decoration: none;">AdConnect</span>
-            </p>
-            <p style="line-height: 1.5;">
-                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
-                text-decoration: none;
-                margin-top: -10px;"></a>
-            </p>
-        </footer>
-    </div>
+        <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>Meeting Rescheduled — AdConnect</title></head>
+<body style="margin:0;padding:0;background:#0e0e0e;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e0e0e;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+ 
+  <tr><td style="background:#1a1917;border-radius:16px 16px 0 0;padding:28px 40px;border-bottom:1px solid #2a2826;text-align:center;">
+    <img src="https://adconnect.co.ke/resources/logo.png" alt="AdConnect" width="130" style="display:block;margin:0 auto;border-radius:8px;"/>
+  </td></tr>
+ 
+  <!-- Hero — orange/amber for change notification -->
+  <tr><td style="background:linear-gradient(135deg,#4a3000,#c87d00,#1a1917);padding:40px 40px 44px;text-align:center;">
+    <div style="width:64px;height:64px;background:rgba(245,166,35,.15);border:2px solid #F5A623;border-radius:50%;text-align:center;line-height:64px;font-size:26px;margin:0 auto 16px;">📅</div>
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.3px;">Meeting Rescheduled</h1>
+    <p style="margin:0;font-size:15px;color:rgba(255,255,255,.8);line-height:1.65;">Your consultation has been moved to a new time.</p>
+  </td></tr>
+ 
+  <tr><td style="background:#1a1917;padding:36px 40px 32px;">
+    <p style="margin:0 0 20px;font-size:15px;color:#B8B4B0;line-height:1.8;">Dear <strong style="color:#fff;">${clientName}</strong>,</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      We wanted to inform you that your upcoming consultation meeting with AdConnect has been rescheduled. Please take note of the updated details below:
+    </p>
+ 
+    <!-- Updated Details -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#252320;border-radius:12px;padding:24px 28px;border:1px solid #3d3b39;">
+        <p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#F5A623;">Updated Meeting Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr><td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;width:120px;">📅 New Date</td><td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingDate}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">🕐 New Time</td><td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingTime} EAT</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">📍 Location</td><td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;color:#B8B4B0;">${meetingLocation}</td></tr>
+          <tr><td style="padding:10px 0;color:#7a7874;font-size:13px;vertical-align:top;">💬 Agenda</td><td style="padding:10px 0;font-size:14px;color:#B8B4B0;line-height:1.6;">${meetingAgenda}</td></tr>
+        </table>
+      </td></tr>
+    </table>
+ 
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td align="center">
+        <a href="${meetingLink}" style="display:inline-block;padding:14px 40px;background:#F65730;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;">
+          🎥 Join Meeting
+        </a>
+      </td></tr>
+    </table>
+ 
+    <p style="margin:0 0 20px;font-size:14px;color:#7a7874;line-height:1.8;">
+      We apologize for any inconvenience this may cause. If you have any questions or need to reschedule again, don't hesitate to reach out.
+    </p>
+    <p style="margin:0 0 4px;font-size:15px;color:#B8B4B0;">Looking forward to connecting with you,</p>
+    <p style="margin:4px 0 2px;font-size:15px;font-weight:700;color:#fff;">Misgina Fitwi</p>
+    <p style="margin:0;font-size:13px;color:#7a7874;"><a href="https://adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">AdConnect Team</a> &nbsp;·&nbsp; <a href="tel:+254790064130" style="color:#7a7874;text-decoration:none;">+254 790 064 130</a></p>
+  </td></tr>
+ 
+  <tr><td style="background:#111110;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #2a2826;text-align:center;">
+    <p style="margin:0;font-size:11px;color:#444;">© 2025 AdConnect · Nairobi, Kenya &nbsp;·&nbsp; <a href="https://adconnect.co.ke/privacy.html" style="color:#555;text-decoration:none;">Privacy Policy</a></p>
+  </td></tr>
+ 
+</table>
+</td></tr>
+</table>
 </body>
 `,
     };
@@ -2026,68 +2456,91 @@ async function sendReminderEmail(clientName, clientEmail, meetingDate, meetingTi
         to: clientEmail, // Recipient email
         subject: 'Meeting Reminder: Consultation with Adconnect',
         html: `
-        <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
-    <div style="
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(to right, #4d4c4b, #646464);
-      border-radius: 10px;
-    ">
-        <p style="line-height: 1.5;">
-            Dear <span style="font-weight: bold;">${clientName},</span>
-        </p>
-        <p style="line-height: 1.5;">
-            This is to remind you of our upcoming consultation meeting as detailed below:
-        </p>
-        <p style="line-height: 1.5;"> <br>
-            <b>Date: </b> ${meetingDate}. <br>
-            <b>Time: </b> ${meetingTime} EAT. <br>
-            <b>Location: </b> ${meetingLocation}. <br>
-            <b>Agenda: </b> ${meetingAgenda}. <br>
-            <br>
-        </p>
-        <p style="line-height: 1.5;">
-            <a href='${meetingLink}' style="display: inline-block;
-            padding: 5px 30px;
-            background-color: #f65730;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;">
-                Proceed to Meeting
-            </a>
-            </p>
-       
-        <p style="line-height: 1.5;">Looking forward to connecting with you.</p>
+        <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Meeting Reminder — AdConnect</title>
+</head>
+<body style="margin:0;padding:0;background:#0e0e0e;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e0e0e;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
-        <p style="line-height: 1.5;">Warm regards,<br /></p>
-        <p style="line-height: 1.5;">
-            Misgina Fitwi<br />
-            <a href="https://adconnect.co.ke" style="color: #4abc4f;
-        text-decoration: none;">Adconnect Team</a><br />
-            Phone: 0790064130
-        </p>
-        <footer style="text-align: center;
-        margin-top: 30px;
-        color: #fff;
-        font-size: 14px;">
-            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
-                Powered By <br /><span style="color: #4abc4f;
-                font-weight: bold;
-                font-size: large;
-                transition: color 0.3s ease;
-                text-decoration: none;">AdConnect</span>
-            </p>
-            <p style="line-height: 1.5;">
-                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
-                text-decoration: none;
-                margin-top: -10px;"></a>
-            </p>
-        </footer>
-    </div>
+  <!-- Logo -->
+  <tr><td style="background:#1a1917;border-radius:16px 16px 0 0;padding:28px 40px;border-bottom:1px solid #2a2826;text-align:center;">
+    <img src="https://adconnect.co.ke/resources/logo.png" alt="AdConnect" width="130" style="display:block;margin:0 auto;border-radius:8px;"/>
+  </td></tr>
+
+  <!-- Hero — orange accent for reminder -->
+  <tr><td style="background:linear-gradient(135deg,#2a1f1a,#4a2c1a,#1a1917);padding:40px 40px 44px;text-align:center;">
+    <div style="width:64px;height:64px;background:rgba(246,87,48,.18);border:2px solid #F65730;border-radius:50%;text-align:center;line-height:64px;font-size:28px;margin:0 auto 16px;">🔔</div>
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.3px;">Meeting Reminder</h1>
+    <p style="margin:0;font-size:15px;color:rgba(255,255,255,.8);line-height:1.65;">Your upcoming consultation with AdConnect is approaching.</p>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="background:#1a1917;padding:36px 40px 32px;">
+    <p style="margin:0 0 20px;font-size:15px;color:#B8B4B0;line-height:1.8;">Dear <strong style="color:#fff;">${clientName}</strong>,</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      This is a friendly reminder of your upcoming consultation meeting as detailed below:
+    </p>
+
+    <!-- Meeting Details Card -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#252320;border-radius:12px;padding:24px 28px;border:1px solid #3d3b39;">
+        <p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#F65730;">Meeting Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;width:120px;">📅 Date</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingDate}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">🕐 Time</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingTime} EAT</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">📍 Location</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;color:#B8B4B0;">${meetingLocation}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;color:#7a7874;font-size:13px;vertical-align:top;">💬 Agenda</td>
+            <td style="padding:10px 0;font-size:14px;color:#B8B4B0;line-height:1.6;">${meetingAgenda}</td>
+          </tr>
+        </table>
+      </td></tr>
+    </table>
+
+    <!-- CTA Button -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td align="center">
+        <a href="${meetingLink}" style="display:inline-block;padding:14px 40px;background:#F65730;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;">
+          🎥 Proceed to Meeting
+        </a>
+      </td></tr>
+    </table>
+
+    <!-- Tip -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#1e1c1a;border-radius:10px;border-left:3px solid #4ABC4F;padding:16px 20px;">
+        <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#4ABC4F;">Before You Join</p>
+        <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">Please ensure you have a stable internet connection and any relevant materials ready ahead of time. We look forward to a productive session.</p>
+      </td></tr>
+    </table>
+
+    <p style="margin:0 0 20px;font-size:14px;color:#7a7874;line-height:1.8;">Need to reschedule? Reply to this email or call us at <a href="tel:+254790064130" style="color:#F65730;text-decoration:none;">+254 790 064 130</a>.</p>
+    <p style="margin:0 0 4px;font-size:15px;color:#B8B4B0;">Looking forward to connecting with you,</p>
+    <p style="margin:4px 0 2px;font-size:15px;font-weight:700;color:#fff;">Misgina Fitwi</p>
+    <p style="margin:0;font-size:13px;color:#7a7874;"><a href="https://adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">AdConnect Team</a> &nbsp;·&nbsp; <a href="tel:+254790064130" style="color:#7a7874;text-decoration:none;">+254 790 064 130</a></p>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#111110;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #2a2826;text-align:center;">
+    <p style="margin:0;font-size:11px;color:#444;">© 2025 AdConnect · Nairobi, Kenya &nbsp;·&nbsp; <a href="https://adconnect.co.ke/privacy.html" style="color:#555;text-decoration:none;">Privacy Policy</a> &nbsp;·&nbsp; <a href="https://adconnect.co.ke/unsubscribe" style="color:#555;text-decoration:none;">Unsubscribe</a></p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
 </body>
 `,
     };
@@ -2112,57 +2565,87 @@ async function sendBookingReactionEmail(clientName, meetingDate, meetingTime, me
         to: 'info@adconnect.co.ke', // Recipient email
         subject: `New Appointment - ${clientName}`,
         html: `
-           <body style="font-family: Arial, sans-serif; color: #fff; padding: 20px">
-    <div style="
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(to right, #4d4c4b, #646464);
-      border-radius: 10px;
-    ">
-        <p style="line-height: 1.5;">
-            A new appointment has been scheduled:
-        </p>
-        <p style="line-height: 1.5;"> <br>
-            <b>Client Name: </b> ${clientName}. <br>
-            <b>Date: </b> ${meetingDate}. <br>
-            <b>Time: </b> ${meetingTime} EAT. <br>
-            <b>Location: </b> ${meetingLocation}. <br>
-            <b>Agenda: </b> ${meetingAgenda}. <br>
-            <br>
-        </p>
-        <p style="line-height: 1.5;">
-            <a href='${meetingLink}' style="display: inline-block;
-            padding: 5px 30px;
-            background-color: #f65730;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;">
-                Proceed to Meeting
-            </a>
-            </p>
-            
-        <footer style="text-align: center;
-        margin-top: 30px;
-        color: #fff;
-        font-size: 14px;">
-            <p style="font-size: x-large; font-weight: bolder; color: #6d6d6d">
-                Powered By <br /><span style="color: #4abc4f;
-                font-weight: bold;
-                font-size: large;
-                transition: color 0.3s ease;
-                text-decoration: none;">AdConnect</span>
-            </p>
-            <p style="line-height: 1.5;">
-                <a href="https://adconnect.co.ke/unsubscribe" style="color: #f65730;
-                text-decoration: none;
-                margin-top: -10px;"></a>
-            </p>
-        </footer>
-    </div>
+           <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>Booking Confirmed — AdConnect</title></head>
+<body style="margin:0;padding:0;background:#0e0e0e;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0e0e0e;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+ 
+  <!-- Logo -->
+  <tr><td style="background:#1a1917;border-radius:16px 16px 0 0;padding:28px 40px;border-bottom:1px solid #2a2826;text-align:center;">
+    <img src="https://adconnect.co.ke/resources/logo.png" alt="AdConnect" width="130" style="display:block;margin:0 auto;border-radius:8px;"/>
+  </td></tr>
+ 
+  <!-- Hero — green accent for confirmation -->
+  <tr><td style="background:linear-gradient(135deg,#1a4a1c,#2d7a30,#1a1917);padding:40px 40px 44px;text-align:center;">
+    <div style="width:64px;height:64px;background:rgba(74,188,79,.2);border:2px solid #4ABC4F;border-radius:50%;text-align:center;line-height:64px;font-size:28px;margin:0 auto 16px;">✅</div>
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.3px;">Booking Confirmed!</h1>
+    <p style="margin:0;font-size:15px;color:rgba(255,255,255,.8);line-height:1.65;">Your consultation with AdConnect is all set.</p>
+  </td></tr>
+ 
+  <!-- Body -->
+  <tr><td style="background:#1a1917;padding:36px 40px 32px;">
+    <p style="margin:0 0 20px;font-size:15px;color:#B8B4B0;line-height:1.8;">Dear <strong style="color:#fff;">${clientName}</strong>,</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#B8B4B0;line-height:1.8;">
+      We're looking forward to meeting with you! Your consultation session has been confirmed with the following details:
+    </p>
+ 
+    <!-- Booking Details Card -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#252320;border-radius:12px;padding:24px 28px;border:1px solid #3d3b39;">
+        <p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#4ABC4F;">Meeting Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;width:120px;">📅 Date</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingDate}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">🕐 Time</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;font-weight:600;color:#fff;">${meetingTime} EAT</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;color:#7a7874;font-size:13px;">📍 Location</td>
+            <td style="padding:10px 0;border-bottom:1px solid #2a2826;font-size:14px;color:#B8B4B0;">${meetingLocation}</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0;color:#7a7874;font-size:13px;vertical-align:top;">💬 Agenda</td>
+            <td style="padding:10px 0;font-size:14px;color:#B8B4B0;line-height:1.6;">${meetingAgenda}</td>
+          </tr>
+        </table>
+      </td></tr>
+    </table>
+ 
+    <!-- Join Button -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td align="center">
+        <a href="${meetingLink}" style="display:inline-block;padding:14px 40px;background:#F65730;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;">
+          🎥 Join Meeting
+        </a>
+      </td></tr>
+    </table>
+ 
+    <!-- Preparation tip -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="background:#1e1c1a;border-radius:10px;border-left:3px solid #F65730;padding:16px 20px;">
+        <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#F65730;">How to Prepare</p>
+        <p style="margin:0;font-size:13px;color:#7a7874;line-height:1.6;">Feel free to bring any questions, current ad performance data, or examples of your current marketing efforts. The more we know upfront, the more value we can deliver in your session.</p>
+      </td></tr>
+    </table>
+ 
+    <p style="margin:0 0 20px;font-size:14px;color:#7a7874;line-height:1.8;">Need to reschedule? Reply to this email or call us at <a href="tel:+254790064130" style="color:#F65730;text-decoration:none;">+254 790 064 130</a>.</p>
+    <p style="margin:0 0 4px;font-size:15px;color:#B8B4B0;">Looking forward to connecting with you,</p>
+    <p style="margin:4px 0 2px;font-size:15px;font-weight:700;color:#fff;">Misgina Fitwi</p>
+    <p style="margin:0;font-size:13px;color:#7a7874;"><a href="https://adconnect.co.ke" style="color:#4ABC4F;text-decoration:none;">AdConnect Team</a> &nbsp;·&nbsp; <a href="tel:+254790064130" style="color:#7a7874;text-decoration:none;">+254 790 064 130</a></p>
+  </td></tr>
+ 
+  <!-- Footer -->
+  <tr><td style="background:#111110;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #2a2826;text-align:center;">
+    <p style="margin:0;font-size:11px;color:#444;">© 2025 AdConnect · Nairobi, Kenya &nbsp;·&nbsp; <a href="https://adconnect.co.ke/privacy.html" style="color:#555;text-decoration:none;">Privacy Policy</a></p>
+  </td></tr>
+ 
+</table>
+</td></tr>
+</table>
 </body>
       `,
     };
@@ -2882,12 +3365,12 @@ async function sendInterviewInvitationEmail(firstName, email, jobTitle, date, ti
     await transporter.sendMail({
         from:    `"AdConnect Careers" <${process.env.EMAIL_USER}>`,
         to:      email,
-        subject: `🎉 Interview Invitation — ${jobTitle} at AdConnect`,
+        subject: `Interview Invitation — ${jobTitle} at AdConnect`,
         html: `
         <body style="font-family:Arial,sans-serif;background:#1A1917;color:#F4F1EE;padding:20px;">
           <div style="max-width:560px;margin:0 auto;background:#252320;border:1px solid #3d3b39;border-radius:12px;overflow:hidden;">
             <div style="background:#F65730;padding:28px;text-align:center;">
-              <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
+              <div style="font-size:2.5rem;margin-bottom:8px;"></div>
               <h2 style="margin:0;color:#fff;">You're Invited to Interview!</h2>
               <p style="margin:6px 0 0;color:rgba(255,255,255,.85);font-size:14px;">${jobTitle} · AdConnect</p>
             </div>
@@ -2942,6 +3425,364 @@ app.use((err, req, res, next) => {
 // 404 Not Found middleware
 app.use((req, res) => {
     res.status(404).json({ error: 'Not Found' });
+});
+
+// ─────────────────────────────────────────────────────────────
+// HELPER: replace template variables in email HTML
+// ─────────────────────────────────────────────────────────────
+function renderEmailTemplate(html, vars) {
+  let out = html;
+  Object.entries(vars).forEach(([k, v]) => {
+    const re = new RegExp(`\\$\\{${k}\\}`, 'g');
+    out = out.replace(re, v || '');
+  });
+  return out;
+}
+ 
+// ─────────────────────────────────────────────────────────────
+// CHECK SUBSCRIPTION STATUS  GET /api/subscription-status
+// ─────────────────────────────────────────────────────────────
+app.get('/api/subscription-status', (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+ 
+  db.query(
+    'SELECT id, clientSubScription FROM clients WHERE clientEmail = ?',
+    [email.trim().toLowerCase()],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      if (!rows.length) return res.status(200).json({ status: 'NOT_FOUND' });
+      const status = rows[0].clientSubScription?.trim().toUpperCase() === 'SUBSCRIBED'
+        ? 'SUBSCRIBED' : 'UNSUBSCRIBED';
+      res.status(200).json({ status });
+    }
+  );
+});
+ 
+// ─────────────────────────────────────────────────────────────
+// UNSUBSCRIBE  POST /api/unsubscribe
+// ─────────────────────────────────────────────────────────────
+app.post('/api/unsubscribe', async (req, res) => {
+  const { email, reason } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+ 
+  const emailLower = email.trim().toLowerCase();
+ 
+  db.query(
+    'SELECT id, clientName FROM clients WHERE clientEmail = ?',
+    [emailLower],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      if (!rows.length) return res.status(404).json({ error: 'Email not found' });
+ 
+      // Update subscription status
+      db.query(
+        `UPDATE clients SET clientSubScription = 'UNSUBSCRIBED', updated_at = ? WHERE clientEmail = ?`,
+        [createdAt(), emailLower],
+        (err2) => {
+          if (err2) return res.status(500).json({ error: 'Database error' });
+ 
+          // Log the unsubscribe reason
+          if (reason) {
+            db.query(
+              `INSERT IGNORE INTO unsubscribe_log (id, email, reason, created_at) VALUES (?, ?, ?, ?)`,
+              [clientID(), emailLower, reason, createdAt()],
+              () => {} // non-critical
+            );
+          }
+ 
+          // Pause their email sequence
+          db.query(
+            `UPDATE email_sequence_queue SET status = 'PAUSED' WHERE email = ? AND status = 'PENDING'`,
+            [emailLower],
+            () => {}
+          );
+ 
+          // Send goodbye email
+          sendUnsubscribeConfirmation(rows[0].clientName || emailLower, emailLower)
+            .catch(e => console.error('Unsubscribe confirmation email error:', e));
+ 
+          console.log(`Unsubscribed: ${emailLower} | Reason: ${reason || 'not specified'}`);
+          res.status(200).json({ message: 'Successfully unsubscribed' });
+        }
+      );
+    }
+  );
+});
+ 
+// ─────────────────────────────────────────────────────────────
+// RESUBSCRIBE  POST /api/resubscribe
+// ─────────────────────────────────────────────────────────────
+app.post('/api/resubscribe', (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const emailLower = email.trim().toLowerCase();
+ 
+  db.query(
+    `UPDATE clients SET clientSubScription = 'SUBSCRIBED', updated_at = ? WHERE clientEmail = ?`,
+    [createdAt(), emailLower],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+ 
+      // Resume or restart their email sequence
+      db.query(
+        `UPDATE email_sequence_queue SET status = 'PENDING' WHERE email = ? AND status = 'PAUSED'`,
+        [emailLower],
+        (err2, result) => {
+          // If nothing was paused, restart from current position
+          if (!err2 && result.affectedRows === 0) {
+            enqueueEmailSequence(emailLower);
+          }
+        }
+      );
+ 
+      res.status(200).json({ message: 'Successfully re-subscribed' });
+    }
+  );
+});
+ 
+// ─────────────────────────────────────────────────────────────
+// EMAIL PREFERENCES  PUT /api/email-preferences
+// ─────────────────────────────────────────────────────────────
+app.put('/api/email-preferences', (req, res) => {
+  const { email, preferences } = req.body;
+  if (!email || !preferences) return res.status(400).json({ error: 'Email and preferences required' });
+ 
+  const prefsJSON = JSON.stringify(preferences);
+  const emailLower = email.trim().toLowerCase();
+ 
+  // Upsert preferences
+  db.query(
+    `INSERT INTO email_preferences (id, email, preferences, updated_at) VALUES (?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE preferences = ?, updated_at = ?`,
+    [clientID(), emailLower, prefsJSON, createdAt(), prefsJSON, createdAt()],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.status(200).json({ message: 'Preferences updated' });
+    }
+  );
+});
+ 
+// ─────────────────────────────────────────────────────────────
+// ENQUEUE EMAIL SEQUENCE — called when a new lead is created
+// ─────────────────────────────────────────────────────────────
+function enqueueEmailSequence(email) {
+  const now = new Date();
+ 
+  // Insert all 20 emails into the queue with scheduled_at = now + day offset
+  EMAIL_SEQUENCE.forEach((emailDef) => {
+    const scheduled = new Date(now.getTime() + emailDef.day * 24 * 60 * 60 * 1000);
+    const scheduledAt = scheduled.toISOString().slice(0, 19).replace('T', ' ');
+ 
+    db.query(
+      `INSERT IGNORE INTO email_sequence_queue
+       (id, email, sequence_day, subject, category, scheduled_at, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?)`,
+      [clientID(), email.toLowerCase(), emailDef.day, emailDef.subject, emailDef.category, scheduledAt, createdAt()],
+      (err) => {
+        if (err) console.error(`Queue insert error (day ${emailDef.day}):`, err.message);
+      }
+    );
+  });
+ 
+  console.log(`📧 Email sequence queued for: ${email} (${EMAIL_SEQUENCE.length} emails)`);
+}
+ 
+// EXPORT so it can be called from client creation route
+module.exports.enqueueEmailSequence = enqueueEmailSequence;
+ 
+// ─────────────────────────────────────────────────────────────
+// CRON JOB — Runs every 15 minutes to send due emails
+// ─────────────────────────────────────────────────────────────
+cron.schedule('*/15 * * * *', async () => {
+  console.log('📨 Email sequence cron running…');
+ 
+  const query = `
+    SELECT q.*, c.clientName, c.clientSubScription
+    FROM email_sequence_queue q
+    JOIN clients c ON c.clientEmail = q.email
+    WHERE q.status = 'PENDING'
+      AND q.scheduled_at <= NOW()
+      AND c.clientSubScription = 'SUBSCRIBED'
+    LIMIT 20
+  `;
+ 
+  db.query(query, async (err, rows) => {
+    if (err) { console.error('Cron query error:', err); return; }
+    if (!rows.length) return;
+ 
+    console.log(`Found ${rows.length} emails to send`);
+ 
+    for (const row of rows) {
+      const emailDef = EMAIL_SEQUENCE.find(e => e.day === row.sequence_day);
+      if (!emailDef) {
+        db.query(`UPDATE email_sequence_queue SET status = 'SKIPPED' WHERE id = ?`, [row.id], () => {});
+        continue;
+      }
+ 
+      // Check per-category preference
+      const prefAllowed = await checkEmailPreference(row.email, emailDef.category);
+      if (!prefAllowed) {
+        db.query(`UPDATE email_sequence_queue SET status = 'SKIPPED_PREF' WHERE id = ?`, [row.id], () => {});
+        continue;
+      }
+ 
+      const unsubUrl = `https://adconnect.co.ke/unsubscribe?email=${encodeURIComponent(row.email)}`;
+      const html = renderEmailTemplate(emailDef.body, {
+        clientName:     row.clientName || row.email.split('@')[0],
+        currentYear:    new Date().getFullYear(),
+        unsubscribeUrl: unsubUrl,
+      });
+ 
+      try {
+        await transporter.sendMail({
+          from:    `"AdConnect" <${process.env.EMAIL_USER}>`,
+          to:      row.email,
+          subject: emailDef.subject,
+          html,
+        });
+ 
+        // Mark as sent
+        db.query(
+          `UPDATE email_sequence_queue SET status = 'SENT', sent_at = ? WHERE id = ?`,
+          [createdAt(), row.id],
+          () => {}
+        );
+ 
+        console.log(`✅ Sent Day ${row.sequence_day} to ${row.email}`);
+      } catch (sendErr) {
+        console.error(`❌ Failed to send to ${row.email}:`, sendErr.message);
+        // Increment retry count; after 3 failures mark as FAILED
+        db.query(
+          `UPDATE email_sequence_queue
+           SET retry_count = retry_count + 1,
+               status = IF(retry_count >= 2, 'FAILED', 'PENDING'),
+               scheduled_at = DATE_ADD(NOW(), INTERVAL 30 MINUTE)
+           WHERE id = ?`,
+          [row.id],
+          () => {}
+        );
+      }
+    }
+  });
+});
+ 
+// ─────────────────────────────────────────────────────────────
+// CHECK EMAIL PREFERENCE
+// ─────────────────────────────────────────────────────────────
+function checkEmailPreference(email, category) {
+  return new Promise((resolve) => {
+    db.query('SELECT preferences FROM email_preferences WHERE email = ?', [email], (err, rows) => {
+      if (err || !rows.length) { resolve(true); return; } // No preferences = send all
+      try {
+        const prefs = JSON.parse(rows[0].preferences);
+        // Map category to preference key
+        const map = {
+          'digital-marketing': 'marketing',
+          'web-development':   'product',
+          'android-dev':       'product',
+          'system-dev':        'product',
+          'value':             'news',
+        };
+        const key = map[category] || 'marketing';
+        resolve(prefs[key] !== false); // default allow
+      } catch { resolve(true); }
+    });
+  });
+}
+ 
+// ─────────────────────────────────────────────────────────────
+// UNSUBSCRIBE CONFIRMATION EMAIL
+// ─────────────────────────────────────────────────────────────
+async function sendUnsubscribeConfirmation(clientName, email) {
+  const resubUrl = `https://adconnect.co.ke/unsubscribe?email=${encodeURIComponent(email)}`;
+  await transporter.sendMail({
+    from:    `"AdConnect" <${process.env.EMAIL_USER}>`,
+    to:      email,
+    subject: 'You\'ve been unsubscribed from AdConnect emails',
+    html: `
+    <!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
+    <body style="background:#0f0e0d;font-family:Arial,sans-serif;padding:20px;">
+      <div style="max-width:520px;margin:0 auto;background:#1a1917;border-radius:14px;overflow:hidden;border:1px solid #2d2b29;">
+        <div style="background:#252320;padding:28px 36px;border-bottom:1px solid #2d2b29;text-align:center;">
+          <div style="font-family:sans-serif;font-size:1.1rem;font-weight:900;margin-bottom:16px;">
+            <span style="color:#F65730;">Ad</span><span style="color:#f4f1ee;">Connect</span>
+          </div>
+          <div style="font-size:2rem;margin-bottom:12px;">👋</div>
+          <h2 style="color:#f4f1ee;font-size:1.2rem;font-weight:700;">You're Unsubscribed</h2>
+        </div>
+        <div style="padding:28px 36px;">
+          <p style="color:#b8b4b0;font-size:14px;line-height:1.7;margin-bottom:16px;">Hi <strong style="color:#f4f1ee;">${clientName}</strong>,</p>
+          <p style="color:#b8b4b0;font-size:14px;line-height:1.7;margin-bottom:16px;">You've been successfully unsubscribed from AdConnect marketing emails. You won't receive any more messages from us.</p>
+          <p style="color:#b8b4b0;font-size:14px;line-height:1.7;margin-bottom:24px;">Changed your mind? You can re-subscribe at any time — no hard feelings.</p>
+          <div style="text-align:center;margin-bottom:20px;">
+            <a href="${resubUrl}" style="display:inline-block;padding:12px 28px;background:#4ABC4F;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;">Re-Subscribe</a>
+          </div>
+          <p style="color:#555;font-size:12px;text-align:center;">AdConnect · Nairobi, Kenya · <a href="https://adconnect.co.ke" style="color:#F65730;text-decoration:none;">adconnect.co.ke</a></p>
+          <p style="color:#2d2b29;font-size:11px;text-align:center;font-style:italic;margin-top:6px;">Designed, Built and Managed by AdConnect Development Team</p>
+        </div>
+      </div>
+    </body></html>`,
+  });
+}
+ 
+// ─────────────────────────────────────────────────────────────
+// ADMIN ENDPOINTS — Sequence Management
+// ─────────────────────────────────────────────────────────────
+ 
+// View all queued emails
+app.get('/api/email-sequence-queue', (req, res) => {
+  const { email, status, limit = 100 } = req.query;
+  let sql = 'SELECT * FROM email_sequence_queue WHERE 1=1';
+  const params = [];
+  if (email)  { sql += ' AND email = ?';  params.push(email); }
+  if (status) { sql += ' AND status = ?'; params.push(status); }
+  sql += ' ORDER BY scheduled_at ASC LIMIT ?';
+  params.push(parseInt(limit));
+  db.query(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json(rows);
+  });
+});
+ 
+// Get sequence stats
+app.get('/api/email-sequence-stats', (req, res) => {
+  const sql = `
+    SELECT
+      status,
+      COUNT(*) as count,
+      category,
+      MIN(scheduled_at) as earliest,
+      MAX(sent_at) as latest_sent
+    FROM email_sequence_queue
+    GROUP BY status, category
+    ORDER BY status, category
+  `;
+  db.query(sql, (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(200).json(rows);
+  });
+});
+ 
+// Manually trigger sequence for a specific email (admin use)
+app.post('/api/email-sequence-queue/enqueue', (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  enqueueEmailSequence(email.trim().toLowerCase());
+  res.status(201).json({ message: `Sequence queued for ${email}` });
+});
+ 
+// Cancel remaining sequence for an email
+app.delete('/api/email-sequence-queue/:email', (req, res) => {
+  const email = decodeURIComponent(req.params.email);
+  db.query(
+    `UPDATE email_sequence_queue SET status = 'CANCELLED' WHERE email = ? AND status = 'PENDING'`,
+    [email],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.status(200).json({ message: `${result.affectedRows} emails cancelled for ${email}` });
+    }
+  );
 });
 
 // Export the app for testing

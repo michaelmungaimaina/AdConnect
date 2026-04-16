@@ -11,9 +11,9 @@
 
 // ── Role Permissions ──────────────────────────────────────────
 const ROLE_PERMISSIONS = {
-  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials','careers', 'career-apps'],
-  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials','careers', 'career-apps'],
-  EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials'],
+  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials','careers', 'career-apps', 'faqs', 'media'],
+  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials','careers', 'career-apps', 'faqs', 'media'],
+  EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials','faqs','media'],
   GEN_USER:    ['dashboard'],
 };
 
@@ -24,8 +24,12 @@ let userList = [], leadList = [], appointmentList = [], aboutList = [],
 let currentPanel = 'dashboard';
 let editIndex = null, aboutIndex = null, appointmentIndex = null;
 let editFlags = { isTitle:false, isIntro:false, isMission:false, isExperience:false };
-let charts = {};
 let careerListings = [], careerApplications = [], currentAppId = null, editJobId = null;
+let faqsList = [], editFAQId = null;
+let mediaList = [], mediaPage = 1, mediaTotalPages = 1;
+let mediaFilesToUpload = [];
+let currentMediaId = null;
+let charts = window.charts || {};
 
 // ── DOM Refs ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -79,7 +83,7 @@ function wireSearch(inputId, rowSelector) {
   });
 }
 
-function openModal(id) { $(id).style.height = '100%'; }
+function openModal(id) { $(id).style.height = '100%'; `$(id).style.width = '100%';` }
 function closeModal(id) { $(id).style.height = '0%'; }
 
 function closeAllModals() {
@@ -90,6 +94,541 @@ function closeAllModals() {
 
 // legacy
 function closePopup() { closeAllModals(); }
+
+async function loadAnalyticsComplete() {
+  showLoader('Loading analytics…');
+  try {
+    const [leadsRes, apptsRes, appsRes, visitsRes] = await Promise.allSettled([
+      fetch(`${DOMAIN}clients`).then(r => r.json()),
+      fetch(`${DOMAIN}appointments`).then(r => r.json()),
+      fetch(`${DOMAIN}marketing-strategy-applications`).then(r => r.json()),
+      fetch(`${DOMAIN}site-analytics/summary`).then(r => r.json()).catch(() => ({
+        totalVisits: 0, uniqueIPs: 0, todayVisits: 0, weekVisits: 0, dailyVisits: [],
+      })),
+    ]);
+ 
+    const leads = leadsRes.value  || [];
+    const appts = apptsRes.value  || [];
+    const apps  = (appsRes.value?.applications) || [];
+    const visits = visitsRes.value || {};
+ 
+    // ── Stat Cards ──
+    renderAnalyticsStats(leads, appts, apps, visits);
+ 
+    // ── Charts ──
+    buildLeadsChart(leads);
+    buildApptSourceChart(appts);
+    buildStatusPieChart(apps);
+    buildSubChart(leads);
+    buildVisitorBarChart(visits.dailyVisits || []);
+    buildSourceBreakdown(leads);
+ 
+    // ── Tables ──
+    buildTopReferrers(visits.referrers || []);
+    buildRecentActivity(leads, appts, apps);
+ 
+  } catch (e) { console.error('Analytics error:', e); }
+  finally { hideLoader(); }
+}
+ 
+function renderAnalyticsStats(leads, appts, apps, visits) {
+  const el = document.getElementById('analyticsStats');
+  if (!el) return;
+  const subscribed   = leads.filter(l => l.clientSubScription === 'SUBSCRIBED').length;
+  const resolved     = apps.filter(a => a.status === 'RESOLVED').length;
+  const doneAppts    = appts.filter(a => a.appointmentStatus === 'DONE').length;
+  const thisMonth    = new Date(); thisMonth.setDate(1);
+  const newLeads     = leads.filter(l => new Date(l.created_at) >= thisMonth).length;
+ 
+  el.innerHTML = `
+    ${statCard('fa-eye',       'Total Visits',    (visits.totalVisits||0).toLocaleString(), `${visits.todayVisits||0} today`,  'var(--clr-primary)')}
+    ${statCard('fa-globe',     'Unique Visitors',  (visits.uniqueIPs||0).toLocaleString(),  `${visits.weekVisits||0} this week`, 'var(--clr-info)')}
+    ${statCard('fa-users',     'Total Leads',      leads.length,   `+${newLeads} this month`, 'var(--clr-primary)')}
+    ${statCard('fa-envelope',  'Subscribed',       subscribed,     `${leads.length?Math.round(subscribed/leads.length*100):0}% rate`, 'var(--clr-accent)')}
+    ${statCard('fa-calendar',  'Appointments',     appts.length,   `${doneAppts} completed`,  'var(--clr-info)')}
+    ${statCard('fa-check',     'Apps Resolved',    resolved,       `${apps.length?Math.round(resolved/apps.length*100):0}% rate`, 'var(--clr-warning)')}`;
+}
+ 
+const statCard = (icon, label, value, sub, color) => `
+  <div class="stat-card" style="--accent-color:${color};">
+    <i class="fa ${icon} stat-icon" style="color:${color};"></i>
+    <div class="stat-label">${label}</div>
+    <div class="stat-value">${value}</div>
+    <div class="stat-change">${sub}</div>
+  </div>`;
+ 
+function buildLeadsChart(leads) {
+  if (charts.leads) charts.leads.destroy();
+  const ctx = document.getElementById('leadsChart')?.getContext('2d');
+  if (!ctx) return;
+  // Group by month (last 6 months)
+  const months = getLast6Months();
+  const counts = months.map(m => leads.filter(l => {
+    const d = new Date(l.created_at);
+    return d.getFullYear() === m.year && d.getMonth() === m.month;
+  }).length);
+  charts.leads = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months.map(m => m.label),
+      datasets: [{
+        label: 'New Leads', data: counts,
+        borderColor: '#F65730', backgroundColor: 'rgba(246,87,48,.1)',
+        borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: '#F65730', pointRadius: 4,
+      }],
+    },
+    options: chartDefaults(),
+  });
+}
+ 
+function buildVisitorBarChart(daily) {
+  if (charts.visitors) charts.visitors.destroy();
+  const ctx = document.getElementById('visitorChart')?.getContext('2d');
+  if (!ctx || !daily.length) return;
+  charts.visitors = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: daily.map(d => new Date(d.date).toLocaleDateString('en-KE',{weekday:'short',day:'numeric'})),
+      datasets: [
+        { label:'Page Visits',     data:daily.map(d=>d.visits||0),     backgroundColor:'rgba(246,87,48,.75)', borderRadius:4 },
+        { label:'Unique Visitors', data:daily.map(d=>d.unique_ips||0), backgroundColor:'rgba(52,152,219,.75)', borderRadius:4 },
+      ],
+    },
+    options: chartDefaults(),
+  });
+}
+ 
+function buildApptSourceChart(appts) {
+  if (charts.apptSource) charts.apptSource.destroy();
+  const ctx = document.getElementById('apptSourceChart')?.getContext('2d');
+  if (!ctx) return;
+  const types = [...new Set(appts.map(a => a.appointmentType || 'Unknown'))];
+  const counts = types.map(t => appts.filter(a => (a.appointmentType||'Unknown') === t).length);
+  charts.apptSource = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: types,
+      datasets: [{ data: counts, backgroundColor: ['#F65730','#4ABC4F','#3498DB','#F5A623','#9B59B6'], borderWidth: 0 }],
+    },
+    options: { ...chartDefaults(), cutout: '65%' },
+  });
+}
+ 
+function buildStatusPieChart(apps) {
+  if (charts.status) charts.status.destroy();
+  const ctx = document.getElementById('statusChart')?.getContext('2d');
+  if (!ctx) return;
+  const statuses = ['RESOLVED','N/SOLVED'];
+  const counts   = statuses.map(s => apps.filter(a => a.status === s).length);
+  charts.status  = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Resolved', 'Unresolved'],
+      datasets: [{ data: counts, backgroundColor: ['#4ABC4F','#F65730'], borderWidth: 0 }],
+    },
+    options: { ...chartDefaults(), cutout: '65%' },
+  });
+}
+ 
+function buildSubChart(leads) {
+  if (charts.sub) charts.sub.destroy();
+  const ctx = document.getElementById('subChart')?.getContext('2d');
+  if (!ctx) return;
+  const subs = leads.filter(l => l.clientSubScription === 'SUBSCRIBED').length;
+  charts.sub = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Subscribed', 'Unsubscribed'],
+      datasets: [{ data: [subs, leads.length - subs], backgroundColor: ['#4ABC4F','#2d2b29'], borderWidth: 0 }],
+    },
+    options: { ...chartDefaults(), cutout: '70%' },
+  });
+}
+ 
+function buildSourceBreakdown(leads) {
+  const container = document.getElementById('sourceBreakdown');
+  if (!container) return;
+  const sources = {};
+  leads.forEach(l => { const s = l.clientSource || 'Direct'; sources[s] = (sources[s]||0) + 1; });
+  const sorted  = Object.entries(sources).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const max     = sorted[0]?.[1] || 1;
+  container.innerHTML = sorted.map(([s, c]) => `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="width:100px;font-size:.78rem;color:var(--clr-text-secondary);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;flex-shrink:0;">${esc(s)}</div>
+      <div style="flex:1;background:var(--clr-surface-2);border-radius:999px;height:8px;overflow:hidden;">
+        <div style="width:${Math.round(c/max*100)}%;height:100%;background:var(--clr-primary);border-radius:999px;transition:width .6s ease;"></div>
+      </div>
+      <div style="font-size:.78rem;font-family:var(--font-mono);color:var(--clr-text-secondary);min-width:24px;text-align:right;">${c}</div>
+    </div>`).join('');
+}
+ 
+function buildTopReferrers(referrers) {
+  const container = document.getElementById('topReferrers');
+  if (!container) return;
+  if (!referrers.length) { container.innerHTML = '<p style="color:var(--clr-text-muted);font-size:.82rem;">No referrer data yet.</p>'; return; }
+  container.innerHTML = referrers.slice(0, 8).map(r => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--clr-border);">
+      <span style="font-size:.8rem;color:var(--clr-text-secondary);">${esc(r.referrer||'Direct')}</span>
+      <span class="badge badge-default" style="font-size:.65rem;">${r.count}</span>
+    </div>`).join('');
+}
+ 
+function buildRecentActivity(leads, appts, apps) {
+  const container = document.getElementById('recentActivity');
+  if (!container) return;
+  const events = [
+    ...leads.slice(-5).map(l => ({ type:'lead',  label:`New lead: ${l.clientName}`,  date:l.created_at, icon:'fa-user', color:'var(--clr-primary)' })),
+    ...appts.slice(-5).map(a => ({ type:'appt',  label:`Appointment: ${a.name}`,     date:a.created_at, icon:'fa-calendar', color:'var(--clr-info)' })),
+    ...apps.slice(-5).map(a  => ({ type:'app',   label:`Application: ${a.applicantFName} ${a.applicantLName}`, date:a.created_at, icon:'fa-file-text', color:'var(--clr-warning)' })),
+  ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+ 
+  container.innerHTML = events.map(e => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--clr-border);">
+      <div style="width:30px;height:30px;background:rgba(246,87,48,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa ${e.icon}" style="color:${e.color};font-size:.75rem;"></i>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.82rem;color:var(--clr-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.label)}</div>
+        <div style="font-size:.7rem;color:var(--clr-text-muted);">${e.date ? new Date(e.date).toLocaleDateString('en-KE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+      </div>
+    </div>`).join('');
+}
+ 
+// ── Chart helpers ─────────────────────────────────────────────
+function chartDefaults() {
+  return {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#B8B4B0', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#7a7874', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#7a7874', font: { size: 10 } }, beginAtZero: true },
+    },
+  };
+}
+ 
+function getLast6Months() {
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    months.push({ year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleDateString('en-KE',{month:'short'}) });
+  }
+  return months;
+}
+
+async function fetchMedia() {
+  showLoader('Loading media…');
+  mediaPage = 1;
+  try {
+    const type = document.getElementById('mediaTypeFilter')?.value || '';
+    const q    = document.getElementById('mediaSearch')?.value || '';
+    const url  = `${DOMAIN}media?page=1&limit=40${type?`&type=${type}`:''}${q?`&q=${encodeURIComponent(q)}`:''}`;
+    const res  = await fetch(url);
+    const data = res.ok ? await res.json() : { items: [], totalPages: 1 };
+    mediaList       = Array.isArray(data) ? data : (data.items || []);
+    mediaTotalPages = data.totalPages || 1;
+    renderMediaGrid();
+  } catch (e) { console.error(e); }
+  finally { hideLoader(); }
+}
+ 
+async function loadMoreMedia() {
+  if (mediaPage >= mediaTotalPages) return;
+  mediaPage++;
+  const type = document.getElementById('mediaTypeFilter')?.value || '';
+  const q    = document.getElementById('mediaSearch')?.value || '';
+  const url  = `$DOMAIN}media?page=${mediaPage}&limit=40${type?`&type=${type}`:''}${q?`&q=${encodeURIComponent(q)}`:''}`;
+  const res  = await fetch(url);
+  const data = res.ok ? await res.json() : { items: [] };
+  const more = Array.isArray(data) ? data : (data.items || []);
+  mediaList  = [...mediaList, ...more];
+  renderMediaGrid();
+}
+ 
+function filterMedia() {
+  // Debounce
+  clearTimeout(filterMedia._t);
+  filterMedia._t = setTimeout(fetchMedia, 350);
+}
+ 
+function openMediaUpload() {
+  const zone = document.getElementById('mediaUploadZone');
+  if (zone) zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
+  mediaFilesToUpload = [];
+  document.getElementById('mediaPreviewQueue').innerHTML = '';
+  document.getElementById('mediaUploadMeta').style.display = 'none';
+  safeVal('mediaUploadAlt', '');
+  safeVal('mediaUploadTags', '');
+}
+ 
+function handleMediaDragOver(e)  { e.preventDefault(); e.currentTarget.style.borderColor='var(--clr-primary)'; e.currentTarget.style.background='var(--clr-primary-light)'; }
+function handleMediaDragLeave(e) { e.currentTarget.style.borderColor='var(--clr-border)'; e.currentTarget.style.background=''; }
+function handleMediaDrop(e) {
+  e.preventDefault();
+  handleMediaDragLeave(e);
+  queueMediaFiles([...e.dataTransfer.files]);
+}
+function handleMediaFileSelect(e) { queueMediaFiles([...e.target.files]); }
+ 
+function queueMediaFiles(files) {
+  const valid = files.filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+  if (files.length !== valid.length) toast(`${files.length - valid.length} file(s) skipped (not image or >5MB)`, 'error');
+  mediaFilesToUpload = [...mediaFilesToUpload, ...valid];
+ 
+  const queue = document.getElementById('mediaPreviewQueue');
+  const meta  = document.getElementById('mediaUploadMeta');
+  const count = document.getElementById('mediaUploadCount');
+  if (count) count.textContent = mediaFilesToUpload.length;
+  if (meta)  meta.style.display = mediaFilesToUpload.length ? 'block' : 'none';
+ 
+  mediaFilesToUpload.forEach((file, i) => {
+    if (document.getElementById(`mq-${i}`)) return;
+    const div = document.createElement('div');
+    div.id    = `mq-${i}`;
+    div.style.cssText = 'position:relative;width:80px;height:80px;flex-shrink:0;';
+    const url = URL.createObjectURL(file);
+    div.innerHTML = `
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--clr-border);" />
+      <div style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(0,0,0,.7);border-radius:4px;padding:2px 4px;font-size:.55rem;font-family:var(--font-mono);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(file.name)}</div>
+      <button onclick="removeMediaFromQueue(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--clr-error);border:none;border-radius:50%;color:#fff;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>`;
+    if (queue) queue.appendChild(div);
+  });
+}
+ 
+function removeMediaFromQueue(i) {
+  mediaFilesToUpload.splice(i, 1);
+  const el = document.getElementById(`mq-${i}`);
+  if (el) el.remove();
+  const count = document.getElementById('mediaUploadCount');
+  if (count) count.textContent = mediaFilesToUpload.length;
+  if (!mediaFilesToUpload.length) {
+    const meta = document.getElementById('mediaUploadMeta');
+    if (meta) meta.style.display = 'none';
+  }
+}
+ 
+async function submitMediaUpload() {
+  if (!mediaFilesToUpload.length) { toast('Select at least one image', 'error'); return; }
+  const type = document.getElementById('mediaUploadType')?.value || 'general';
+  const alt  = safeGet('mediaUploadAlt');
+  const tags = safeGet('mediaUploadTags');
+ 
+  showLoader(`Uploading ${mediaFilesToUpload.length} image(s)…`);
+  let uploaded = 0, failed = 0;
+  for (const file of mediaFilesToUpload) {
+    const form = new FormData();
+    form.append('image', file);
+    form.append('type',  type);
+    form.append('alt',   alt || file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g,' '));
+    form.append('tags',  tags);
+    try {
+      const res = await fetch(`${DOMAIN}media`, { method: 'POST', body: form });
+      if (res.ok) uploaded++; else failed++;
+    } catch { failed++; }
+  }
+  hideLoader();
+  if (uploaded) toast(`${uploaded} image(s) uploaded successfully!`);
+  if (failed)   toast(`${failed} upload(s) failed`, 'error');
+  mediaFilesToUpload = [];
+  document.getElementById('mediaPreviewQueue').innerHTML = '';
+  document.getElementById('mediaUploadMeta').style.display = 'none';
+  document.getElementById('mediaUploadZone').style.display = 'none';
+  fetchMedia();
+}
+ 
+function renderMediaGrid() {
+  const grid = document.getElementById('mediaGrid');
+  const more = document.getElementById('mediaLoadMoreBtn');
+  if (!grid) return;
+  if (more)  more.style.display = mediaPage < mediaTotalPages ? 'block' : 'none';
+ 
+  if (!mediaList.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">
+      <i class="fa fa-photo" style="font-size:2rem;display:block;margin-bottom:12px;"></i>No media found
+    </div>`;
+    return;
+  }
+ 
+  grid.innerHTML = mediaList.map(m => `
+    <div onclick="openMediaDetail('${m.id}')" style="
+      position:relative; cursor:pointer; border-radius:var(--radius-lg);
+      overflow:hidden; border:1.5px solid var(--clr-border);
+      aspect-ratio:1; background:var(--clr-surface-2);
+      transition:var(--transition-base);
+    " onmouseenter="this.style.borderColor='var(--clr-primary)';this.querySelector('.media-overlay').style.opacity='1'"
+       onmouseleave="this.style.borderColor='var(--clr-border)';this.querySelector('.media-overlay').style.opacity='0'">
+      <img src="${esc(m.url||m.thumbnail||m.path)}" alt="${esc(m.alt||m.filename)}"
+           style="width:100%;height:100%;object-fit:cover;"
+           loading="lazy" onerror="this.src='/resources/logo.png'" />
+      <div class="media-overlay" style="
+        position:absolute;inset:0;background:rgba(0,0,0,.65);
+        opacity:0;transition:.2s;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:6px;
+      ">
+        <i class="fa fa-search-plus" style="color:#fff;font-size:1.2rem;"></i>
+        <span style="color:#fff;font-size:.7rem;font-weight:600;text-align:center;padding:0 8px;line-height:1.3;">${esc(truncateStr(m.alt||m.filename,22))}</span>
+      </div>
+      <!-- Type badge -->
+      <div style="position:absolute;top:6px;left:6px;background:var(--clr-primary);color:#fff;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:4px;">
+        ${esc(m.type||'img')}
+      </div>
+    </div>`).join('');
+}
+ 
+async function openMediaDetail(id) {
+  currentMediaId = id;
+  const m = mediaList.find(x => x.id === id);
+  if (!m) return;
+ 
+  const img  = document.getElementById('mediaDetailImg');
+  const name = document.getElementById('mediaDetailName');
+  const type = document.getElementById('mediaDetailType');
+  const size = document.getElementById('mediaDetailSize');
+  const date = document.getElementById('mediaDetailDate');
+  const url  = document.getElementById('mediaDetailUrl');
+  const dl   = document.getElementById('mediaDetailDownload');
+ 
+  if (img)  img.src = m.url || m.path || '';
+  if (img)  img.alt = m.alt || m.filename || '';
+  if (name) name.textContent = m.filename || '—';
+  if (type) type.textContent = m.type     || 'general';
+  if (size) size.textContent = m.size ? formatBytes(m.size) : '—';
+  if (date) date.textContent = m.created_at ? new Date(m.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  if (url)  url.value        = m.url || m.path || '';
+  if (dl)   dl.href          = m.url || m.path || '#';
+ 
+  safeVal('mediaDetailAlt',  m.alt  || '');
+  safeVal('mediaDetailTags', Array.isArray(m.tags) ? m.tags.join(', ') : (m.tags || ''));
+ 
+  openModal('mediaDetailPopup');
+}
+ 
+async function saveMediaMeta() {
+  if (!currentMediaId) return;
+  showLoader('Saving…');
+  try {
+    const res = await fetch(`${DOMAIN}media/${currentMediaId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        alt:  safeGet('mediaDetailAlt'),
+        tags: safeGet('mediaDetailTags').split(',').map(t=>t.trim()).filter(Boolean),
+      }),
+    });
+    if (res.ok) {
+      toast('Media updated!');
+      const m = mediaList.find(x => x.id === currentMediaId);
+      if (m) {
+        m.alt  = safeGet('mediaDetailAlt');
+        m.tags = safeGet('mediaDetailTags').split(',').map(t=>t.trim()).filter(Boolean);
+      }
+    } else toast('Save failed', 'error');
+  } finally { hideLoader(); }
+}
+ 
+function copyMediaUrl() {
+  const url = document.getElementById('mediaDetailUrl')?.value;
+  if (url) {
+    navigator.clipboard?.writeText(url).then(() => toast('URL copied!'));
+  }
+}
+ 
+async function deleteMedia() {
+  if (!confirm('Delete this image? This cannot be undone.')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}media/${currentMediaId}`, { method: 'DELETE' });
+    toast('Image deleted');
+    closeModal('mediaDetailPopup');
+    mediaList = mediaList.filter(m => m.id !== currentMediaId);
+    renderMediaGrid();
+  } finally { hideLoader(); currentMediaId = null; }
+}
+
+const AutoSignout = (() => {
+  let timer = null;
+  let warningTimer = null;
+  let timeoutMs = 5 * 60 * 1000; // default 5 min
+  let warnBeforeMs = 60 * 1000;   // warn 1 min before
+ 
+  const EVENTS = ['mousemove','keydown','click','scroll','touchstart'];
+ 
+  function reset() {
+    clearTimeout(timer);
+    clearTimeout(warningTimer);
+    hideWarning();
+ 
+    warningTimer = setTimeout(showWarning, timeoutMs - warnBeforeMs);
+    timer        = setTimeout(signOut,      timeoutMs);
+  }
+ 
+  function showWarning() {
+    const remaining = Math.round(warnBeforeMs / 1000);
+    let el = document.getElementById('autoSignoutWarning');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'autoSignoutWarning';
+      el.style.cssText = `
+        position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:99998;
+        background:var(--clr-surface-2);border:1.5px solid var(--clr-warning);
+        border-radius:var(--radius-lg);padding:14px 20px;display:flex;align-items:center;
+        gap:14px;box-shadow:var(--shadow-lg);min-width:320px;animation:slideDown .3s ease;
+      `;
+      el.innerHTML = `
+        <i class="fa fa-clock-o" style="color:var(--clr-warning);font-size:1.2rem;"></i>
+        <div style="flex:1;">
+          <div style="font-size:.85rem;font-weight:700;color:var(--clr-text-primary);">Session expiring soon</div>
+          <div id="autoSignoutCountdown" style="font-size:.78rem;color:var(--clr-text-muted);">You'll be signed out in ${remaining}s</div>
+        </div>
+        <button onclick="AutoSignout.extend()" style="padding:7px 14px;background:var(--clr-primary);border:none;border-radius:var(--radius-md);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;">Stay Logged In</button>
+      `;
+      document.body.appendChild(el);
+    }
+    el.style.display = 'flex';
+ 
+    // Countdown
+    let secs = Math.round(warnBeforeMs / 1000);
+    const cdInterval = setInterval(() => {
+      secs--;
+      const cdEl = document.getElementById('autoSignoutCountdown');
+      if (cdEl) cdEl.textContent = `You'll be signed out in ${secs}s`;
+      if (secs <= 0) clearInterval(cdInterval);
+    }, 1000);
+    el._cdInterval = cdInterval;
+  }
+ 
+  function hideWarning() {
+    const el = document.getElementById('autoSignoutWarning');
+    if (el) { clearInterval(el._cdInterval); el.style.display = 'none'; }
+  }
+ 
+  function signOut() {
+    hideWarning();
+    toast('Session expired — you have been signed out.', 'error');
+    setTimeout(() => handleLogout(), 1200);
+  }
+ 
+  function start(minutes) {
+    if (minutes) timeoutMs = minutes * 60 * 1000;
+    EVENTS.forEach(ev => document.addEventListener(ev, reset, { passive: true }));
+    reset();
+  }
+ 
+  function stop() {
+    EVENTS.forEach(ev => document.removeEventListener(ev, reset));
+    clearTimeout(timer);
+    clearTimeout(warningTimer);
+    hideWarning();
+  }
+ 
+  function setMinutes(minutes) {
+    timeoutMs = minutes * 60 * 1000;
+    reset();
+  }
+ 
+  return { start, stop, reset, extend: reset, setMinutes };
+})();
+window.AutoSignout = AutoSignout;
 
 // ── Auth ──────────────────────────────────────────────────────
 async function handleLogin(e) {
@@ -122,9 +661,179 @@ async function handleLogin(e) {
     $('adminHero').style.display  = 'block';
     console.log(`Logged in as ${data.username} with role ${session.role}`);
     navigate('dashboard');
+    AutoSignout.start(10);
+    checkAndRefreshToken();
     toast(`Welcome back, ${data.username}!`);
   } catch (err) {
     showErr('Network error — please try again', errEl);
+  } finally { hideLoader(); }
+}
+
+async function fetchFAQs() {
+  showLoader('Loading FAQs…');
+  try {
+    const res = await fetch(`${DOMAIN}faqs`);
+    faqsList  = res.ok ? await res.json() : [];
+    updateFAQStats();
+    buildFAQCategoryFilter();
+    renderFAQs();
+  } catch (e) { console.error(e); }
+  finally { hideLoader(); }
+}
+ 
+function updateFAQStats() {
+  const cats = [...new Set(faqsList.map(f => f.category).filter(Boolean))];
+  safeSet('faqTotalCount',     faqsList.length);
+  safeSet('faqPublishedCount', faqsList.filter(f => f.status === 'PUBLISHED').length);
+  safeSet('faqCategoryCount',  cats.length);
+}
+ 
+function buildFAQCategoryFilter() {
+  const cats  = [...new Set(faqsList.map(f => f.category).filter(Boolean))];
+  const sel   = document.getElementById('faqCatFilter');
+  const dl    = document.getElementById('faqCategoryOptions');
+  if (sel) {
+    sel.innerHTML = '<option value="">All Categories</option>' +
+      cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  }
+  if (dl) dl.innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+}
+ 
+function renderFAQs() {
+  const container = document.getElementById('faqListAdmin');
+  if (!container) return;
+ 
+  const cat    = document.getElementById('faqCatFilter')?.value    || '';
+  const status = document.getElementById('faqStatusFilter')?.value || '';
+  const q      = document.getElementById('faqSearch')?.value?.toLowerCase() || '';
+ 
+  const filtered = faqsList.filter(f => {
+    const catOk    = !cat    || f.category === cat;
+    const statusOk = !status || f.status   === status;
+    const qOk      = !q      || f.question?.toLowerCase().includes(q) || f.answer?.toLowerCase().includes(q);
+    return catOk && statusOk && qOk;
+  });
+ 
+  if (!filtered.length) {
+    container.innerHTML = `<div style="padding:var(--space-8);text-align:center;color:var(--clr-text-muted);">
+      <i class="fa fa-question-circle" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+      No FAQs found
+    </div>`;
+    return;
+  }
+ 
+  container.innerHTML = filtered.map((f, i) => `
+    <div style="
+      padding:var(--space-5) var(--space-6);
+      border-bottom:1px solid var(--clr-border);
+      display:flex; align-items:flex-start; gap:var(--space-5);
+      transition:var(--transition-base);
+    " onmouseenter="this.style.background='var(--clr-surface-2)'"
+       onmouseleave="this.style.background='transparent'">
+      <!-- Drag handle placeholder -->
+      <div style="color:var(--clr-text-muted);padding-top:2px;cursor:grab;"><i class="fa fa-bars"></i></div>
+      <!-- Content -->
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-family:var(--font-display);font-weight:700;color:var(--clr-text-primary);font-size:.95rem;">${esc(f.question)}</span>
+          ${f.featured ? '<span class="badge badge-warning" style="font-size:.62rem;">Featured</span>' : ''}
+          ${faqStatusBadge(f.status)}
+          ${f.category ? `<span class="badge badge-info" style="font-size:.62rem;">${esc(f.category)}</span>` : ''}
+        </div>
+        <p style="color:var(--clr-text-muted);font-size:.82rem;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${esc(f.answer)}</p>
+      </div>
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+        <button class="btn btn-${f.status==='PUBLISHED'?'warning':'accent'} btn-sm" onclick="toggleFAQStatus('${f.id}','${f.status}')" style="font-size:.72rem;min-width:74px;">
+          ${f.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+        </button>
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="editFAQ('${f.id}')"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteFAQ('${f.id}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+ 
+const faqStatusBadge = s => s === 'PUBLISHED'
+  ? '<span class="badge badge-success" style="font-size:.62rem;">Published</span>'
+  : '<span class="badge badge-default" style="font-size:.62rem;">Draft</span>';
+ 
+function openFAQForm(faq = null) {
+  editFAQId = faq?.id || null;
+  document.getElementById('faqFormTitle').textContent = faq ? 'Edit FAQ' : 'Add FAQ';
+  safeVal('faqQuestion', faq?.question || '');
+  safeVal('faqAnswer',   faq?.answer   || '');
+  safeVal('faqCategory', faq?.category || '');
+  safeVal('faqOrder',    faq?.sort_order ?? 0);
+  const selStatus = document.getElementById('faqStatus');
+  if (selStatus) selStatus.value = faq?.status || 'PUBLISHED';
+  const cbFeat = document.getElementById('faqFeatured');
+  if (cbFeat) cbFeat.checked = !!faq?.featured;
+  openModal('faqFormPopup');
+}
+ 
+function editFAQ(id) {
+  const faq = faqsList.find(f => f.id === id);
+  if (faq) openFAQForm(faq);
+}
+ 
+async function saveFAQ() {
+  const question = safeGet('faqQuestion');
+  const answer   = safeGet('faqAnswer');
+  if (!question || !answer) { toast('Question and answer are required', 'error'); return; }
+ 
+  const body = {
+    question,
+    answer,
+    category:   safeGet('faqCategory'),
+    status:     document.getElementById('faqStatus')?.value || 'PUBLISHED',
+    sort_order: parseInt(safeGet('faqOrder')) || 0,
+    featured:   document.getElementById('faqFeatured')?.checked || false,
+  };
+ 
+  showLoader('Saving FAQ…');
+  try {
+    const url    = editFAQId ? `${DOMAIN}faqs/${editFAQId}` : `${DOMAIN}faqs`;
+    const method = editFAQId ? 'PUT' : 'POST';
+    const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (res.ok) {
+      toast(editFAQId ? 'FAQ updated!' : 'FAQ created!');
+      closeModal('faqFormPopup');
+      fetchFAQs();
+    } else {
+      const d = await res.json();
+      toast(d.error || 'Save failed', 'error');
+    }
+  } finally { hideLoader(); editFAQId = null; }
+}
+ 
+async function toggleFAQStatus(id, current) {
+  const newStatus = current === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+  showLoader('Updating…');
+  try {
+    const res = await fetch(`${DOMAIN}faqs/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (res.ok) {
+      const f = faqsList.find(x => x.id === id);
+      if (f) f.status = newStatus;
+      updateFAQStats();
+      renderFAQs();
+      toast(`FAQ ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'}!`);
+    } else toast('Update failed', 'error');
+  } finally { hideLoader(); }
+}
+ 
+async function deleteFAQ(id) {
+  if (!confirm('Delete this FAQ?')) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}faqs/${id}`, { method: 'DELETE' });
+    faqsList = faqsList.filter(f => f.id !== id);
+    updateFAQStats();
+    renderFAQs();
+    toast('FAQ deleted');
   } finally { hideLoader(); }
 }
 
@@ -394,6 +1103,7 @@ async function deleteCareerApp(id) {
 
 function handleLogout() {
   if (!confirm_action('Sign out?')) return;
+  AutoSignout.stop();
   session = { user:null, role:null };
   $('login-page').style.display = 'flex';
   $('adminHero').style.display  = 'none';
@@ -431,6 +1141,30 @@ function canAccess(panel) {
   return allowed.includes(panel);
 }
 
+// ── Modal Close Button Patch ──────────────────────────────────
+// Ensures EVERY modal has a working close button
+function patchAllModals() {
+  const modals = [
+    'userPopUp','appointmentPopup','aboutPopup','applicationPopup',
+    'aboutRegisterPopup','videoRegisterPopup','blogPopup','projectPopup',
+    'aboutPhotoPopup','aboutVideoPopup','testimonialPopup','contactMsgPopup',
+    'jobFormPopup','appDetailPopup','teamMemberPopup',
+  ];
+  modals.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Check if close button already exists
+    if (el.querySelector('.modal-close-injected')) return;
+    const btn = document.createElement('button');
+    btn.className = 'btn-close modal-close-injected';
+    btn.innerHTML = '<i class="fa fa-times"></i>';
+    btn.setAttribute('aria-label', 'Close');
+    btn.onclick = () => closeModal(id);
+    btn.style.cssText = 'position:fixed;top:70px;right:20px;z-index:10001;';
+    el.prepend(btn);
+  });
+}
+
 function showErr(msg, container) {
   if (!container) return toast(msg, 'error');
   container.textContent = msg;
@@ -458,10 +1192,13 @@ function navigate(panel) {
     applications: fetchApplications,
     homepage:    () => { loadHomepageSettings(); },
     testimonials: fetchTestimonials,
-    users:        fetchUsers,
-    settings:     () => {},
-    'careers':     fetchCareerListings,
+    analytics:  loadAnalyticsWithVisits,
+    users:      () => { fetchUsers(); fetchTeamMembers(); },
+    settings:   loadAllSettings,
+    careers:     fetchCareerListings,
     'career-apps': fetchCareerApplications,
+    faqs:         fetchFAQs,
+    media:        fetchMedia,
   };
   if (loaders[panel]) loaders[panel]();
 }
@@ -1093,7 +1830,7 @@ async function updateIntroduction(i) { await patchAbout(i,{introduction:$('about
 async function updateTitle(i) { await patchAbout(i,{title:$('aboutInput').value}); }
 async function updateMission(i) { await patchAbout(i,{mission:$('aboutInput').value}); }
 
-async function updateStatus(i) {
+/**async function updateStatus(i) {
   aboutList[i].status = 'ACTIVE';
   showLoader('Activating profile…');
   try {
@@ -1101,6 +1838,526 @@ async function updateStatus(i) {
     if (res.ok) { toast('Profile activated!'); await fetchAbout(); }
     else toast('Failed','error');
   } finally { hideLoader(); }
+}*/
+
+async function updateStatus(index) {
+  // Toggle: if already ACTIVE deactivate; if INACTIVE activate
+  const targetStatus = aboutList[index].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+  const confirmed = targetStatus === 'ACTIVE'
+    ? confirm(`Activate "${aboutList[index].title}"? This will be set as the ACTIVE profile.`)
+    : confirm(`Deactivate "${aboutList[index].title}"?`);
+  if (!confirmed) return;
+ 
+  showLoader(`${targetStatus === 'ACTIVE' ? 'Activating' : 'Deactivating'} profile…`);
+  try {
+    let res;
+    if (targetStatus === 'ACTIVE') {
+      // Use the "update status" endpoint which deactivates others in the same dept
+      const payload = { ...aboutList[index], status: 'ACTIVE' };
+      res = await fetch(`${DOMAIN}about-data-update-status/${aboutList[index].id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      // Just update this one to INACTIVE
+      const payload = { ...aboutList[index], status: 'INACTIVE' };
+      res = await fetch(`${DOMAIN}about-data/${aboutList[index].id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+    if (res.ok) {
+      toast(`Profile ${targetStatus === 'ACTIVE' ? 'activated' : 'deactivated'}!`);
+      await fetchAbout();
+    } else {
+      const d = await res.json();
+      toast(d.error || 'Update failed', 'error');
+    }
+  } finally { hideLoader(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. TEAM MEMBERS MANAGEMENT SECTION
+   Separate from "about" — manages company team + roles
+   ═══════════════════════════════════════════════════════════ */
+let teamMembers = [];
+let editTeamMemberId = null;
+ 
+async function fetchTeamMembers() {
+  showLoader('Loading team members…');
+  try {
+    const res = await fetch(`${DOMAIN}team-members`);
+    teamMembers = res.ok ? await res.json() : [];
+    renderTeamMembers();
+  } finally { hideLoader(); }
+}
+ 
+function renderTeamMembers() {
+  const tbody = document.getElementById('teamMembersTbody');
+  if (!tbody) return;
+  if (!teamMembers.length) { tbody.innerHTML = emptyRow(7, 'No team members added yet'); return; }
+  tbody.innerHTML = teamMembers.map((m, i) => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${m.photo ? `<div style="width:36px;height:36px;border-radius:50%;background:url(${m.photo}) center/cover;border:2px solid var(--clr-primary);flex-shrink:0;"></div>` : `<div style="width:36px;height:36px;border-radius:50%;background:var(--clr-primary);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.85rem;flex-shrink:0;">${(m.name||'?').charAt(0).toUpperCase()}</div>`}
+          <span style="font-weight:600;">${esc(m.name)}</span>
+        </div>
+      </td>
+      <td><span class="badge badge-info">${esc(m.company_role||'—')}</span></td>
+      <td>${esc(m.department||'—')}</td>
+      <td>${esc(m.email||'—')}</td>
+      <td>${esc(m.phone||'—')}</td>
+      <td>
+        <button onclick="toggleTeamMemberStatus('${m.id}',${i})" class="badge ${m.is_active?'badge-success':'badge-default'}" style="cursor:pointer;border:none;font-size:.72rem;" title="Click to toggle">
+          ${m.is_active ? '● Active' : '○ Inactive'}
+        </button>
+      </td>
+      <td class="actions-cell">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="openEditTeamMember(${i})"><i class="fa fa-pencil"></i></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteTeamMember('${m.id}',${i})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+ 
+async function toggleTeamMemberStatus(id, i) {
+  const m = teamMembers[i];
+  const newStatus = !m.is_active;
+  showLoader('Updating…');
+  try {
+    const res = await fetch(`${DOMAIN}team-members/${id}/status`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: newStatus }),
+    });
+    if (res.ok) {
+      teamMembers[i].is_active = newStatus;
+      renderTeamMembers();
+      toast(`${m.name} ${newStatus ? 'activated' : 'deactivated'}`);
+    } else toast('Update failed', 'error');
+  } finally { hideLoader(); }
+}
+ 
+function openAddTeamMember() {
+  editTeamMemberId = null;
+  document.getElementById('teamMemberModalTitle').textContent = 'Add Team Member';
+  ['tmName','tmRole','tmDept','tmEmail','tmPhone','tmBio'].forEach(id => setValue(id, ''));
+  document.getElementById('tmIsActive').checked = true;
+  openModal('teamMemberPopup');
+}
+ 
+function openEditTeamMember(i) {
+  const m = teamMembers[i];
+  editTeamMemberId = m.id;
+  document.getElementById('teamMemberModalTitle').textContent = 'Edit Team Member';
+  setValue('tmName',  m.name);
+  setValue('tmRole',  m.company_role||'');
+  setValue('tmDept',  m.department||'');
+  setValue('tmEmail', m.email||'');
+  setValue('tmPhone', m.phone||'');
+  setValue('tmBio',   m.bio||'');
+  document.getElementById('tmIsActive').checked = !!m.is_active;
+  openModal('teamMemberPopup');
+}
+ 
+async function saveTeamMember() {
+  const name = getValue('tmName'), role = getValue('tmRole');
+  if (!name || !role) { toast('Name and company role are required', 'error'); return; }
+ 
+  const form = new FormData();
+  form.append('name',         name);
+  form.append('company_role', role);
+  form.append('department',   getValue('tmDept'));
+  form.append('email',        getValue('tmEmail'));
+  form.append('phone',        getValue('tmPhone'));
+  form.append('bio',          getValue('tmBio'));
+  form.append('is_active',    document.getElementById('tmIsActive').checked ? 1 : 0);
+  const photo = document.getElementById('tmPhoto')?.files[0];
+  if (photo) form.append('photo', photo);
+ 
+  showLoader('Saving team member…');
+  try {
+    const isEdit = editTeamMemberId !== null;
+    const url    = isEdit ? `${DOMAIN}team-members/${editTeamMemberId}` : `${DOMAIN}team-members`;
+    const method = isEdit ? 'PUT' : 'POST';
+    const res    = isEdit
+      ? await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(form)) })
+      : await fetch(url, { method, body: form });
+    if (res.ok) { toast(isEdit ? 'Team member updated!' : 'Team member added!'); closeModal('teamMemberPopup'); fetchTeamMembers(); }
+    else toast('Save failed', 'error');
+  } finally { hideLoader(); editTeamMemberId = null; }
+}
+ 
+async function deleteTeamMember(id, i) {
+  if (!confirm(`Delete ${teamMembers[i].name}?`)) return;
+  showLoader('Deleting…');
+  try {
+    await fetch(`${DOMAIN}team-members/${id}`, { method: 'DELETE' });
+    toast('Deleted'); teamMembers.splice(i, 1); renderTeamMembers();
+  } finally { hideLoader(); }
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════
+   4. ANALYTICS — Web Visits + Unique IPs
+   ═══════════════════════════════════════════════════════════ */
+async function loadAnalyticsWithVisits() {
+  showLoader('Loading analytics…');
+  try {
+    const [visits, unique, leads, appts, apps] = await Promise.allSettled([
+      //fetch(`${DOMAIN}analytics/track`).then(r => r.json()),
+      fetch(`${DOMAIN}analytics/track`)
+  .then(r => r.json())
+  .then(data => console.log(data)),
+      fetch(`${DOMAIN}analytics/unique-ips`).then(r => r.json()),
+      fetch(`${DOMAIN}clients`).then(r => r.json()),
+      fetch(`${DOMAIN}appointments`).then(r => r.json()),
+      fetch(`${DOMAIN}marketing-strategy-applications`).then(r => r.json()),
+    ]);
+ 
+    const V = visits.value || {};
+    const U = unique.value || {};
+    const L = leads.value  || [];
+    const A = appts.value  || [];
+    const P = (apps.value?.applications) || [];
+ 
+    // Update stats grid
+    document.getElementById('analyticsStats').innerHTML = `
+      <div class="stat-card" style="--accent-color:#3498DB;">
+        <i class="fa fa-eye stat-icon"></i>
+        <div class="stat-label">Total Page Views</div>
+        <div class="stat-value">${(V.total || 0).toLocaleString()}</div>
+        <div class="stat-change up"><i class="fa fa-arrow-up"></i> ${V.today || 0} today</div>
+      </div>
+      <div class="stat-card" style="--accent-color:#9B59B6;">
+        <i class="fa fa-users stat-icon"></i>
+        <div class="stat-label">Unique Visitors</div>
+        <div class="stat-value">${(U.total || 0).toLocaleString()}</div>
+        <div class="stat-change up"><i class="fa fa-arrow-up"></i> ${U.today || 0} today</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-primary);">
+        <i class="fa fa-users stat-icon"></i>
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-value">${L.length}</div>
+        <div class="stat-change up">All time</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-accent);">
+        <i class="fa fa-calendar stat-icon"></i>
+        <div class="stat-label">Appointments</div>
+        <div class="stat-value">${A.length}</div>
+        <div class="stat-change">${A.filter(a => a.appointmentStatus === 'DONE').length} completed</div>
+      </div>
+      <div class="stat-card" style="--accent-color:var(--clr-warning);">
+        <i class="fa fa-check-circle stat-icon"></i>
+        <div class="stat-label">Applications</div>
+        <div class="stat-value">${P.length}</div>
+        <div class="stat-change">${P.filter(p => p.status === 'RESOLVED').length} resolved</div>
+      </div>
+      <div class="stat-card" style="--accent-color:#1ABC9C;">
+        <i class="fa fa-line-chart stat-icon"></i>
+        <div class="stat-label">Lead Rate</div>
+        <div class="stat-value">${V.total ? ((L.length / V.total) * 100).toFixed(1) + '%' : '—'}</div>
+        <div class="stat-change">Views → Leads</div>
+      </div>`;
+ 
+    // Build charts
+    buildMonthlyChart(L, A);
+    buildStatusChart(P);
+    buildSubChart(L);
+    buildSourceList(L);
+    buildVisitChart(V.daily || []);
+    buildTopPagesTable(V.pages || []);
+  } catch (e) { console.error(e); }
+  finally { hideLoader(); }
+}
+ 
+function buildVisitChart(dailyData) {
+  if (charts.visits) charts.visits.destroy();
+  const ctx = document.getElementById('visitsChart')?.getContext('2d');
+  if (!ctx || !dailyData.length) return;
+  charts.visits = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dailyData.map(d => new Date(d.date).toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })),
+      datasets: [
+        { label: 'Page Views', data: dailyData.map(d => d.views), borderColor: '#3498DB', backgroundColor: 'rgba(52,152,219,.1)', fill: true, tension: .4, pointRadius: 3 },
+        { label: 'Unique IPs', data: dailyData.map(d => d.unique), borderColor: '#9B59B6', backgroundColor: 'rgba(155,89,182,.1)', fill: true, tension: .4, pointRadius: 3 },
+      ],
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#B8B4B0', font: { size: 11 } } } },
+      scales: { x: { grid: { color: 'rgba(255,255,255,.05)' } }, y: { grid: { color: 'rgba(255,255,255,.05)' }, beginAtZero: true } },
+    },
+  });
+}
+ 
+function buildTopPagesTable(pages) {
+  const el = document.getElementById('topPagesTable');
+  if (!el || !pages.length) return;
+  el.innerHTML = pages.slice(0, 8).map((p, i) => `
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--clr-text-muted);">${i+1}</td>
+      <td style="font-size:.82rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.page || '/')}</td>
+      <td style="font-family:var(--font-mono);font-size:.82rem;">${(p.views || 0).toLocaleString()}</td>
+      <td style="font-family:var(--font-mono);font-size:.82rem;">${(p.unique || 0).toLocaleString()}</td>
+    </tr>`).join('');
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════
+   5. SETTINGS — Email Management + Location + Auto-signout
+   ═══════════════════════════════════════════════════════════ */
+async function loadAllSettings() {
+  showLoader('Loading settings…');
+  try {
+    const res  = await fetch(`${DOMAIN}site-settings/global`);
+    const data = res.ok ? await res.json() : {};
+ 
+    // General
+    setValue('settingSiteName',       data.site_name       || 'AdConnect');
+    setValue('settingContactEmail',   data.contact_email   || 'info@adconnect.co.ke');
+    setValue('settingPhone',          data.phone           || '+254 790 064 130');
+    setValue('settingWhatsapp',       data.whatsapp        || '254790064130');
+    setValue('settingAddress',        data.address         || 'Nairobi, Kenya');
+    setValue('settingCity',           data.city            || 'Nairobi');
+    setValue('settingCountry',        data.country         || 'Kenya');
+    setValue('settingMapUrl',         data.map_url         || '');
+    setValue('settingTimezone',       data.timezone        || 'Africa/Nairobi');
+ 
+    // Email
+    setValue('settingSmtpHost',       data.smtp_host       || '');
+    setValue('settingSmtpPort',       data.smtp_port       || '465');
+    setValue('settingSmtpUser',       data.smtp_user       || '');
+    setValue('settingEmailFromName',  data.email_from_name || 'AdConnect Team');
+    setValue('settingAdminEmail',     data.admin_email     || 'info@adconnect.co.ke');
+ 
+    // Auto-signout
+    const mins = parseInt(data.auto_signout_minutes) || 10;
+    setValue('settingAutoSignout', mins);
+    AutoSignout.setMinutes(mins);
+ 
+    // Google OAuth status
+    const tokenRes = await fetch(`${DOMAIN}google-token-status`);
+    const tokenData = tokenRes.ok ? await tokenRes.json() : {};
+    updateTokenStatus(tokenData);
+  } finally { hideLoader(); }
+}
+ 
+async function saveAllSettings() {
+  const mins = parseInt(getValue('settingAutoSignout')) || 10;
+  const body = {
+    site_name:           getValue('settingSiteName'),
+    contact_email:       getValue('settingContactEmail'),
+    phone:               getValue('settingPhone'),
+    whatsapp:            getValue('settingWhatsapp'),
+    address:             getValue('settingAddress'),
+    city:                getValue('settingCity'),
+    country:             getValue('settingCountry'),
+    map_url:             getValue('settingMapUrl'),
+    timezone:            getValue('settingTimezone'),
+    smtp_host:           getValue('settingSmtpHost'),
+    smtp_port:           getValue('settingSmtpPort'),
+    smtp_user:           getValue('settingSmtpUser'),
+    email_from_name:     getValue('settingEmailFromName'),
+    admin_email:         getValue('settingAdminEmail'),
+    auto_signout_minutes: mins,
+  };
+ 
+  // Only save SMTP password if provided
+  const smtpPass = getValue('settingSmtpPassword');
+  if (smtpPass) body.smtp_password = smtpPass;
+ 
+  showLoader('Saving settings…');
+  try {
+    const res = await fetch(`${DOMAIN}site-settings/global`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      toast('Settings saved!');
+      AutoSignout.setMinutes(mins);
+    } else toast('Save failed', 'error');
+  } finally { hideLoader(); }
+}
+ 
+async function sendTestEmail() {
+  const email = getValue('settingContactEmail') || getValue('settingAdminEmail');
+  if (!email) { toast('Enter an email address first', 'error'); return; }
+  showLoader('Sending test email…');
+  try {
+    const res = await fetch(`${DOMAIN}settings/test-email`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: email }),
+    });
+    if (res.ok) toast(`Test email sent to ${email}!`);
+    else toast('Failed to send test email', 'error');
+  } finally { hideLoader(); }
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════
+   6. GOOGLE MEET TOKEN MANAGEMENT (Shared Hosting Fix)
+   Since you can't access terminal on TrueHost shared hosting,
+   tokens are managed via the admin UI.
+   ═══════════════════════════════════════════════════════════ */
+function updateTokenStatus(data) {
+  const el = document.getElementById('googleTokenStatus');
+  if (!el) return;
+  if (data.valid) {
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:10px;height:10px;background:var(--clr-accent);border-radius:50%;animation:blink 1.4s ease infinite;"></div>
+        <div>
+          <div style="font-size:.85rem;font-weight:600;color:var(--clr-accent);">Token Active</div>
+          <div style="font-size:.72rem;color:var(--clr-text-muted);">Expires: ${data.expiry ? new Date(data.expiry).toLocaleString('en-KE') : 'Unknown'}</div>
+        </div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:10px;height:10px;background:var(--clr-error);border-radius:50%;"></div>
+        <div>
+          <div style="font-size:.85rem;font-weight:600;color:var(--clr-error);">Token Expired / Missing</div>
+          <div style="font-size:.72rem;color:var(--clr-text-muted);">Click "Re-authorize" to fix Google Meet links</div>
+        </div>
+      </div>`;
+  }
+}
+ 
+async function initiateGoogleAuth() {
+  showLoader('Getting authorization URL…');
+  try {
+    const res  = await fetch(`${DOMAIN}google-auth-url`);
+    const data = await res.json();
+    if (data.url) {
+      // Open in popup so admin stays on page
+      const w = window.open(data.url, 'GoogleAuth', 'width=600,height=700,top=100,left=200');
+      // Poll for completion
+      const poll = setInterval(async () => {
+        try {
+          const check = await fetch(`${DOMAIN}google-token-status`);
+          const status = await check.json();
+          if (status.valid) {
+            clearInterval(poll);
+            if (w && !w.closed) w.close();
+            updateTokenStatus(status);
+            toast('Google authorization successful! Meet links will now work.');
+          }
+        } catch {}
+      }, 3000);
+      // Stop polling after 5 min
+      setTimeout(() => clearInterval(poll), 5 * 60 * 1000);
+    } else toast('Failed to get authorization URL', 'error');
+  } finally { hideLoader(); }
+}
+ 
+async function refreshGoogleToken() {
+  showLoader('Refreshing token…');
+  try {
+    const res  = await fetch(`${DOMAIN}google-refresh-token`, { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) { updateTokenStatus({ valid: true, expiry: data.expiry }); toast('Token refreshed!'); }
+    else toast(data.error || 'Refresh failed', 'error');
+  } finally { hideLoader(); }
+}
+ 
+// Auto-refresh token on admin load if near expiry
+async function checkAndRefreshToken() {
+  try {
+    const res  = await fetch(`${DOMAIN}google-token-status`);
+    const data = await res.json();
+    if (data.expiry && data.expiry - Date.now() < 30 * 60 * 1000) {
+      // Less than 30 min left — auto refresh
+      await refreshGoogleToken();
+    }
+  } catch {}
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════
+   7. APPOINTMENT PANEL — Full handling
+   ═══════════════════════════════════════════════════════════ */
+function populateAppointments() {
+  const tbody = document.querySelector('#panel-appointments .data-table tbody');
+  if (!tbody) return;
+  if (!appointmentList.length) { tbody.innerHTML = emptyRow(8, 'No appointments booked'); return; }
+ 
+  tbody.innerHTML = appointmentList.map((a, i) => `
+    <tr>
+      <td>
+        <div style="font-weight:600;color:var(--clr-text-primary);">${esc(a.name)}</div>
+        <div style="font-size:.72rem;color:var(--clr-text-muted);">${esc(a.email)}</div>
+      </td>
+      <td><a href="tel:${esc(a.phone||'')}" style="color:var(--clr-primary);font-size:.82rem;">${esc(a.phone||'—')}</a></td>
+      <td style="font-size:.82rem;">${formatDate(a.appointmentDate)}</td>
+      <td style="font-family:var(--font-mono);font-size:.78rem;">${esc(a.appointmentTime||'—')}</td>
+      <td><span class="badge badge-default" style="font-size:.68rem;">${esc(a.appointmentType||'Online')}</span></td>
+      <td>${apptStatusBadge(a.appointmentStatus)}</td>
+      <td style="font-size:.75rem;color:var(--clr-text-muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.appointmentNotes||'')}">${esc(a.appointmentNotes||'—')}</td>
+      <td class="actions-cell">
+        <!-- Reschedule -->
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReschedule(${i})" title="Reschedule">
+          <i class="fa fa-calendar action-icon"></i>
+        </button>
+        <!-- Reminder email -->
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReminder(${i})" title="Send reminder">
+          <i class="fa fa-clock action-icon"></i>
+        </button>
+        <!-- Join meeting -->
+        ${a.meetingLink ? `<a href="${esc(a.meetingLink)}" target="_blank" class="btn btn-ghost btn-sm btn-icon" title="Join meeting">
+          <i class="fa fa-video-camera action-icon"></i>
+        </a>` : `<button class="btn btn-ghost btn-sm btn-icon" onclick="regenerateMeetLink(${i})" title="Generate meet link">
+          <i class="fa fa-link action-icon"></i>
+        </button>`}
+        <!-- Mark done -->
+        <button class="btn btn-accent btn-sm btn-icon" onclick="appointmentUpdateStatus(${i})" title="Mark as Done">
+          <i class="fa fa-check-circle"></i>
+        </button>
+        <!-- Delete -->
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAppointment(${i})" title="Delete">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+ 
+async function regenerateMeetLink(i) {
+  showLoader('Generating Meet link…');
+  try {
+    const a   = appointmentList[i];
+    const res = await fetch(`${DOMAIN}create-meet-link`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventTitle: `AdConnect Consultation with ${a.name}`, startDateTime: `${a.appointmentDate} 09:00:00`, endDateTime: `${a.appointmentDate} 09:30:00` }),
+    });
+    const data = await res.json();
+    if (res.ok && data.meetLink) {
+      // Save to DB
+      await fetch(`${DOMAIN}appointments/${a.clientId}/meeting-link`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingLink: data.meetLink }),
+      });
+      appointmentList[i].meetingLink = data.meetLink;
+      populateAppointments();
+      toast('Meeting link generated!');
+    } else {
+      toast(data.error || 'Failed — Google token may need refresh. Check Settings → Google OAuth.', 'error');
+    }
+  } finally { hideLoader(); }
+}
+ 
+function previewNotes(i) {
+  document.getElementById('popupHeaderTextAppt').textContent = `Notes — ${appointmentList[i].name?.split(' ')[0]}`;
+  document.getElementById('titleText').textContent = appointmentList[i].appointmentNotes || 'No notes.';
+  document.getElementById('titleText').style.display = 'block';
+  document.getElementById('rescheduleForm').style.display = 'none';
+  openModal('appointmentPopup');
+}
+ 
+function appointmentReschedule(i) {
+  document.getElementById('popupHeaderTextAppt').textContent = `Reschedule — ${appointmentList[i].name?.split(' ')[0]}`;
+  document.getElementById('titleText').style.display = 'none';
+  document.getElementById('rescheduleForm').style.display = 'block';
+  document.getElementById('appointmentInput').value = appointmentList[i].appointmentTime || '';
+  appointmentIndex = i;
+  openModal('appointmentPopup');
 }
 
 async function updateVideoStatus(i) {
@@ -1460,7 +2717,8 @@ const blogStatusBadge = s => {
 };
 const getValue = id => document.getElementById(id)?.value?.trim() || '';
 const setValue = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
-
-// Wire into navigate() loaders:
-// 'careers':     fetchCareerListings,
-// 'career-apps': fetchCareerApplications,
+const safeGet = id => document.getElementById(id)?.value?.trim() || '';
+const safeVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+const safeSet = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+const truncateStr = (s, n) => s && s.length > n ? s.slice(0, n) + '…' : (s || '');
+const formatBytes = b => b < 1024 ? b+'B' : b < 1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(1)+'MB';

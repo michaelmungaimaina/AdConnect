@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsubscribe — AdConnect</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Manage your AdConnect email subscription preferences." />
+  <link rel="shortcut icon" href="/resources/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+  <!-- ── Master Theme CSS ── -->
+  <link rel="stylesheet" href="css/theme.css" />
+
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clr-bg:        #0f0e0d;
+    --clr-surface:   #1a1917;
+    --clr-surface-2: #252320;
+    --clr-border:    #2d2b29;
+    --clr-primary:   #F65730;
+    --clr-accent:    #4ABC4F;
+    --clr-text:      #f4f1ee;
+    --clr-muted:     #7a7874;
+    --clr-error:     #E74C3C;
+    --font-display:  'Syne', sans-serif;
+    --font-body:     'DM Sans', sans-serif;
+    --font-mono:     'IBM Plex Mono', monospace;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --shadow-primary: 0 8px 28px rgba(246,87,48,.3);
+    --transition: all .25s ease;
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--clr-bg);
+    font-family: var(--font-body);
+    color: var(--clr-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Background orbs */
+  .orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+  .orb-1 { width: 500px; height: 500px; top: -200px; right: -150px; background: radial-gradient(circle, rgba(246,87,48,.08) 0%, transparent 70%); animation: float1 9s ease-in-out infinite; }
+  .orb-2 { width: 350px; height: 350px; bottom: -100px; left: -100px; background: radial-gradient(circle, rgba(74,188,79,.06) 0%, transparent 70%); animation: float2 11s ease-in-out infinite; }
+  @keyframes float1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-20px,20px);} }
+  @keyframes float2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(15px,-15px);} }
+
+  /* ── Header ── */
+  .page-header {
+    position: relative;
+    z-index: 1;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--clr-border);
+    background: rgba(15,14,13,.8);
+    backdrop-filter: blur(12px);
+  }
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .header-logo img { height: 32px; border-radius: 6px; }
+  .header-logo-text { font-family: var(--font-display); font-size: 1rem; font-weight: 900; }
+  .header-logo-text .red   { color: var(--clr-primary); }
+  .header-logo-text .white { color: var(--clr-text); }
+
+  /* ── Main container ── */
+  .page-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .unsub-card {
+    background: var(--clr-surface);
+    border: 1.5px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+    animation: card-in .5s ease both;
+  }
+  @keyframes card-in { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── States ── */
+  .state { display: none; }
+  .state.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── Initial state ── */
+  .card-header {
+    width: 100%;
+    background: linear-gradient(135deg, #1e1c1a 0%, var(--clr-surface-2) 100%);
+    padding: 36px 40px 28px;
+    border-bottom: 1px solid var(--clr-border);
+    text-align: center;
+  }
+  .card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin: 0 auto 20px;
+  }
+  .icon-warning { background: rgba(246,87,48,.12); border: 1.5px solid rgba(246,87,48,.25); color: var(--clr-primary); }
+  .icon-success { background: rgba(74,188,79,.12); border: 1.5px solid rgba(74,188,79,.25); color: var(--clr-accent); }
+  .icon-info    { background: rgba(52,152,219,.12); border: 1.5px solid rgba(52,152,219,.25); color: #3498DB; }
+
+  .card-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: var(--clr-text);
+  }
+  .card-header p {
+    color: var(--clr-muted);
+    font-size: .875rem;
+    line-height: 1.6;
+  }
+  .card-header .email-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(246,87,48,.08);
+    border: 1px solid rgba(246,87,48,.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    color: var(--clr-primary);
+    margin-top: 10px;
+  }
+
+  .card-body { width: 100%; padding: 32px 40px; }
+
+  /* ── Email input ── */
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .field label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--clr-muted); }
+  .field input {
+    background: var(--clr-surface-2);
+    border: 1.5px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    color: var(--clr-text);
+    padding: 12px 16px;
+    font-size: .9rem;
+    font-family: var(--font-body);
+    outline: none;
+    width: 100%;
+    transition: var(--transition);
+  }
+  .field input:focus { border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(246,87,48,.12); }
+  .field input.error { border-color: var(--clr-error); }
+
+  /* ── Reason selector ── */
+  .reason-title { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--clr-muted); margin-bottom: 12px; }
+  .reason-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .reason-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--clr-surface-2);
+    border: 1.5px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .reason-item:hover, .reason-item.selected {
+    border-color: var(--clr-primary);
+    background: rgba(246,87,48,.06);
+  }
+  .reason-item input[type="radio"] { accent-color: var(--clr-primary); width: 16px; height: 16px; flex-shrink: 0; }
+  .reason-item label { font-size: .85rem; color: var(--clr-text); cursor: pointer; flex: 1; }
+
+  /* ── Alert box ── */
+  .alert-box {
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    font-size: .83rem;
+    line-height: 1.6;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .alert-box.show { display: flex; }
+  .alert-box.info    { background: rgba(52,152,219,.1); border: 1px solid rgba(52,152,219,.3); color: #3498DB; }
+  .alert-box.success { background: rgba(74,188,79,.1);  border: 1px solid rgba(74,188,79,.3);  color: var(--clr-accent); }
+  .alert-box.error   { background: rgba(231,76,60,.1);  border: 1px solid rgba(231,76,60,.3);  color: var(--clr-error); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 24px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: .875rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    text-decoration: none;
+    width: 100%;
+  }
+  .btn-danger  { background: var(--clr-error); color: #fff; }
+  .btn-danger:hover:not(:disabled) { background: #c0392b; transform: translateY(-1px); }
+  .btn-ghost   { background: transparent; color: var(--clr-muted); border: 1.5px solid var(--clr-border); }
+  .btn-ghost:hover:not(:disabled)   { border-color: var(--clr-text); color: var(--clr-text); }
+  .btn-accent  { background: var(--clr-accent); color: #fff; }
+  .btn-accent:hover:not(:disabled) { background: #37a041; transform: translateY(-1px); }
+  .btn-primary { background: var(--clr-primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #d44520; transform: translateY(-1px); box-shadow: var(--shadow-primary); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  .btn-row { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ── What you'll miss list ── */
+  .miss-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .miss-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--clr-surface-2);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+  }
+  .miss-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; }
+  .miss-icon.orange { background: rgba(246,87,48,.1); color: var(--clr-primary); }
+  .miss-icon.green  { background: rgba(74,188,79,.1);  color: var(--clr-accent); }
+  .miss-icon.blue   { background: rgba(52,152,219,.1); color: #3498DB; }
+  .miss-text { font-size: .82rem; color: var(--clr-muted); }
+
+  /* ── Success state big icon ── */
+  .success-circle {
+    width: 80px;
+    height: 80px;
+    background: rgba(74,188,79,.1);
+    border: 2px solid var(--clr-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--clr-accent);
+    margin-bottom: 20px;
+    animation: pop .4s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes pop { from{transform:scale(0);} to{transform:scale(1);} }
+  .success-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+  .success-desc  { color: var(--clr-muted); font-size: .875rem; line-height: 1.75; text-align: center; max-width: 360px; }
+
+  /* ── Footer ── */
+  .page-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--clr-border);
+    color: var(--clr-muted);
+    font-size: .75rem;
+  }
+  .page-footer a { color: var(--clr-primary); text-decoration: none; }
+  .page-footer a:hover { text-decoration: underline; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--clr-border); margin: 20px 0; width: 100%; }
+
+  /* ── Prefs section ── */
+  .pref-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--clr-border);
+  }
+  .pref-row:last-child { border-bottom: none; }
+  .pref-label { font-size: .875rem; color: var(--clr-text); }
+  .pref-sub   { font-size: .72rem; color: var(--clr-muted); margin-top: 2px; }
+  .toggle-switch {
+    position: relative;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-knob {
+    position: absolute;
+    inset: 0;
+    background: #3d3b39;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .toggle-knob::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: var(--transition);
+  }
+  .toggle-switch input:checked + .toggle-knob { background: var(--clr-accent); }
+  .toggle-switch input:checked + .toggle-knob::before { transform: translateX(22px); }
+
+  @media (max-width: 560px) {
+    .card-header, .card-body { padding: 24px 20px; }
+    .card-header h1 { font-size: 1.2rem; }
+  }
+
+   .logo-wrap {
+  display: inline-block;
+  height: auto; /* allow vertical growth */
+  width: fit-content;  /* shrink to fit content */
+  display: flex;
+  align-items: center;
+  background: #252320;
+  border-radius: 5px;
+  padding: 5px 15px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  border: 1px solid #3d3b39;
+}
+
+.logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center both lines */
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-top: -7px;
+}
+
+.container-nav .footer-v2-logo-text .ac-red   { color: #F65730; }
+.footer-v2-logo-text .ac-white { color: #f4f1ee; }
+
+.logo-text .ad { color: #f65730; }
+.logo-text .connect { color: #ffffff; }
+
+.logo-tagline {
+  font-size: 12px;              /* smaller */
+  color: #4abc4f;               /* green */
+  margin-top: -6px;
+  white-space: nowrap;          /* keep in one line */
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.9px;
+}
+  </style>
+</head>
+<body>
+<div class="orb orb-1" aria-hidden="true"></div>
+<div class="orb orb-2" aria-hidden="true"></div>
+
+<!-- Header -->
+<header class="page-header">
+  <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+</header>
+
+<!-- Main -->
+<main class="page-main" id="pageMain">
+  <div class="unsub-card" id="unsubCard">
+
+    <!-- ─── STATE 1: Enter Email ─── -->
+    <div id="stateEmail" class="state active">
+      <div class="card-header">
+        <div class="card-icon icon-warning"><i class="fa fa-envelope-o"></i></div>
+        <h1>Manage Your Subscription</h1>
+        <p>Enter your email address to manage your AdConnect communication preferences.</p>
+      </div>
+      <div class="card-body">
+        <div id="alertEmail" class="alert-box"></div>
+        <div class="field">
+          <label for="emailInput">Email Address</label>
+          <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email"
+                 onkeydown="if(event.key==='Enter')checkEmail()" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnCheckEmail" onclick="checkEmail()">
+            <i class="fa fa-arrow-right"></i> Continue
+          </button>
+          <a href="index.html" class="btn btn-ghost"><i class="fa fa-home"></i> Back to Website</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 2: Choose Action ─── -->
+    <div id="stateAction" class="state">
+      <div class="card-header">
+        <div class="card-icon icon-warning"><i class="fa fa-envelope"></i></div>
+        <h1>You're Subscribed</h1>
+        <p>What would you like to do with your subscription?</p>
+        <div class="email-pill"><i class="fa fa-at"></i> <span id="confirmedEmail">—</span></div>
+      </div>
+      <div class="card-body">
+        <!-- What you'll miss -->
+        <p style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--clr-muted);margin-bottom:12px;">What you'll miss out on:</p>
+        <ul class="miss-list">
+          <li class="miss-item"><div class="miss-icon orange"><i class="fa fa-bullhorn"></i></div><div class="miss-text">Proven digital marketing strategies for real estate businesses</div></li>
+          <li class="miss-item"><div class="miss-icon green"><i class="fa fa-code"></i></div><div class="miss-text">Web & mobile development tips to grow your online presence</div></li>
+          <li class="miss-item"><div class="miss-icon blue"><i class="fa fa-line-chart"></i></div><div class="miss-text">Industry insights, case studies, and exclusive offers</div></li>
+        </ul>
+
+        <!-- Reasons -->
+        <div class="reason-title">Why are you leaving? (optional)</div>
+        <ul class="reason-list" id="reasonList">
+          <li class="reason-item" onclick="selectReason(this)">
+            <input type="radio" name="reason" value="too_many" /><label>Too many emails</label>
+          </li>
+          <li class="reason-item" onclick="selectReason(this)">
+            <input type="radio" name="reason" value="not_relevant" /><label>Content isn't relevant to me</label>
+          </li>
+          <li class="reason-item" onclick="selectReason(this)">
+            <input type="radio" name="reason" value="never_signed_up" /><label>I didn't sign up for this</label>
+          </li>
+          <li class="reason-item" onclick="selectReason(this)">
+            <input type="radio" name="reason" value="prefer_less" /><label>I'd prefer fewer emails (manage preferences)</label>
+          </li>
+          <li class="reason-item" onclick="selectReason(this)">
+            <input type="radio" name="reason" value="other" /><label>Other reason</label>
+          </li>
+        </ul>
+
+        <div id="alertAction" class="alert-box"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="openPreferences()" style="width:auto;padding:10px 18px;font-size:.8rem;">
+            <i class="fa fa-sliders"></i> Manage Preferences Instead
+          </button>
+          <button class="btn btn-danger" id="btnUnsubscribe" onclick="performUnsubscribe()">
+            <i class="fa fa-sign-out"></i> Unsubscribe from All Emails
+          </button>
+          <button class="btn btn-ghost" onclick="goBack()"><i class="fa fa-arrow-left"></i> Go Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 3: Preferences (lighter option) ─── -->
+    <div id="statePrefs" class="state">
+      <div class="card-header">
+        <div class="card-icon icon-info"><i class="fa fa-sliders"></i></div>
+        <h1>Email Preferences</h1>
+        <p>Choose which emails you'd like to receive from AdConnect.</p>
+        <div class="email-pill"><i class="fa fa-at"></i> <span id="prefEmail">—</span></div>
+      </div>
+      <div class="card-body">
+        <div class="pref-row">
+          <div><div class="pref-label">Marketing Tips & Strategies</div><div class="pref-sub">Weekly real estate marketing insights</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="pref-marketing" checked /><span class="toggle-knob"></span></label>
+        </div>
+        <div class="pref-row">
+          <div><div class="pref-label">Product Updates & New Services</div><div class="pref-sub">What's new at AdConnect</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="pref-product" checked /><span class="toggle-knob"></span></label>
+        </div>
+        <div class="pref-row">
+          <div><div class="pref-label">Industry News & Case Studies</div><div class="pref-sub">What's working in digital marketing</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="pref-news" checked /><span class="toggle-knob"></span></label>
+        </div>
+        <div class="pref-row">
+          <div><div class="pref-label">Promotional Offers</div><div class="pref-sub">Exclusive deals and discounts</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="pref-promo" /><span class="toggle-knob"></span></label>
+        </div>
+        <div class="divider"></div>
+        <div id="alertPrefs" class="alert-box"></div>
+        <div class="btn-row">
+          <button class="btn btn-accent" onclick="savePreferences()"><i class="fa fa-check"></i> Save Preferences</button>
+          <button class="btn btn-ghost" onclick="setState('stateAction')"><i class="fa fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 4: Not Subscribed ─── -->
+    <div id="stateNotFound" class="state">
+      <div class="card-header">
+        <div class="card-icon icon-info"><i class="fa fa-search"></i></div>
+        <h1>Email Not Found</h1>
+        <p>We couldn't find a subscription for this email address.</p>
+        <div class="email-pill"><i class="fa fa-at"></i> <span id="notFoundEmail">—</span></div>
+      </div>
+      <div class="card-body">
+        <div class="alert-box info show">
+          <i class="fa fa-info-circle"></i>
+          <span>This email is either not subscribed or has already been unsubscribed from our mailing list.</span>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn btn-primary" onclick="goBack()"><i class="fa fa-arrow-left"></i> Try a Different Email</button>
+          <a href="index.html" class="btn btn-ghost"><i class="fa fa-home"></i> Back to Website</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 5: Unsubscribed Successfully ─── -->
+    <div id="stateUnsubscribed" class="state">
+      <div class="card-body" style="align-items:center;text-align:center;padding:48px 40px;">
+        <div class="success-circle"><i class="fa fa-check"></i></div>
+        <div class="success-title">You're Unsubscribed</div>
+        <p class="success-desc">
+          <span id="unsubEmail" style="color:var(--clr-primary);font-weight:600;"></span> has been successfully removed from our mailing list. You won't receive any more marketing emails from AdConnect.
+        </p>
+        <div class="divider"></div>
+        <p style="font-size:.82rem;color:var(--clr-muted);margin-bottom:20px;line-height:1.7;">
+          Changed your mind? You can re-subscribe at any time — your data remains secure and we'll never share it.
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-accent" onclick="resubscribe()"><i class="fa fa-undo"></i> Re-Subscribe</button>
+          <a href="index.html" class="btn btn-ghost"><i class="fa fa-home"></i> Back to Website</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 6: Re-subscribed ─── -->
+    <div id="stateResubscribed" class="state">
+      <div class="card-body" style="align-items:center;text-align:center;padding:48px 40px;">
+        <div class="success-circle" style="border-color:var(--clr-primary);color:var(--clr-primary);background:rgba(246,87,48,.1);">🎉</div>
+        <div class="success-title">Welcome Back!</div>
+        <p class="success-desc">
+          You've been re-subscribed to AdConnect marketing emails. We're excited to have you back!
+        </p>
+        <div class="divider"></div>
+        <div class="btn-row">
+          <a href="index.html?lead-capture-form=true" class="btn btn-primary"><i class="fa fa-calendar"></i> Book a Free Consultation</a>
+          <a href="index.html" class="btn btn-ghost"><i class="fa fa-home"></i> Back to Website</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STATE 7: Preferences Saved ─── -->
+    <div id="statePrefsaved" class="state">
+      <div class="card-body" style="align-items:center;text-align:center;padding:48px 40px;">
+        <div class="success-circle"><i class="fa fa-check"></i></div>
+        <div class="success-title">Preferences Saved!</div>
+        <p class="success-desc">Your email preferences have been updated. We'll only send you the emails you selected.</p>
+        <div class="divider"></div>
+        <div class="btn-row">
+          <a href="index.html" class="btn btn-primary"><i class="fa fa-home"></i> Back to Website</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.unsub-card -->
+</main>
+
+<!-- Footer -->
+<footer class="page-footer">
+  <p>© <span id="footYear"></span> <a href="/index.html">AdConnect</a>. All rights reserved. ·
+     <a href="/?privacy-policy=true">Privacy Policy</a> ·
+     Designed, Built and Managed by <strong style="color:#3d3b39;">AdConnect Development Team</strong>
+  </p>
+</footer>
+
+<script>
+  //const API = 'https://adconnect.co.ke/api/';
+  const API = 'http://localhost:8080/api/';
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let currentEmail = '';
+  let currentStatus = ''; // SUBSCRIBED | UNSUBSCRIBED | NOT_FOUND
+
+  document.getElementById('footYear').textContent = new Date().getFullYear();
+
+  // Pre-fill email from URL ?email=…
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const e = params.get('email');
+    if (e) {
+      document.getElementById('emailInput').value = e;
+      checkEmail();
+    }
+  });
+
+  // ── State machine ──────────────────────────────────────────
+  function setState(id) {
+    document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goBack() {
+    setState('stateEmail');
+    document.getElementById('emailInput').value = currentEmail || '';
+    clearAlert('alertEmail');
+  }
+
+  function openPreferences() {
+    document.getElementById('prefEmail').textContent = currentEmail;
+    setState('statePrefs');
+  }
+
+  // ── Alerts ─────────────────────────────────────────────────
+  function showAlert(id, type, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `alert-box ${type} show`;
+    el.innerHTML = `<i class="fa fa-${type==='error'?'exclamation-circle':type==='success'?'check-circle':'info-circle'}"></i><span>${msg}</span>`;
+  }
+  function clearAlert(id) {
+    const el = document.getElementById(id);
+    if (el) el.className = 'alert-box';
+  }
+
+  // ── Reason selector ────────────────────────────────────────
+  function selectReason(item) {
+    document.querySelectorAll('.reason-item').forEach(r => r.classList.remove('selected'));
+    item.classList.add('selected');
+    const radio = item.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+  }
+
+  // ── Step 1: Check email ────────────────────────────────────
+  async function checkEmail() {
+    const email = document.getElementById('emailInput').value.trim();
+    clearAlert('alertEmail');
+
+    if (!email) { showAlert('alertEmail','error','Please enter your email address.'); return; }
+    if (!RE_EMAIL.test(email)) { showAlert('alertEmail','error','Please enter a valid email address.'); return; }
+
+    const btn = document.getElementById('btnCheckEmail');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Checking…';
+    currentEmail = email;
+
+    try {
+      const res  = await fetch(`${API}subscription-status?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      currentStatus = data.status;
+
+      if (data.status === 'SUBSCRIBED') {
+        document.getElementById('confirmedEmail').textContent = email;
+        setState('stateAction');
+      } else if (data.status === 'UNSUBSCRIBED') {
+        // Already unsubscribed — offer to re-subscribe
+        document.getElementById('unsubEmail').textContent = email;
+        showAlert('alertEmail','info','This email is already unsubscribed. Re-subscribe below?');
+      } else {
+        document.getElementById('notFoundEmail').textContent = email;
+        setState('stateNotFound');
+      }
+    } catch {
+      showAlert('alertEmail','error','Connection error. Please try again in a moment.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-arrow-right"></i> Continue';
+    }
+  }
+
+  // ── Step 2: Unsubscribe ────────────────────────────────────
+  async function performUnsubscribe() {
+    const reason  = document.querySelector('input[name="reason"]:checked')?.value || 'not_specified';
+    const btn     = document.getElementById('btnUnsubscribe');
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing…';
+    clearAlert('alertAction');
+
+    try {
+      const res  = await fetch(`${API}unsubscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentEmail, reason }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('unsubEmail').textContent = currentEmail;
+        setState('stateUnsubscribed');
+      } else {
+        showAlert('alertAction','error', data.error || 'Something went wrong. Please try again.');
+      }
+    } catch {
+      showAlert('alertAction','error','Connection error. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-sign-out"></i> Unsubscribe from All Emails';
+    }
+  }
+
+  // ── Re-subscribe ───────────────────────────────────────────
+  async function resubscribe() {
+    try {
+      await fetch(`${API}resubscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentEmail }),
+      });
+      setState('stateResubscribed');
+    } catch {
+      alert('Could not re-subscribe. Please visit adconnect.co.ke and submit the contact form.');
+    }
+  }
+
+  // ── Save Preferences ────────────────────────────────────────
+  async function savePreferences() {
+    const prefs = {
+      marketing: document.getElementById('pref-marketing')?.checked,
+      product:   document.getElementById('pref-product')?.checked,
+      news:      document.getElementById('pref-news')?.checked,
+      promo:     document.getElementById('pref-promo')?.checked,
+    };
+    // If all unchecked, treat as full unsubscribe
+    if (!prefs.marketing && !prefs.product && !prefs.news && !prefs.promo) {
+      await performUnsubscribeFromPrefs();
+      return;
+    }
+    clearAlert('alertPrefs');
+    try {
+      const res = await fetch(`${API}email-preferences`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentEmail, preferences: prefs }),
+      });
+      if (res.ok) setState('statePrefsaved');
+      else showAlert('alertPrefs','error','Save failed. Please try again.');
+    } catch {
+      showAlert('alertPrefs','error','Connection error. Please try again.');
+    }
+  }
+
+  async function performUnsubscribeFromPrefs() {
+    await fetch(`${API}unsubscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentEmail, reason: 'prefer_less' }),
+    });
+    document.getElementById('unsubEmail').textContent = currentEmail;
+    setState('stateUnsubscribed');
+  }
+</script>
+</body>
+</html>
