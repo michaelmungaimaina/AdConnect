@@ -1035,8 +1035,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
 
 async function subscribeNewsletter() {
-  const email = getValue('newsletterEmail');
+  const email = getValue('footerNewsletterEmail');
   if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+
+  fetch(`${DOMAIN}newsletter-subscribe`, { 
+    method:'POST', 
+    headers:{'Content-Type':'application/json'}, 
+    body:JSON.stringify({ 
+      email 
+    }), 
+  }).catch(() => { /* ignore errors */ });
   toast('Subscribed! Thanks for joining our newsletter.', 'success');
   setValue('newsletterEmail','');
 }

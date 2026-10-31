@@ -1016,12 +1016,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
 
 async function subscribeNewsletter() {
-  const email = getValue('newsletterEmail');
+  const email = getValue('footerNewsletterEmail');
   if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+
+  fetch(`${DOMAIN}newsletter-subscribe`, { 
+    method:'POST', 
+    headers:{'Content-Type':'application/json'}, 
+    body:JSON.stringify({ 
+      email 
+    }), 
+  }).catch(() => { /* ignore errors */ });
   toast('Subscribed! Thanks for joining our newsletter.', 'success');
   setValue('newsletterEmail','');
 }
 const getValue = id => document.getElementById(id)?.value.trim() || '';
+/* ── Patterns ────────────────────────────────── */
+const RE = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^(?:\+254|0)(7|1)\d{8}$/,
+  twoWords: /^\S+\s+\S+/,
+};
 
 /* ── Toast Notifications ─────────────────────── */
 function toast(msg, type='success') {
