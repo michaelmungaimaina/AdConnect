@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submit a Project Proposal — AdConnect</title>
+  <meta name="description" content="Send us your project proposal or brief. Upload your documents and track the progress of your submission." />
+  <meta name="robots" content="index,follow" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body data-site-nav>
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+         <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+        <button id="navbarTogler" class="navbar-toggler" type="button"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="dropdown">
+            <a href="our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+            </ul>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
+        <button id="sidePanelCloseBtn" type="button" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div>
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="collapse-btn">
+            <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
+            <div class="collapse" id="services">
+              <ul>
+                <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+              </ul>
+            </div>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </aside>
+  </header>
+</div>
+<main class="pg pg-narrow" id="proposalPage">
+  <div class="pg-hero">
+    <span class="eyebrow"><i class="fa fa-file-arrow-up"></i> Project proposal</span>
+    <h1>Have a project in mind? <span class="hl">Send us your proposal</span></h1>
+    <p>Describe what you want to build or achieve and attach your brief, proposal or requirements. We reply within two working days with questions, a quote or next steps.</p>
+  </div>
+
+  <div class="panel" id="formPanel">
+    <form id="propForm" novalidate>
+      <div class="f-grid">
+        <div class="f-field"><label for="pName">Full name <span class="req">*</span></label><input id="pName" name="name" autocomplete="name" required /></div>
+        <div class="f-field"><label for="pEmail">Email <span class="req">*</span></label><input id="pEmail" name="email" type="email" autocomplete="email" required /></div>
+        <div class="f-field"><label for="pPhone">Phone</label><input id="pPhone" name="phone" type="tel" autocomplete="tel" placeholder="0712 345 678" /></div>
+        <div class="f-field"><label for="pCompany">Company / organisation</label><input id="pCompany" name="company" autocomplete="organization" /></div>
+        <div class="f-field"><label for="pCat">Service category <span class="req">*</span></label><select id="pCat" name="category" required><option value="">Loading…</option></select></div>
+        <div class="f-field"><label for="pSvc">Specific service</label><select id="pSvc" name="service"><option value="">Not sure / several</option></select></div>
+        <div class="f-field full"><label for="pTitle">Project title <span class="req">*</span></label><input id="pTitle" name="title" maxlength="250" placeholder="e.g. Online booking system for a clinic" required /></div>
+        <div class="f-field full"><label for="pSummary">Describe your project <span class="req">*</span></label>
+          <textarea id="pSummary" name="summary" maxlength="6000" placeholder="Goals, who it is for, key features, existing systems, deadlines…" style="min-height:170px"></textarea>
+          <div class="hint">Attached a full proposal? A short summary is enough.</div></div>
+        <div class="f-field"><label for="pBudget">Budget range</label>
+          <select id="pBudget" name="budget_range"><option value="">Prefer to discuss</option><option>Under KES 50,000</option><option>KES 50,000 – 150,000</option><option>KES 150,000 – 500,000</option><option>KES 500,000 – 1,500,000</option><option>Above KES 1,500,000</option></select></div>
+        <div class="f-field"><label for="pTime">Timeline</label>
+          <select id="pTime" name="timeline"><option value="">Flexible</option><option>As soon as possible</option><option>Within 1 month</option><option>1 – 3 months</option><option>3 – 6 months</option><option>6+ months</option></select></div>
+
+        <div class="f-field full">
+          <label>Attach your proposal or brief <span class="hint" style="display:inline">(up to 3 files, 15&nbsp;MB each)</span></label>
+          <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose files to upload">
+            <i class="fa fa-cloud-arrow-up"></i>
+            <div><b>Tap to choose files</b> or drag them here</div>
+            <small>PDF, Word, PowerPoint, Excel, CSV, images or ZIP</small>
+          </div>
+          <input type="file" id="files" multiple hidden accept=".pdf,.doc,.docx,.odt,.rtf,.txt,.ppt,.pptx,.xls,.xlsx,.csv,.zip,.png,.jpg,.jpeg,.webp" />
+          <div class="proposal-files" id="fileList"></div>
+        </div>
+
+        <div class="f-field full"><label class="f-check"><input type="checkbox" id="pSub" /> <span>Also send me occasional tips and updates by email.</span></label></div>
+        <input class="hp" tabindex="-1" autocomplete="off" id="pWebsite" aria-hidden="true" />
+      </div>
+      <div class="msg err" id="pErr"></div>
+      <div class="nav-row"><button type="submit" class="btn btn-primary btn-lg" id="pBtn"><i class="fa fa-paper-plane"></i> Submit proposal</button></div>
+    </form>
+  </div>
+
+  <div class="panel" id="donePanel" hidden>
+    <div class="done-card">
+      <div class="tick"><i class="fa fa-check"></i></div>
+      <h2>Proposal received</h2>
+      <p>Thank you! We will review it and get back to you within two working days.</p>
+      <div class="ref" id="pRef"></div>
+      <p style="font-size:.85rem">A confirmation email is on its way. Keep this reference to track your proposal.</p>
+      <div class="nav-row" style="justify-content:center">
+        <a class="btn btn-primary" id="pTrack" href="booking-status.html">Track my proposal</a>
+        <a class="btn btn-ghost" href="proposal.html">Submit another</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html">Social Media Ads</a></li>
+        <li><a href="our-services.html">Ad Creative Design</a></li>
+        <li><a href="our-services.html">Analytics & Reporting</a></li>
+        <li><a href="our-services.html">Facebook Campaigns</a></li>
+        <li><a href="our-services.html">Web Development</a></li>
+        <li><a href="our-services.html">Android Apps</a></li>
+        <li><a href="our-services.html">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li><a href="book.html">Book a Session</a></li>
+        <li><a href="proposal.html">Submit a Proposal</a></li>
+        <li><a href="booking-status.html">Track Booking / Proposal</a></li>
+        <li><a href="subscribe.html">Email Updates</a></li>
+        <li><a href="faqs.html">FAQs</a></li>
+        <li><a href="unsubscribe.html">Unsubscribe</a></li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      </div>
+    </div>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
+      </div>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:var(--clr-border);">AdConnect Development Team</span>
+      </p>
+    </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
+      <a href="unsubscribe.html">Unsubscribe</a>
+    </nav>
+  </div>
+ 
+</footer>
+<script src="scripts/site.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = SITE.esc, picked = [], cats = [];
+  var MAX = 15 * 1024 * 1024, OK = /\.(pdf|docx?|odt|rtf|txt|pptx?|xlsx?|csv|zip|png|jpe?g|webp)$/i;
+  var qs = new URLSearchParams(location.search);
+  if (qs.get('track')) { location.replace('booking-status.html?type=proposal&ref=' + encodeURIComponent(qs.get('track'))); return; }
+
+  function err(m) { var e = $('pErr'); e.textContent = m || ''; e.classList.toggle('show', !!m); }
+
+  SITE.api('service-categories?include=services').then(function (list) {
+    cats = (list || []).filter(function (c) { return c.allow_proposal; });
+    $('pCat').innerHTML = '<option value="">Choose a category…</option>' + cats.map(function (c) { return '<option value="' + esc(c.slug) + '">' + esc(c.name) + '</option>'; }).join('');
+    if (qs.get('category')) { $('pCat').value = qs.get('category'); fillSvc(); if (qs.get('service')) $('pSvc').value = qs.get('service'); }
+  }).catch(function () { $('pCat').innerHTML = '<option value="">Could not load categories</option>'; });
+
+  function fillSvc() {
+    var c = cats.filter(function (x) { return x.slug === $('pCat').value; })[0];
+    $('pSvc').innerHTML = '<option value="">Not sure / several</option>' + ((c && c.services) || []).map(function (s) { return '<option value="' + esc(s.slug) + '">' + esc(s.name) + '</option>'; }).join('');
+  }
+  $('pCat').addEventListener('change', fillSvc);
+
+  /* files */
+  function drawFiles() {
+    $('fileList').innerHTML = picked.map(function (f, i) {
+      return '<div class="file-chip"><i class="fa fa-file"></i><span class="nm">' + esc(f.name) + '</span><span style="color:var(--clr-text-muted)">' + (f.size / 1048576).toFixed(1) + ' MB</span><button type="button" data-i="' + i + '" aria-label="Remove file">&times;</button></div>';
+    }).join('');
+    $('fileList').querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { picked.splice(+b.getAttribute('data-i'), 1); drawFiles(); }); });
+  }
+  function add(files) {
+    err('');
+    Array.prototype.forEach.call(files, function (f) {
+      if (picked.length >= 3) return err('You can attach up to 3 files.');
+      if (!OK.test(f.name)) return err('"' + f.name + '" is not an accepted file type.');
+      if (f.size > MAX) return err('"' + f.name + '" is larger than 15 MB.');
+      picked.push(f);
+    });
+    drawFiles();
+  }
+  var drop = $('drop');
+  drop.addEventListener('click', function () { $('files').click(); });
+  drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('files').click(); } });
+  $('files').addEventListener('change', function () { add(this.files); this.value = ''; });
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { add(e.dataTransfer.files); });
+
+  /* submit */
+  $('propForm').addEventListener('submit', function (e) {
+    e.preventDefault(); err('');
+    var name = $('pName').value.trim(), email = $('pEmail').value.trim(), title = $('pTitle').value.trim(), summary = $('pSummary').value.trim();
+    if (name.length < 2) return err('Please enter your name.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err('Please enter a valid email address.');
+    if (!$('pCat').value) return err('Please choose a service category.');
+    if (!title) return err('Please give your project a title.');
+    if (summary.length < 20 && !picked.length) return err('Please describe your project, or attach your proposal document.');
+    var fd = new FormData();
+    [['name', name], ['email', email], ['phone', $('pPhone').value.trim()], ['company', $('pCompany').value.trim()], ['category', $('pCat').value], ['service', $('pSvc').value],
+     ['title', title], ['summary', summary], ['budget_range', $('pBudget').value], ['timeline', $('pTime').value], ['subscribe', $('pSub').checked ? 'true' : ''], ['website', $('pWebsite').value]]
+      .forEach(function (p) { fd.append(p[0], p[1]); });
+    picked.forEach(function (f) { fd.append('files', f); });
+    var btn = $('pBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading…';
+    SITE.api('proposals', { method: 'POST', body: fd }).then(function (r) {
+      $('pRef').textContent = r.reference;
+      $('pTrack').href = 'booking-status.html?type=proposal&ref=' + encodeURIComponent(r.reference) + '&email=' + encodeURIComponent(email);
+      $('formPanel').hidden = true; $('donePanel').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
+    }).catch(function (x) { err(x.message); }).finally(function () { btn.disabled = false; btn.innerHTML = '<i class="fa fa-paper-plane"></i> Submit proposal'; });
+  });
+})();
+
+</script>
+</body>
+</html>

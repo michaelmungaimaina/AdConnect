@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
   <style>
   .policy-page { padding-top: var(--header-h); min-height: 100vh; background: var(--clr-bg); }
   .policy-container { max-width: 780px; margin: 0 auto; padding: 60px 24px 100px; }
@@ -28,7 +30,7 @@
   @media (max-width: 600px) { .policy-body { padding: 28px 20px; } }
   </style>
 </head>
-<body>
+<body data-site-nav>
 
 <!-- NAV -->
 <div class="headerindex">
@@ -89,7 +91,7 @@
 
       <h2>2. How We Use Your Data</h2>
       <ul>
-        <li>To connect real estate companies with potential local and international customers.</li>
+        <li>To help businesses grow through marketing, technology and data.</li>
         <li>To analyse website performance and improve user experience.</li>
         <li>To create targeted marketing campaigns through Facebook Pixel and similar tools.</li>
         <li>To send updates, promotional offers, and service communications.</li>
@@ -141,5 +143,6 @@
   </div>
 </footer>
 <script>document.getElementById('cy').textContent=new Date().getFullYear();</script>
+<script src="scripts/site.js"></script>
 </body>
 </html>

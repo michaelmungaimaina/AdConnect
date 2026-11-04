@@ -6,23 +6,22 @@
 'use strict';
 
 // ── Config ────────────────────────────────────────────────────
-//const DOMAIN = 'https://adconnect.co.ke/api/';
- const DOMAIN = 'http://localhost:3000/api/';
+ const DOMAIN = '/api/';
 
 // ── Role Permissions ──────────────────────────────────────────
 const ROLE_PERMISSIONS = {
-  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','users','settings','homepage','testimonials','careers', 'career-apps', 'faqs', 'media'],
-  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','appointments','applications','settings','homepage','testimonials','careers', 'career-apps', 'faqs', 'media'],
-  EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials','faqs','media'],
+  SUPER_ADMIN: ['dashboard','analytics','content','blog','portfolio','leads','applications','users','settings','homepage','testimonials','careers','career-apps','faqs','media','bookings','proposals','services','subscribers','campaign','messages','appearance'],
+  ADMIN:       ['dashboard','analytics','content','blog','portfolio','leads','applications','settings','homepage','testimonials','careers','career-apps','faqs','media','bookings','proposals','services','subscribers','campaign','messages','appearance'],
+  EDITOR:      ['dashboard','content','blog','portfolio','homepage','testimonials','faqs','media','messages'],
   GEN_USER:    ['dashboard'],
 };
 
 // ── State ─────────────────────────────────────────────────────
 let session = { user: null, role: null };
-let userList = [], leadList = [], appointmentList = [], aboutList = [],
+let userList = [], leadList = [], aboutList = [],
     videoList = [], applicationList = [], blogList = [], projectList = [];
 let currentPanel = 'dashboard';
-let editIndex = null, aboutIndex = null, appointmentIndex = null;
+let editIndex = null, aboutIndex = null;
 let editFlags = { isTitle:false, isIntro:false, isMission:false, isExperience:false };
 let careerListings = [], careerApplications = [], currentAppId = null, editJobId = null;
 let faqsList = [], editFAQId = null;
@@ -31,25 +30,26 @@ let mediaFilesToUpload = [];
 let currentMediaId = null;
 let charts = window.charts || {};
 
+// Bookings in the shape the older analytics charts expect
+const fetchBookingsAsAppts = () => fetch(`${DOMAIN}bookings`).then(r => (r.ok ? r.json() : []))
+  .then(l => (Array.isArray(l) ? l.map(b => ({ ...b, appointmentStatus: b.status === 'COMPLETED' ? 'DONE' : b.status, appointmentType: b.category_name || 'Session' })) : []))
+  .catch(() => []);
+
 // ── DOM Refs ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  restoreSession();
   $('dashboardDate').textContent = new Date().toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   $('footerText').textContent = `© ${new Date().getFullYear()} AdConnect · Admin Panel`;
 
   // Wire sidebar search inputs
   wireSearch('searchUserInput',       '#panel-users .data-table tbody tr');
   wireSearch('searchLeadsInput',      '#panel-leads .data-table tbody tr');
-  wireSearch('searchAppointmentInput','#panel-appointments .data-table tbody tr');
   wireSearch('searchApplicationInput','#panel-applications .data-table tbody tr');
   wireSearch('searchBlogInput',       '#panel-blog .data-table tbody tr');
 
-  // Mobile guard
-  if (window.innerWidth < 1024) {
-    document.querySelectorAll('.admin-only-desktop').forEach(el => el.style.display = 'none');
-  }
 });
 
 // ── Utilities ─────────────────────────────────────────────────
@@ -83,11 +83,11 @@ function wireSearch(inputId, rowSelector) {
   });
 }
 
-function openModal(id) { $(id).style.height = '100%'; `$(id).style.width = '100%';` }
-function closeModal(id) { $(id).style.height = '0%'; }
+function openModal(id) { const el = $(id); if (el) el.style.height = '100%'; }
+function closeModal(id) { const el = $(id); if (el) el.style.height = '0%'; }
 
 function closeAllModals() {
-  ['userPopUp','appointmentPopup','aboutPopup','applicationPopup',
+  ['userPopUp','aboutPopup','applicationPopup',
    'aboutRegisterPopup','videoRegisterPopup','blogPopup','projectPopup',
    'aboutPhotoPopup','aboutVideoPopup'].forEach(closeModal);
 }
@@ -100,7 +100,7 @@ async function loadAnalyticsComplete() {
   try {
     const [leadsRes, apptsRes, appsRes, visitsRes] = await Promise.allSettled([
       fetch(`${DOMAIN}clients`).then(r => r.json()),
-      fetch(`${DOMAIN}appointments`).then(r => r.json()),
+      fetchBookingsAsAppts(),
       fetch(`${DOMAIN}marketing-strategy-applications`).then(r => r.json()),
       fetch(`${DOMAIN}site-analytics/summary`).then(r => r.json()).catch(() => ({
         totalVisits: 0, uniqueIPs: 0, todayVisits: 0, weekVisits: 0, dailyVisits: [],
@@ -174,7 +174,7 @@ function buildLeadsChart(leads) {
       datasets: [{
         label: 'New Leads', data: counts,
         borderColor: '#F65730', backgroundColor: 'rgba(246,87,48,.1)',
-        borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: '#F65730', pointRadius: 4,
+        borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: 'var(--clr-primary)', pointRadius: 4,
       }],
     },
     options: chartDefaults(),
@@ -284,7 +284,7 @@ function buildRecentActivity(leads, appts, apps) {
  
   container.innerHTML = events.map(e => `
     <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--clr-border);">
-      <div style="width:30px;height:30px;background:rgba(246,87,48,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <div style="width:30px;height:30px;background:rgba(var(--clr-primary-rgb),.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <i class="fa ${e.icon}" style="color:${e.color};font-size:.75rem;"></i>
       </div>
       <div style="flex:1;min-width:0;">
@@ -298,10 +298,10 @@ function buildRecentActivity(leads, appts, apps) {
 function chartDefaults() {
   return {
     responsive: true,
-    plugins: { legend: { labels: { color: '#B8B4B0', font: { size: 11 } } } },
+    plugins: { legend: { labels: { color: 'var(--clr-text-secondary)', font: { size: 11 } } } },
     scales: {
-      x: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#7a7874', font: { size: 10 } } },
-      y: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#7a7874', font: { size: 10 } }, beginAtZero: true },
+      x: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'var(--clr-text-muted)', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'var(--clr-text-muted)', font: { size: 10 } }, beginAtZero: true },
     },
   };
 }
@@ -631,10 +631,26 @@ const AutoSignout = (() => {
 window.AutoSignout = AutoSignout;
 
 // ── Auth ──────────────────────────────────────────────────────
+function enterApp(data, { silent } = {}) {
+  session.user = data.username || data.name;
+  session.email = data.email;
+  session.role = data.role || 'GEN_USER';
+  $('usernameSession').textContent = session.user;
+  $('userRoleDisplay').textContent = session.role.replace('_',' ');
+  $('userAvatar').textContent = (session.user || 'A').charAt(0).toUpperCase();
+  applyRolePermissions(session.role);
+  $('login-page').style.display = 'none';
+  $('adminHero').style.display  = 'block';
+  navigate('dashboard');
+  AutoSignout.start(30);
+  loadAllSettingsQuiet();
+  if (!silent) toast(`Welcome back, ${session.user}!`);
+}
+
 async function handleLogin(e) {
   if (e) e.preventDefault();
   const email = $('email').value.trim();
-  const pass  = $('password').value.trim();
+  const pass  = $('password').value;
   const errEl = $('login-error');
 
   if (!email || !pass) { showErr('All fields required', errEl); return; }
@@ -644,30 +660,30 @@ async function handleLogin(e) {
     const res  = await fetch(`${DOMAIN}auth`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pass}) });
     const data = await res.json();
     if (!res.ok) { showErr(data.error || 'Invalid credentials', errEl); return; }
-
-    session.user = data.username;
-    session.role = data.role || 'GEN_USER';
-
-    // Update UI
-    $('usernameSession').textContent = data.username;
-    $('userRoleDisplay').textContent = session.role.replace('_',' ');
-    $('userAvatar').textContent = data.username.charAt(0).toUpperCase();
-
-    // Apply role-based visibility
-    applyRolePermissions(session.role);
-
-    // Show admin
-    $('login-page').style.display = 'none';
-    $('adminHero').style.display  = 'block';
-    console.log(`Logged in as ${data.username} with role ${session.role}`);
-    navigate('dashboard');
-    AutoSignout.start(10);
-    checkAndRefreshToken();
-    toast(`Welcome back, ${data.username}!`);
+    AdminToken.set(data.token, !!($('rememberMe') && $('rememberMe').checked));
+    $('password').value = '';
+    enterApp(data);
   } catch (err) {
     showErr('Network error — please try again', errEl);
   } finally { hideLoader(); }
 }
+
+/** Restore a previous session on page load (token kept in the browser). */
+async function restoreSession() {
+  if (!AdminToken.get()) return;
+  try {
+    const res = await fetch(`${DOMAIN}auth/me`);
+    if (!res.ok) { AdminToken.clear(); return; }
+    const me = await res.json();
+    enterApp({ username: me.name || me.username, email: me.email, role: me.role }, { silent: true });
+  } catch { /* stay on the login screen */ }
+}
+window.__sessionExpired = () => {
+  if (!session.user) return;
+  AdminToken.clear(); AutoSignout.stop(); session = { user:null, role:null };
+  $('login-page').style.display = 'flex'; $('adminHero').style.display = 'none';
+  toast('Your session has expired — please sign in again.', 'error');
+};
 
 async function fetchFAQs() {
   showLoader('Loading FAQs…');
@@ -1103,8 +1119,10 @@ async function deleteCareerApp(id) {
 
 function handleLogout() {
   if (!confirm_action('Sign out?')) return;
+  AdminToken.clear();
   AutoSignout.stop();
   session = { user:null, role:null };
+  document.body.classList.remove('nav-open');
   $('login-page').style.display = 'flex';
   $('adminHero').style.display  = 'none';
   $('email').value = '';
@@ -1113,27 +1131,20 @@ function handleLogout() {
 
 function applyRolePermissions(role) {
   const allowed = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS.GEN_USER;
-
-  // Hide/show CRM nav
-  const crmSections = ['nav-leads','nav-appointments','nav-applications'];
-  crmSections.forEach(id => {
-    const el = $(id);
-    if (el) el.style.display = allowed.includes(id.replace('nav-','')) ? '' : 'none';
+  // every sidebar entry is shown only when the role may open that panel
+  document.querySelectorAll('.admin-sidebar li[id^="nav-"]').forEach(li => {
+    li.style.display = allowed.includes(li.id.replace('nav-','')) ? '' : 'none';
   });
-
-  // Hide users nav for non-admins
-  const usersNav = $('nav-users');
-  if (usersNav) usersNav.style.display = allowed.includes('users') ? '' : 'none';
-  if (!allowed.includes('users')) {
-    $('admin-section-label').style.display = 'none';
-  }
-
-  // Editor: hide leads/appts/applications labels
-  if (role === 'EDITOR') {
-    ['crm-section-label','admin-section-label'].forEach(id => {
-      if ($(id)) $(id).style.display = 'none';
-    });
-  }
+  // hide section headings whose entries are all hidden
+  document.querySelectorAll('.admin-sidebar .nav-section-label').forEach(label => {
+    let n = label.nextElementSibling, any = false;
+    while (n && !n.classList.contains('nav-section-label')) {
+      n.querySelectorAll ? n.querySelectorAll('li[id^="nav-"]').forEach(li => { if (li.style.display !== 'none') any = true; }) : null;
+      if (n.matches && n.matches('li[id^="nav-"]') && n.style.display !== 'none') any = true;
+      n = n.nextElementSibling;
+    }
+    label.style.display = any ? '' : 'none';
+  });
 }
 
 function canAccess(panel) {
@@ -1145,7 +1156,7 @@ function canAccess(panel) {
 // Ensures EVERY modal has a working close button
 function patchAllModals() {
   const modals = [
-    'userPopUp','appointmentPopup','aboutPopup','applicationPopup',
+    'userPopUp','aboutPopup','applicationPopup',
     'aboutRegisterPopup','videoRegisterPopup','blogPopup','projectPopup',
     'aboutPhotoPopup','aboutVideoPopup','testimonialPopup','contactMsgPopup',
     'jobFormPopup','appDetailPopup','teamMemberPopup',
@@ -1179,6 +1190,8 @@ function navigate(panel) {
   currentPanel = panel;
   showActivePanel(panel);
   updateSidebarActive(panel);
+  document.body.classList.remove('nav-open');
+  window.scrollTo({ top: 0 });
 
   // Load data for panel
   const loaders = {
@@ -1188,7 +1201,6 @@ function navigate(panel) {
     blog:         fetchBlogPosts,
     portfolio:    fetchProjects,
     leads:        fetchLeads,
-    appointments: fetchAppointments,
     applications: fetchApplications,
     homepage:    () => { loadHomepageSettings(); },
     testimonials: fetchTestimonials,
@@ -1199,6 +1211,13 @@ function navigate(panel) {
     'career-apps': fetchCareerApplications,
     faqs:         fetchFAQs,
     media:        fetchMedia,
+    bookings:     () => AX.bookings.load(),
+    proposals:    () => AX.proposals.load(),
+    services:     () => AX.services.load(),
+    subscribers:  () => AX.subs.load(),
+    campaign:     () => AX.camp.load(),
+    messages:     () => AX.msgs.load(),
+    appearance:   () => AX.theme.load(),
   };
   if (loaders[panel]) loaders[panel]();
 }
@@ -1219,32 +1238,35 @@ function updateSidebarActive(panel) {
 async function loadDashboard() {
   showLoader('Loading dashboard…');
   try {
-    const [leads, appts, apps, blogs] = await Promise.allSettled([
-      fetch(`${DOMAIN}clients`).then(r=>r.json()),
-      fetch(`${DOMAIN}appointments`).then(r=>r.json()),
-      fetch(`${DOMAIN}marketing-strategy-applications`).then(r=>r.json()),
-      fetch(`${DOMAIN}blog-posts`).then(r=>r.json()).catch(()=>[]),
+    const staff = ['SUPER_ADMIN','ADMIN'].includes(session.role);
+    const [leads, overview, blogs] = await Promise.allSettled([
+      staff || session.role === 'EDITOR' ? fetch(`${DOMAIN}clients`).then(r => (r.ok ? r.json() : [])) : Promise.resolve([]),
+      staff || session.role === 'EDITOR' ? fetch(`${DOMAIN}overview`).then(r => (r.ok ? r.json() : {})) : Promise.resolve({}),
+      fetch(`${DOMAIN}blog-posts`).then(r => r.json()).catch(() => []),
     ]);
-
-    const leadsData = leads.value || [];
-    const apptsData = appts.value || [];
-    const appsData  = (apps.value?.applications) || [];
+    const leadsData = Array.isArray(leads.value) ? leads.value : [];
+    const ov = overview.value || {};
     const blogsData = Array.isArray(blogs.value) ? blogs.value : [];
 
     $('statLeads').textContent = leadsData.length;
-    $('statAppts').textContent = apptsData.length;
-    $('statApps').textContent  = appsData.length;
+    $('statAppts').textContent = ov.bookingsUpcoming ?? '—';
+    $('statApps').textContent  = ov.proposalsNew ?? '—';
     $('statBlogs').textContent = blogsData.length;
+    $('statSubs').textContent  = ov.subscribers ?? '—';
+    $('statMsgs').textContent  = ov.unreadMessages ?? '—';
+    $('statApptsChange').textContent = ov.bookingsPending ? `${ov.bookingsPending} awaiting confirmation` : 'All confirmed';
+    $('statAppsChange').textContent  = ov.proposalsOpen ? `${ov.proposalsOpen} open` : '—';
+    $('statSubsChange').textContent  = ov.subscribers30 ? `+${ov.subscribers30} in 30 days` : '—';
+    setBadge('bkBadge', ov.bookingsPending); setBadge('prBadge', ov.proposalsNew); setBadge('msgBadge', ov.unreadMessages);
 
-    // recent leads
     renderRecentLeads(leadsData.slice(-5).reverse());
-
-    // Charts
     buildLeadsChart(leadsData);
     buildSourceChart(leadsData);
   } catch (e) { console.error(e); }
   finally { hideLoader(); }
 }
+
+function setBadge(id, n) { const el = $(id); if (!el) return; el.textContent = n || ''; el.style.display = n ? '' : 'none'; }
 
 function renderRecentLeads(list) {
   const tbody = $('recentLeadsTbody');
@@ -1281,7 +1303,7 @@ function buildLeadsChart(leads) {
         backgroundColor: 'rgba(246,87,48,.12)',
         fill: true,
         tension: .4,
-        pointBackgroundColor: '#F65730',
+        pointBackgroundColor: 'var(--clr-primary)',
         pointRadius: 4,
       }]
     },
@@ -1297,11 +1319,11 @@ function buildSourceChart(leads) {
   if (charts.source) charts.source.destroy();
   const ctx = document.getElementById('sourceChart')?.getContext('2d');
   if (!ctx) return;
-  const colors = ['#F65730','#4ABC4F','#3498DB','#F5A623','#9B59B6','#1ABC9C'];
+  const colors = ['var(--clr-primary)','var(--clr-accent)','#3498DB','#F5A623','#9B59B6','#1ABC9C'];
   charts.source = new Chart(ctx, {
     type: 'doughnut',
     data: { labels: keys, datasets: [{ data: vals, backgroundColor: colors, borderColor: '#252320', borderWidth: 2 }] },
-    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0', font:{size:11} } } }, cutout:'65%' }
+    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'var(--clr-text-secondary)', font:{size:11} } } }, cutout:'65%' }
   });
 }
 
@@ -1311,7 +1333,7 @@ async function loadAnalytics() {
   try {
     const [leads, appts, apps] = await Promise.allSettled([
       fetch(`${DOMAIN}clients`).then(r=>r.json()),
-      fetch(`${DOMAIN}appointments`).then(r=>r.json()),
+      fetchBookingsAsAppts(),
       fetch(`${DOMAIN}marketing-strategy-applications`).then(r=>r.json()),
     ]);
     const L = leads.value||[], A = appts.value||[], P = (apps.value?.applications)||[];
@@ -1372,7 +1394,7 @@ function buildMonthlyChart(leads, appts) {
         { label:'Appts', data: months.map(m => appts.filter(a=>(a.created_at||'').startsWith(m.key)).length), backgroundColor:'rgba(74,188,79,.7)', borderRadius:4 },
       ]
     },
-    options: { plugins:{legend:{labels:{color:'#B8B4B0'}}}, scales:{ x:{grid:{color:'rgba(255,255,255,.06)'}}, y:{grid:{color:'rgba(255,255,255,.06)'},beginAtZero:true} } }
+    options: { plugins:{legend:{labels:{color:'var(--clr-text-secondary)'}}}, scales:{ x:{grid:{color:'rgba(255,255,255,.06)'}}, y:{grid:{color:'rgba(255,255,255,.06)'},beginAtZero:true} } }
   });
 }
 
@@ -1385,7 +1407,7 @@ function buildStatusChart(apps) {
   charts.status = new Chart(ctx, {
     type: 'pie',
     data: { labels:['Resolved','Pending'], datasets:[{ data:[resolved,pending], backgroundColor:['#4ABC4F','#F65730'], borderColor:'#252320', borderWidth:2 }] },
-    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0' } } } }
+    options: { plugins:{ legend:{ position:'bottom', labels:{ color:'var(--clr-text-secondary)' } } } }
   });
 }
 
@@ -1398,7 +1420,7 @@ function buildSubChart(leads) {
   charts.sub = new Chart(ctx, {
     type: 'doughnut',
     data: { labels:['Subscribed','Unsubscribed'], datasets:[{ data:[subbed,unsub], backgroundColor:['#3498DB','#7a7874'], borderColor:'#252320', borderWidth:2 }] },
-    options: { cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ color:'#B8B4B0' } } } }
+    options: { cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ color:'var(--clr-text-secondary)' } } } }
   });
 }
 
@@ -1529,9 +1551,6 @@ function populateLeads() {
       <td>${subBadge(l.clientSubScription)}</td>
       <td style="color:var(--clr-text-muted);font-size:.78rem;">${formatDate(l.created_at)}</td>
       <td class="actions-cell">
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="previewEmailTemplate(${i})" title="Preview email"><i class="fa fa-envelope-open action-icon"></i></button>
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="sendSubsequentEmail(${i})" title="Send follow-up"><i class="fa fa-envelope action-icon"></i></button>
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="unsubscribeFromLead(${i})" title="Unsubscribe"><i class="fa fa-sign-out action-icon"></i></button>
         <button class="btn btn-danger btn-sm btn-icon" onclick="deleteLead(${i})" title="Delete"><i class="fa fa-trash"></i></button>
       </td>
     </tr>`).join('');
@@ -1546,31 +1565,6 @@ async function deleteLead(i) {
     await fetch(`${DOMAIN}clients/${leadList[i].clientID}`, {method:'DELETE'});
     toast('Lead deleted'); leadList.splice(i,1); populateLeads();
   } finally { hideLoader(); }
-}
-
-async function unsubscribeFromLead(i) {
-  showLoader('Unsubscribing…');
-  try {
-    const res = await fetch(`${DOMAIN}unsubscribeLead`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientID:leadList[i].clientID}) });
-    if (res.ok) { toast('Lead unsubscribed'); leadList[i].clientSubScription='UNSUBSCRIBED'; populateLeads(); }
-  } finally { hideLoader(); }
-}
-
-async function sendSubsequentEmail(i) {
-  showLoader('Sending follow-up…');
-  try {
-    const res = await fetch(`${DOMAIN}sendSubsequentEmail`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clientID:leadList[i].clientID}) });
-    const d = await res.json();
-    if (res.ok) toast(d.message); else toast(d.error,'error');
-  } finally { hideLoader(); }
-}
-
-async function previewEmailTemplate(i) {
-  showLoader('Loading template…');
-  const res = await fetch(`${DOMAIN}emailTemplate?status=${leadList[i].clientStatus}`);
-  const tpl = await res.json();
-  hideLoader();
-  if (tpl) { const w = window.open('','_blank'); w.document.write(tpl.body); }
 }
 
 function downloadExcel() {
@@ -1590,91 +1584,6 @@ function downloadExcel() {
     .finally(() => hideLoader());
 }
 
-// ── Appointments ──────────────────────────────────────────────
-async function fetchAppointments() {
-  showLoader('Fetching appointments…');
-  try {
-    const res       = await fetch(`${DOMAIN}appointments`);
-    appointmentList = await res.json();
-    populateAppointments();
-  } finally { hideLoader(); }
-}
-
-function populateAppointments() {
-  const tbody = document.querySelector('#panel-appointments .data-table tbody');
-  if (!tbody) return;
-  if (!appointmentList.length) { tbody.innerHTML = emptyRow(8,'No appointments booked'); return; }
-  tbody.innerHTML = appointmentList.map((a,i) => `
-    <tr>
-      <td><strong>${esc(a.name)}</strong></td>
-      <td>${esc(a.email)}</td>
-      <td>${esc(a.phone)}</td>
-      <td>${formatDate(a.appointmentDate)}</td>
-      <td style="font-size:.8rem;">${esc(a.appointmentTime||'—')}</td>
-      <td><span class="badge badge-default">${esc(a.appointmentType||'—')}</span></td>
-      <td>${apptStatusBadge(a.appointmentStatus)}</td>
-      <td class="actions-cell">
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReschedule(${i})" title="Reschedule"><i class="fa fa-calendar action-icon"></i></button>
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReminder(${i})" title="Remind"><i class="fa fa-clock action-icon"></i></button>
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentStartMeeting(${i})" title="Join meeting"><i class="fa fa-video-camera action-icon"></i></button>
-        <button class="btn btn-accent btn-sm btn-icon" onclick="appointmentUpdateStatus(${i})" title="Mark done"><i class="fa fa-check-circle"></i></button>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAppointment(${i})" title="Delete"><i class="fa fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-function refreshAppointmentTable() { appointmentList=[]; fetchAppointments(); }
-
-function appointmentReschedule(i) {
-  $('popupHeaderTextAppt').textContent = `Reschedule — ${appointmentList[i].name?.split(' ')[0]}`;
-  $('titleText').style.display = 'none';
-  $('rescheduleForm').style.display = 'block';
-  $('appointmentInput').value = appointmentList[i].appointmentTime||'';
-  appointmentIndex = i;
-  openModal('appointmentPopup');
-}
-
-async function appointmentReminder(i) {
-  showLoader('Sending reminder…');
-  try {
-    const res = await fetch(`${DOMAIN}reminder-email`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(appointmentList[i]) });
-    const d   = await res.json();
-    if (res.ok) toast(d.message); else toast(d.error,'error');
-  } finally { hideLoader(); }
-}
-
-function appointmentStartMeeting(i) { window.open(appointmentList[i].meetingLink,'_blank'); }
-
-async function appointmentUpdateStatus(i) {
-  showLoader('Updating…');
-  try {
-    await fetch(`${DOMAIN}appointments/${appointmentList[i].clientId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:'DONE'}) });
-    toast('Marked as Done'); appointmentList[i].appointmentStatus='DONE'; populateAppointments();
-  } finally { hideLoader(); }
-}
-
-async function deleteAppointment(i) {
-  if (!confirm_action('Delete this appointment?')) return;
-  showLoader('Deleting…');
-  try {
-    await fetch(`${DOMAIN}appointments/${appointmentList[i].clientId}`, {method:'DELETE'});
-    toast('Deleted'); appointmentList.splice(i,1); populateAppointments();
-  } finally { hideLoader(); }
-}
-
-async function rescheduleMeeting() {
-  const input = $('appointmentInput').value.trim();
-  if (!input) { toast('Enter new date/time','error'); return; }
-  showLoader('Rescheduling…');
-  try {
-    const res = await fetch(`${DOMAIN}rescheduleMeeting`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(appointmentList[appointmentIndex]) });
-    const d   = await res.json();
-    if (res.ok) { toast(d.message); closeModal('appointmentPopup'); fetchAppointments(); }
-    else toast(d.error,'error');
-  } finally { hideLoader(); }
-}
-
-// ── Applications ──────────────────────────────────────────────
 async function fetchApplications() {
   showLoader('Fetching applications…');
   try {
@@ -2012,7 +1921,7 @@ async function loadAnalyticsWithVisits() {
   .then(data => console.log(data)),
       fetch(`${DOMAIN}analytics/unique-ips`).then(r => r.json()),
       fetch(`${DOMAIN}clients`).then(r => r.json()),
-      fetch(`${DOMAIN}appointments`).then(r => r.json()),
+      fetchBookingsAsAppts(),
       fetch(`${DOMAIN}marketing-strategy-applications`).then(r => r.json()),
     ]);
  
@@ -2086,7 +1995,7 @@ function buildVisitChart(dailyData) {
       ],
     },
     options: {
-      plugins: { legend: { labels: { color: '#B8B4B0', font: { size: 11 } } } },
+      plugins: { legend: { labels: { color: 'var(--clr-text-secondary)', font: { size: 11 } } } },
       scales: { x: { grid: { color: 'rgba(255,255,255,.05)' } }, y: { grid: { color: 'rgba(255,255,255,.05)' }, beginAtZero: true } },
     },
   });
@@ -2108,6 +2017,17 @@ function buildTopPagesTable(pages) {
 /* ═══════════════════════════════════════════════════════════
    5. SETTINGS — Email Management + Location + Auto-signout
    ═══════════════════════════════════════════════════════════ */
+/** Reads only the auto-sign-out value after login (no loader, no UI changes). */
+async function loadAllSettingsQuiet() {
+  try {
+    const res = await fetch(`${DOMAIN}site-settings/global`);
+    if (!res.ok) return;
+    const d = await res.json();
+    const m = parseInt(d.auto_signout_minutes, 10);
+    if (m > 0) AutoSignout.setMinutes(m);
+  } catch { /* ignore */ }
+}
+
 async function loadAllSettings() {
   showLoader('Loading settings…');
   try {
@@ -2118,6 +2038,17 @@ async function loadAllSettings() {
     setValue('settingSiteName',       data.site_name       || 'AdConnect');
     setValue('settingContactEmail',   data.contact_email   || 'info@adconnect.co.ke');
     setValue('settingPhone',          data.phone           || '+254 790 064 130');
+    setValue('settingPhoneLabel',     data.phone_label     || '');
+    setValue('settingPhone2',         data.phone_secondary || '');
+    setValue('settingPhone2Label',    data.phone_secondary_label || '');
+    setValue('settingTagline',        data.tagline         || '');
+    setValue('settingHours',          data.business_hours  || '');
+    setValue('settingFacebook',       data.facebook_url    || '');
+    setValue('settingInstagram',      data.instagram_url   || '');
+    setValue('settingTiktok',         data.tiktok_url      || '');
+    setValue('settingTwitter',        data.twitter_url     || '');
+    setValue('settingYoutube',        data.youtube_url     || '');
+    setValue('settingLinkedin',       data.linkedin_url    || '');
     setValue('settingWhatsapp',       data.whatsapp        || '254790064130');
     setValue('settingAddress',        data.address         || 'Nairobi, Kenya');
     setValue('settingCity',           data.city            || 'Nairobi');
@@ -2150,6 +2081,17 @@ async function saveAllSettings() {
     site_name:           getValue('settingSiteName'),
     contact_email:       getValue('settingContactEmail'),
     phone:               getValue('settingPhone'),
+    phone_label:         getValue('settingPhoneLabel'),
+    phone_secondary:     getValue('settingPhone2'),
+    phone_secondary_label: getValue('settingPhone2Label'),
+    tagline:             getValue('settingTagline'),
+    business_hours:      getValue('settingHours'),
+    facebook_url:        getValue('settingFacebook'),
+    instagram_url:       getValue('settingInstagram'),
+    tiktok_url:          getValue('settingTiktok'),
+    twitter_url:         getValue('settingTwitter'),
+    youtube_url:         getValue('settingYoutube'),
+    linkedin_url:        getValue('settingLinkedin'),
     whatsapp:            getValue('settingWhatsapp'),
     address:             getValue('settingAddress'),
     city:                getValue('settingCity'),
@@ -2253,7 +2195,7 @@ async function initiateGoogleAuth() {
 async function refreshGoogleToken() {
   showLoader('Refreshing token…');
   try {
-    const res  = await fetch(`${DOMAIN}google-refresh-token`, { method: 'POST' });
+    const res  = await fetch(`${DOMAIN}google-token-refresh`, { method: 'POST' });
     const data = await res.json();
     if (res.ok) { updateTokenStatus({ valid: true, expiry: data.expiry }); toast('Token refreshed!'); }
     else toast(data.error || 'Refresh failed', 'error');
@@ -2273,93 +2215,6 @@ async function checkAndRefreshToken() {
 }
  
  
-/* ═══════════════════════════════════════════════════════════
-   7. APPOINTMENT PANEL — Full handling
-   ═══════════════════════════════════════════════════════════ */
-function populateAppointments() {
-  const tbody = document.querySelector('#panel-appointments .data-table tbody');
-  if (!tbody) return;
-  if (!appointmentList.length) { tbody.innerHTML = emptyRow(8, 'No appointments booked'); return; }
- 
-  tbody.innerHTML = appointmentList.map((a, i) => `
-    <tr>
-      <td>
-        <div style="font-weight:600;color:var(--clr-text-primary);">${esc(a.name)}</div>
-        <div style="font-size:.72rem;color:var(--clr-text-muted);">${esc(a.email)}</div>
-      </td>
-      <td><a href="tel:${esc(a.phone||'')}" style="color:var(--clr-primary);font-size:.82rem;">${esc(a.phone||'—')}</a></td>
-      <td style="font-size:.82rem;">${formatDate(a.appointmentDate)}</td>
-      <td style="font-family:var(--font-mono);font-size:.78rem;">${esc(a.appointmentTime||'—')}</td>
-      <td><span class="badge badge-default" style="font-size:.68rem;">${esc(a.appointmentType||'Online')}</span></td>
-      <td>${apptStatusBadge(a.appointmentStatus)}</td>
-      <td style="font-size:.75rem;color:var(--clr-text-muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.appointmentNotes||'')}">${esc(a.appointmentNotes||'—')}</td>
-      <td class="actions-cell">
-        <!-- Reschedule -->
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReschedule(${i})" title="Reschedule">
-          <i class="fa fa-calendar action-icon"></i>
-        </button>
-        <!-- Reminder email -->
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="appointmentReminder(${i})" title="Send reminder">
-          <i class="fa fa-clock action-icon"></i>
-        </button>
-        <!-- Join meeting -->
-        ${a.meetingLink ? `<a href="${esc(a.meetingLink)}" target="_blank" class="btn btn-ghost btn-sm btn-icon" title="Join meeting">
-          <i class="fa fa-video-camera action-icon"></i>
-        </a>` : `<button class="btn btn-ghost btn-sm btn-icon" onclick="regenerateMeetLink(${i})" title="Generate meet link">
-          <i class="fa fa-link action-icon"></i>
-        </button>`}
-        <!-- Mark done -->
-        <button class="btn btn-accent btn-sm btn-icon" onclick="appointmentUpdateStatus(${i})" title="Mark as Done">
-          <i class="fa fa-check-circle"></i>
-        </button>
-        <!-- Delete -->
-        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAppointment(${i})" title="Delete">
-          <i class="fa fa-trash"></i>
-        </button>
-      </td>
-    </tr>`).join('');
-}
- 
-async function regenerateMeetLink(i) {
-  showLoader('Generating Meet link…');
-  try {
-    const a   = appointmentList[i];
-    const res = await fetch(`${DOMAIN}create-meet-link`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventTitle: `AdConnect Consultation with ${a.name}`, startDateTime: `${a.appointmentDate} 09:00:00`, endDateTime: `${a.appointmentDate} 09:30:00` }),
-    });
-    const data = await res.json();
-    if (res.ok && data.meetLink) {
-      // Save to DB
-      await fetch(`${DOMAIN}appointments/${a.clientId}/meeting-link`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ meetingLink: data.meetLink }),
-      });
-      appointmentList[i].meetingLink = data.meetLink;
-      populateAppointments();
-      toast('Meeting link generated!');
-    } else {
-      toast(data.error || 'Failed — Google token may need refresh. Check Settings → Google OAuth.', 'error');
-    }
-  } finally { hideLoader(); }
-}
- 
-function previewNotes(i) {
-  document.getElementById('popupHeaderTextAppt').textContent = `Notes — ${appointmentList[i].name?.split(' ')[0]}`;
-  document.getElementById('titleText').textContent = appointmentList[i].appointmentNotes || 'No notes.';
-  document.getElementById('titleText').style.display = 'block';
-  document.getElementById('rescheduleForm').style.display = 'none';
-  openModal('appointmentPopup');
-}
- 
-function appointmentReschedule(i) {
-  document.getElementById('popupHeaderTextAppt').textContent = `Reschedule — ${appointmentList[i].name?.split(' ')[0]}`;
-  document.getElementById('titleText').style.display = 'none';
-  document.getElementById('rescheduleForm').style.display = 'block';
-  document.getElementById('appointmentInput').value = appointmentList[i].appointmentTime || '';
-  appointmentIndex = i;
-  openModal('appointmentPopup');
-}
-
 async function updateVideoStatus(i) {
   videoList[i].status = 'ACTIVE';
   showLoader('Activating video…');

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Booking or Proposal — AdConnect</title>
+  <meta name="description" content="Look up the status of a session booking or project proposal using your reference number." />
+  <meta name="robots" content="noindex,follow" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body data-site-nav>
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+         <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+        <button id="navbarTogler" class="navbar-toggler" type="button"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="dropdown">
+            <a href="our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+            </ul>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
+        <button id="sidePanelCloseBtn" type="button" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div>
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="collapse-btn">
+            <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
+            <div class="collapse" id="services">
+              <ul>
+                <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+              </ul>
+            </div>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </aside>
+  </header>
+</div>
+<main class="pg pg-narrow">
+  <div class="pg-hero">
+    <span class="eyebrow"><i class="fa fa-magnifying-glass"></i> Track</span>
+    <h1>Check your <span class="hl">booking or proposal</span></h1>
+    <p>Enter the reference number from your confirmation email and the email address you used.</p>
+  </div>
+  <div class="panel">
+    <div class="tabs" role="tablist">
+      <button type="button" class="on" data-type="booking" role="tab">Session booking</button>
+      <button type="button" data-type="proposal" role="tab">Project proposal</button>
+    </div>
+    <form id="lookupForm" class="f-grid" novalidate>
+      <div class="f-field"><label for="lRef">Reference <span class="req">*</span></label><input id="lRef" placeholder="BK-7F3K9Q" autocapitalize="characters" required /></div>
+      <div class="f-field"><label for="lEmail">Email <span class="req">*</span></label><input id="lEmail" type="email" required /></div>
+      <div class="full"><button class="btn btn-primary" type="submit" id="lBtn"><i class="fa fa-search"></i> Look up</button></div>
+    </form>
+    <div class="msg err" id="lErr"></div>
+  </div>
+  <div class="panel" id="result" hidden></div>
+</main>
+
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html">Social Media Ads</a></li>
+        <li><a href="our-services.html">Ad Creative Design</a></li>
+        <li><a href="our-services.html">Analytics & Reporting</a></li>
+        <li><a href="our-services.html">Facebook Campaigns</a></li>
+        <li><a href="our-services.html">Web Development</a></li>
+        <li><a href="our-services.html">Android Apps</a></li>
+        <li><a href="our-services.html">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li><a href="book.html">Book a Session</a></li>
+        <li><a href="proposal.html">Submit a Proposal</a></li>
+        <li><a href="booking-status.html">Track Booking / Proposal</a></li>
+        <li><a href="subscribe.html">Email Updates</a></li>
+        <li><a href="faqs.html">FAQs</a></li>
+        <li><a href="unsubscribe.html">Unsubscribe</a></li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      </div>
+    </div>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
+      </div>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:var(--clr-border);">AdConnect Development Team</span>
+      </p>
+    </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
+      <a href="unsubscribe.html">Unsubscribe</a>
+    </nav>
+  </div>
+ 
+</footer>
+<script src="scripts/site.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = SITE.esc, type = 'booking', qs = new URLSearchParams(location.search);
+  var BOOK_PILL = { PENDING: ['warn', 'Awaiting confirmation'], CONFIRMED: ['good', 'Confirmed'], RESCHEDULED: ['info', 'Rescheduled'], COMPLETED: ['good', 'Completed'], CANCELLED: ['bad', 'Cancelled'], NO_SHOW: ['bad', 'Missed'] };
+  var PROP_FLOW = [['NEW', 'Received'], ['UNDER_REVIEW', 'Under review'], ['QUOTED', 'Quote sent'], ['ACCEPTED', 'Accepted'], ['COMPLETED', 'Completed']];
+  var MODE = { ONLINE: 'Online (Google Meet)', IN_PERSON: 'In person', PHONE: 'Phone call' };
+
+  function setType(t) {
+    type = t;
+    document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-type') === t); });
+    $('lRef').placeholder = t === 'booking' ? 'BK-7F3K9Q' : 'PR-7F3K9Q';
+    $('result').hidden = true; err('');
+  }
+  function err(m) { var e = $('lErr'); e.textContent = m || ''; e.classList.toggle('show', !!m); }
+  document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { setType(b.getAttribute('data-type')); }); });
+
+  function row(k, v) { return v ? '<div><span class="k">' + k + '</span><b>' + v + '</b></div>' : ''; }
+
+  function showBooking(b) {
+    var p = BOOK_PILL[b.status] || ['', b.status];
+    var active = ['PENDING', 'CONFIRMED', 'RESCHEDULED'].indexOf(b.status) > -1;
+    var r = $('result');
+    r.innerHTML = '<h2>Booking <span style="font-family:var(--font-mono);color:var(--clr-primary)">' + esc(b.reference) + '</span> <span class="pill ' + p[0] + '">' + p[1] + '</span></h2>' +
+      '<div class="summary" style="margin-top:14px">' + row('Service', esc(b.category) + (b.service ? ' — ' + esc(b.service) : '')) + row('Date', esc(SITE.fmtDate(b.date))) +
+      row('Time', esc(SITE.fmtTime(b.time) + (b.end ? ' – ' + SITE.fmtTime(b.end) : ''))) + row('Format', esc(MODE[b.mode] || b.mode)) + row('Host', esc(b.host)) +
+      (b.meeting_link ? row('Meeting link', '<a href="' + esc(b.meeting_link) + '">Open Google Meet</a>') : '') + '</div>' +
+      (active ? '<div class="nav-row"><button class="btn btn-ghost" id="cancelBtn"><i class="fa fa-ban"></i> Cancel this booking</button><a class="btn btn-secondary" href="book.html">Book another time</a></div>' +
+        '<p style="font-size:.8rem;margin-top:10px;color:var(--clr-text-muted)">To reschedule, cancel and book a new time, or reply to your confirmation email.</p>' : '');
+    r.hidden = false;
+    var c = $('cancelBtn');
+    if (c) c.addEventListener('click', function () {
+      if (!confirm('Cancel this booking?')) return;
+      c.disabled = true;
+      SITE.api('bookings/cancel', { method: 'POST', body: { reference: b.reference, email: $('lEmail').value.trim() } })
+        .then(function (x) { SITE.toast(x.message); lookup(); }).catch(function (e) { SITE.toast(e.message, 'err'); c.disabled = false; });
+    });
+  }
+
+  function showProposal(p) {
+    var idx = PROP_FLOW.map(function (x) { return x[0]; }).indexOf(p.status);
+    var special = p.status === 'NEEDS_INFO' || p.status === 'DECLINED';
+    var tl = PROP_FLOW.map(function (x, i) {
+      var cls = special ? (i === 0 ? 'done' : '') : i < idx ? 'done' : i === idx ? 'now' : '';
+      return '<div class="tl ' + cls + '"><i class="fa ' + (cls === 'done' ? 'fa-check' : cls === 'now' ? 'fa-circle' : 'fa-minus') + '"></i>' + x[1] + '</div>';
+    }).join('');
+    var pill = p.status === 'DECLINED' ? 'bad' : p.status === 'NEEDS_INFO' ? 'warn' : p.status === 'COMPLETED' || p.status === 'ACCEPTED' ? 'good' : 'info';
+    var r = $('result');
+    r.innerHTML = '<h2>Proposal <span style="font-family:var(--font-mono);color:var(--clr-primary)">' + esc(p.reference) + '</span> <span class="pill ' + pill + '">' + esc(p.status_label) + '</span></h2>' +
+      '<div class="summary" style="margin-top:14px">' + row('Project', esc(p.title)) + row('Category', esc(p.category)) + row('Submitted', esc(SITE.fmtDate(p.submitted))) + row('Last update', esc(SITE.fmtDate(p.updated))) +
+      row('Quote', esc(p.quote_amount)) + row('Files', (p.files || []).map(function (f) { return esc(f.original_name); }).join(', ')) + '</div>' +
+      (special ? '' : '<div class="timeline">' + tl + '</div>') +
+      (p.status === 'NEEDS_INFO' ? '<p style="margin-top:12px">We need a little more information — please check your email and reply to our message.</p>' : '');
+    r.hidden = false;
+  }
+
+  function lookup() {
+    var ref = $('lRef').value.trim().toUpperCase(), email = $('lEmail').value.trim();
+    if (!ref || !email) return err('Enter both your reference number and email.');
+    err(''); var btn = $('lBtn'); btn.disabled = true;
+    var url = (type === 'booking' ? 'bookings/lookup' : 'proposals/track') + '?reference=' + encodeURIComponent(ref) + '&email=' + encodeURIComponent(email);
+    SITE.api(url).then(function (d) { type === 'booking' ? showBooking(d) : showProposal(d); })
+      .catch(function (e) { $('result').hidden = true; err(e.message); }).finally(function () { btn.disabled = false; });
+  }
+  $('lookupForm').addEventListener('submit', function (e) { e.preventDefault(); lookup(); });
+
+  var t = qs.get('type') || (/^PR-/i.test(qs.get('ref') || '') ? 'proposal' : 'booking');
+  setType(t);
+  if (qs.get('ref')) $('lRef').value = qs.get('ref');
+  if (qs.get('email')) $('lEmail').value = qs.get('email');
+  if (qs.get('ref') && qs.get('email')) lookup();
+})();
+
+</script>
+</body>
+</html>

@@ -9,6 +9,8 @@
 
   <!-- Theme CSS (combined) -->
   <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/admin-mobile.css" />
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -17,17 +19,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-
-  <!-- Mobile wall — shown on phones only, hidden on tablets/desktops -->
-<div class="admin-mobile-wall" aria-label="Desktop required">
-  <img src="resources/logo.png" alt="AdConnect" style="height:44px;border-radius:8px;" />
-  <div class="wall-icon"><i class="fa fa-desktop"></i></div>
-  <h2>Tablet or Desktop Required</h2>
-  <p>The AdConnect admin panel is designed for screens 768 px and wider. Please open it on a tablet, laptop, or desktop computer.</p>
-  <a href="index.html"><i class="fa fa-home"></i> Back to Website</a>
-</div>
-
-<div class="admin-shell"></div>
 <!-- ══════════════ LOGIN PAGE ══════════════ -->
 <section id="login-page">
   <form id="login-form" onsubmit="handleLogin(event)">
@@ -63,6 +54,7 @@
   <!-- Header -->
   <header id="admin-header">
     <div class="logo-area">
+      <button id="menuToggle" type="button" aria-label="Open menu" onclick="document.body.classList.toggle('nav-open')"><i class="fa fa-bars"></i></button>
       <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
       <span class="dashboard-label">Admin Panel</span>
     </div>
@@ -79,11 +71,25 @@
   </header>
 
   <!-- Sidebar -->
+  <div id="navScrim" onclick="document.body.classList.remove('nav-open')"></div>
   <nav class="admin-sidebar" id="adminSidebar">
     <span class="nav-section-label">Overview</span>
     <ul>
       <li id="nav-dashboard"><span onclick="navigate('dashboard')"><i class="fa fa-th-large"></i> Dashboard</span></li>
       <li id="nav-analytics"><span onclick="navigate('analytics')"><i class="fa fa-bar-chart"></i> Analytics</span></li>
+    </ul>
+
+    <span class="nav-section-label" id="sec-business">Business</span>
+    <ul id="business-nav">
+      <li id="nav-bookings"><span onclick="navigate('bookings')"><i class="fa fa-calendar-check"></i> Bookings <span id="bkBadge" class="nav-badge" style="display:none"></span></span></li>
+      <li id="nav-proposals"><span onclick="navigate('proposals')"><i class="fa fa-file-arrow-up"></i> Proposals <span id="prBadge" class="nav-badge" style="display:none"></span></span></li>
+      <li id="nav-services"><span onclick="navigate('services')"><i class="fa fa-th-large"></i> Services</span></li>
+    </ul>
+    <span class="nav-section-label" id="sec-email">Email</span>
+    <ul id="email-nav">
+      <li id="nav-subscribers"><span onclick="navigate('subscribers')"><i class="fa fa-envelope-open-text"></i> Subscribers</span></li>
+      <li id="nav-campaign"><span onclick="navigate('campaign')"><i class="fa fa-paper-plane"></i> Campaigns</span></li>
+      <li id="nav-messages"><span onclick="navigate('messages')"><i class="fa fa-inbox"></i> Messages <span id="msgBadge" class="nav-badge" style="display:none"></span></span></li>
     </ul>
 
     <span class="nav-section-label">Content</span>
@@ -116,7 +122,6 @@
     <span class="nav-section-label" id="crm-section-label">CRM</span>
     <ul id="crm-nav">
       <li id="nav-leads"><span onclick="navigate('leads')"><i class="fa fa-users"></i> Leads</span></li>
-      <li id="nav-appointments"><span onclick="navigate('appointments')"><i class="fa fa-calendar"></i> Appointments</span></li>
       <li id="nav-applications"><span onclick="navigate('applications')"><i class="fa fa-file-text"></i> Applications</span></li>
     </ul>
 
@@ -127,6 +132,7 @@
 
     <span class="nav-section-label">Settings</span>
     <ul>
+      <li id="nav-appearance"><span onclick="navigate('appearance')"><i class="fa fa-palette"></i> Appearance</span></li>
       <li id="nav-settings"><span onclick="navigate('settings')"><i class="fa fa-cog"></i> Settings</span></li>
     </ul>
   </nav>
@@ -433,13 +439,13 @@
         </div>
         <div class="stat-card" style="--accent-color:var(--clr-accent);">
           <i class="fa fa-calendar stat-icon"></i>
-          <div class="stat-label">Appointments</div>
+          <div class="stat-label">Upcoming Sessions</div>
           <div class="stat-value" id="statAppts">—</div>
           <div class="stat-change up" id="statApptsChange">—</div>
         </div>
         <div class="stat-card" style="--accent-color:var(--clr-info);">
           <i class="fa fa-file-text stat-icon"></i>
-          <div class="stat-label">Applications</div>
+          <div class="stat-label">New Proposals</div>
           <div class="stat-value" id="statApps">—</div>
           <div class="stat-change up" id="statAppsChange">—</div>
         </div>
@@ -448,6 +454,18 @@
           <div class="stat-label">Blog Posts</div>
           <div class="stat-value" id="statBlogs">—</div>
           <div class="stat-change" id="statBlogsChange">—</div>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--clr-accent);">
+          <i class="fa fa-envelope-open-text stat-icon"></i>
+          <div class="stat-label">Subscribers</div>
+          <div class="stat-value" id="statSubs">—</div>
+          <div class="stat-change up" id="statSubsChange">—</div>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--clr-error);">
+          <i class="fa fa-inbox stat-icon"></i>
+          <div class="stat-label">Unread Messages</div>
+          <div class="stat-value" id="statMsgs">—</div>
+          <div class="stat-change" id="statMsgsChange">—</div>
         </div>
       </div>
 
@@ -682,31 +700,6 @@
     </section>
 
     <!-- ── APPOINTMENTS PANEL ── -->
-    <section id="panel-appointments" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
-      <div class="panel-header">
-        <h2 class="panel-title"><i class="fa fa-calendar" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Appointments</h2>
-        <div class="panel-actions">
-          <div class="search-wrapper">
-            <i class="fa fa-search search-icon"></i>
-            <input class="search-input" id="searchAppointmentInput" placeholder="Search appointments…" />
-          </div>
-          <button class="btn btn-secondary btn-sm" onclick="refreshAppointmentTable()"><i class="fa fa-refresh"></i></button>
-        </div>
-      </div>
-      <div class="content-panel">
-        <div class="data-table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Client</th><th>Email</th><th>Phone</th><th>Date</th><th>Time</th>
-                <th>Type</th><th>Status</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="appointmentList"><tr><td colspan="8" style="text-align:center;padding:var(--space-8);color:var(--clr-text-muted);">No data loaded</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
 
     <!-- ── APPLICATIONS PANEL ── -->
     <section id="panel-applications" class="panel" style="display:none; flex-direction:column;gap:var(--space-5);">
@@ -1017,28 +1010,12 @@
       <div class="panel-header">
         <h2 class="panel-title"><i class="fa fa-cog" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Settings</h2>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5);">
-        <div class="card">
-          <h5 style="margin-bottom:var(--space-4);">Site Information</h5>
-          <div class="form-section">
-            <div><label class="label">Site Name</label><input class="input-field" value="AdConnect" /></div>
-            <div><label class="label">Contact Email</label><input class="input-field" value="info@adconnect.co.ke" /></div>
-            <div><label class="label">Phone</label><input class="input-field" value="+254 790 064 130" /></div>
-            <button class="btn btn-primary btn-sm" style="align-self:flex-start;">Save Changes</button>
-          </div>
-        </div>
-        <div class="card">
-          <h5 style="margin-bottom:var(--space-4);">Email Templates</h5>
-          <p style="font-size:.85rem;margin-bottom:var(--space-4);">Configure automated email subjects and bodies for each lead status.</p>
-          <button class="btn btn-secondary btn-sm">Manage Templates</button>
-        </div>
-        <div class="card">
-          <h5 style="margin-bottom:var(--space-4);">Account Security</h5>
-          <div class="form-section">
-            <div><label class="label">Current Password</label><input class="input-field" type="password" /></div>
-            <div><label class="label">New Password</label><input class="input-field" type="password" /></div>
-            <button class="btn btn-primary btn-sm" style="align-self:flex-start;">Update Password</button>
-          </div>
+      <div class="content-panel" style="margin-bottom:var(--space-5);">
+        <div class="panel-header"><span class="panel-title">🔒 My account</span></div>
+        <div style="padding:var(--space-6);display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-4);align-items:end;">
+          <div><label class="label">Current password</label><input id="pwCurrent" type="password" class="input-field" autocomplete="current-password" /></div>
+          <div><label class="label">New password <span style="font-size:.65rem;color:var(--clr-text-muted)">(min 8 characters)</span></label><input id="pwNew" type="password" class="input-field" autocomplete="new-password" /></div>
+          <div><button class="btn btn-primary btn-sm" onclick="AX.changePassword()"><i class="fa fa-key"></i> Update password</button></div>
         </div>
       </div>
       <div class="content-panel" style="margin-bottom:var(--space-5);">
@@ -1054,7 +1031,18 @@
     </div>
     <div><label class="label">Contact Email</label><input id="settingContactEmail" type="email" class="input-field" /></div>
     <div><label class="label">Phone Number</label><input id="settingPhone" type="text" class="input-field" /></div>
+    <div><label class="label">Primary contact name</label><input id="settingPhoneLabel" type="text" class="input-field" placeholder="Misgina Fitwi · Marketing" /></div>
+    <div><label class="label">Second phone (Michael Maina)</label><input id="settingPhone2" type="text" class="input-field" placeholder="+254 799 292 048" /></div>
+    <div><label class="label">Second contact name</label><input id="settingPhone2Label" type="text" class="input-field" placeholder="Michael Maina · Software &amp; Data" /></div>
     <div><label class="label">WhatsApp (digits, with code)</label><input id="settingWhatsapp" type="text" class="input-field" /></div>
+    <div><label class="label">Tagline</label><input id="settingTagline" type="text" class="input-field" placeholder="Short line shown in the footer" /></div>
+    <div><label class="label">Business hours</label><input id="settingHours" type="text" class="input-field" placeholder="Mon–Sat, 9:00–17:00 EAT" /></div>
+    <div><label class="label">Facebook URL</label><input id="settingFacebook" type="url" class="input-field" /></div>
+    <div><label class="label">Instagram URL</label><input id="settingInstagram" type="url" class="input-field" /></div>
+    <div><label class="label">TikTok URL</label><input id="settingTiktok" type="url" class="input-field" /></div>
+    <div><label class="label">X / Twitter URL</label><input id="settingTwitter" type="url" class="input-field" /></div>
+    <div><label class="label">YouTube URL</label><input id="settingYoutube" type="url" class="input-field" /></div>
+    <div><label class="label">LinkedIn URL</label><input id="settingLinkedin" type="url" class="input-field" /></div>
     <div><label class="label">City</label><input id="settingCity" type="text" class="input-field" /></div>
     <div><label class="label">Country</label><input id="settingCountry" type="text" class="input-field" /></div>
     <div style="grid-column:1/-1;"><label class="label">Full Address</label><input id="settingAddress" type="text" class="input-field" /></div>
@@ -1121,6 +1109,120 @@
     </section>
 
     <!-- ── ACCESS DENIED ── -->
+    <!-- ═════════ NEW PANELS (services · bookings · proposals · email · appearance · messages) ═════════ -->
+<section id="panel-services" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-th-large" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Services &amp; Categories</h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="AX.services.load()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-accent btn-sm" onclick="AX.services.editCat()"><i class="fa fa-plus"></i> Category</button>
+    </div>
+  </div>
+  <div id="servicesBody"></div>
+</section>
+
+<section id="panel-bookings" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-calendar-check" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Bookings</h2>
+    <div class="panel-actions"><button class="btn btn-secondary btn-sm" onclick="AX.bookings.load()"><i class="fa fa-refresh"></i></button></div>
+  </div>
+  <div class="tabbar" id="bookingTabs"><button class="on" data-t="list">Sessions</button><button data-t="rules">Availability rules</button></div>
+  <div id="bookingList">
+    <div class="kpis" id="bookingKpis" style="margin-bottom:14px"></div>
+    <div class="toolbar" style="margin-bottom:12px">
+      <input class="input-field" id="bkSearch" placeholder="Search name, email, reference…" />
+      <select class="input-field" id="bkStatus"><option value="">All statuses</option><option>PENDING</option><option>CONFIRMED</option><option>RESCHEDULED</option><option>COMPLETED</option><option>CANCELLED</option><option>NO_SHOW</option></select>
+      <select class="input-field" id="bkCat"><option value="">All categories</option></select>
+      <input class="input-field" type="date" id="bkFrom" title="From date" /><input class="input-field" type="date" id="bkTo" title="To date" />
+    </div>
+    <div class="content-panel"><div class="data-table-wrapper"><table class="data-table">
+      <thead><tr><th>Ref</th><th>Client</th><th>Service</th><th>When</th><th>Format</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="bkRows"></tbody></table></div></div>
+  </div>
+  <div id="bookingRules" hidden><div class="content-panel" style="padding:20px"><div class="form-grid" id="rulesForm"></div>
+    <div style="margin-top:16px"><button class="btn btn-primary btn-sm" onclick="AX.bookings.saveRules()"><i class="fa fa-save"></i> Save rules</button></div></div></div>
+</section>
+
+<section id="panel-proposals" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-file-arrow-up" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Project Proposals</h2>
+    <div class="panel-actions"><button class="btn btn-secondary btn-sm" onclick="AX.proposals.load()"><i class="fa fa-refresh"></i></button></div>
+  </div>
+  <div class="toolbar">
+    <input class="input-field" id="prSearch" placeholder="Search name, email, reference, title…" />
+    <select class="input-field" id="prStatus"><option value="">All statuses</option><option>NEW</option><option>UNDER_REVIEW</option><option>NEEDS_INFO</option><option>QUOTED</option><option>ACCEPTED</option><option>DECLINED</option><option>COMPLETED</option></select>
+    <select class="input-field" id="prCat"><option value="">All categories</option></select>
+  </div>
+  <div class="content-panel"><div class="data-table-wrapper"><table class="data-table">
+    <thead><tr><th>Ref</th><th>Client</th><th>Project</th><th>Category</th><th>Files</th><th>Status</th><th>Received</th><th>Actions</th></tr></thead>
+    <tbody id="prRows"></tbody></table></div></div>
+</section>
+
+<section id="panel-subscribers" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-envelope-open-text" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Subscribers</h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="AX.subs.load()"><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-secondary btn-sm" onclick="AX.subs.exportCsv()"><i class="fa fa-download"></i> CSV</button>
+      <button class="btn btn-secondary btn-sm" onclick="AX.subs.importDlg()"><i class="fa fa-upload"></i> Import</button>
+      <button class="btn btn-accent btn-sm" onclick="AX.subs.edit()"><i class="fa fa-plus"></i> Add</button>
+    </div>
+  </div>
+  <div class="kpis" id="subKpis"></div>
+  <div class="toolbar">
+    <input class="input-field" id="sbSearch" placeholder="Search email, name, phone…" />
+    <select class="input-field" id="sbStatus"><option value="">All statuses</option><option>SUBSCRIBED</option><option>PENDING</option><option>UNSUBSCRIBED</option><option>BOUNCED</option></select>
+    <select class="input-field" id="sbSource"><option value="">All sources</option></select>
+  </div>
+  <div class="content-panel"><div class="data-table-wrapper"><table class="data-table">
+    <thead><tr><th>Email</th><th>Name</th><th>Interests</th><th>Source</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="sbRows"></tbody></table></div></div>
+</section>
+
+<section id="panel-campaign" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-paper-plane" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Email Campaigns</h2>
+    <div class="panel-actions"><button class="btn btn-secondary btn-sm" onclick="AX.camp.refresh()"><i class="fa fa-refresh"></i></button></div>
+  </div>
+  <div class="tabbar" id="campTabs"><button class="on" data-t="steps">Drip sequence</button><button data-t="broadcasts">Broadcasts</button><button data-t="log">Send log</button><button data-t="settings">Settings</button></div>
+  <div id="campBody"></div>
+</section>
+
+<section id="panel-messages" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-inbox" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Messages</h2>
+    <div class="panel-actions"><button class="btn btn-secondary btn-sm" onclick="AX.msgs.load()"><i class="fa fa-refresh"></i></button></div>
+  </div>
+  <div class="content-panel"><div class="data-table-wrapper"><table class="data-table">
+    <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Status</th><th>Received</th><th>Actions</th></tr></thead>
+    <tbody id="msgRows"></tbody></table></div></div>
+</section>
+
+<section id="panel-appearance" class="panel" style="display:none;flex-direction:column;gap:var(--space-5);">
+  <div class="panel-header">
+    <h2 class="panel-title"><i class="fa fa-palette" style="color:var(--clr-primary);margin-right:var(--space-3);"></i>Appearance</h2>
+    <div class="panel-actions">
+      <button class="btn btn-secondary btn-sm" onclick="AX.theme.reset()"><i class="fa fa-undo"></i> Reset</button>
+      <button class="btn btn-primary btn-sm" onclick="AX.theme.save()"><i class="fa fa-save"></i> Save theme</button>
+    </div>
+  </div>
+  <p style="font-size:.88rem">Choose the colours of the website and emails. Fonts stay as designed (Syne, DM Sans and IBM Plex Mono). Changes go live for all visitors when you save.</p>
+  <div class="content-panel" style="padding:18px"><h5 style="margin-bottom:12px">Ready-made palettes</h5><div class="preset-row" id="presetRow"></div></div>
+  <div class="content-panel" style="padding:18px"><h5 style="margin-bottom:12px">Colours</h5><div id="swatchWrap"></div></div>
+  <div class="content-panel" style="padding:18px"><h5 style="margin-bottom:12px">Live preview</h5>
+    <div class="live-preview" id="themePreview">
+      <p style="font-size:.72rem;letter-spacing:1px;text-transform:uppercase" id="pvKicker">Preview</p>
+      <h3 style="margin:6px 0">Grow with AdConnect</h3>
+      <p style="margin-bottom:12px" id="pvText">Body text sits on the card background and uses the secondary text colour.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span id="pvBtn" style="display:inline-block;padding:10px 18px;border-radius:999px;font-weight:700">Primary button</span>
+      <span id="pvAcc" style="display:inline-block;padding:10px 18px;border-radius:999px;font-weight:700">Accent</span></div>
+      <p id="pvWarn" style="font-size:.8rem;margin-top:10px"></p>
+    </div></div>
+</section>
+
+<dialog class="adlg" id="adlg"><div class="dlg-h"><h3 id="adlgTitle"></h3><button class="btn btn-ghost btn-sm btn-icon" onclick="AX.closeDlg()" aria-label="Close"><i class="fa fa-times"></i></button></div>
+  <div class="dlg-b" id="adlgBody"></div><div class="dlg-f" id="adlgFoot"></div></dialog>
+
     <section id="panel-access-denied" class="panel" style="display:none;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
       <div>
         <i class="fa fa-lock" style="font-size:3rem;color:var(--clr-error);margin-bottom:var(--space-4);display:block;"></i>
@@ -1216,23 +1318,6 @@
 </section>
 
 <!-- Appointment Modal -->
-<section id="appointmentPopup" class="background-tint-black">
-  <button onclick="closeModal('appointmentPopup')" class="btn-close"><i class="fa fa-times"></i></button>
-  <div class="appointment-layout">
-    <div class="modal-box">
-      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);">
-        <div class="slash-rect"></div>
-        <h3 class="panel-title" id="popupHeaderTextAppt">Appointment Details</h3>
-      </div>
-      <p id="titleText" style="display:none;background:var(--clr-surface-2);padding:var(--space-4);border-radius:var(--radius-md);font-size:.875rem;margin-bottom:var(--space-4);"></p>
-      <div id="rescheduleForm" style="display:none;">
-        <p style="font-size:.85rem;color:var(--clr-text-secondary);margin-bottom:var(--space-3);">Reschedule to (format: 2025-01-20, 01.30 PM - 02.00 PM):</p>
-        <input id="appointmentInput" type="text" class="input-field" placeholder="2025-01-20, 01.30 PM - 02.00 PM" style="margin-bottom:var(--space-4);" />
-        <button id="btnReschedule" onclick="rescheduleMeeting()" class="btn btn-primary">Reschedule</button>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- About Edit Modal -->
 <section id="aboutPopup" class="background-tint-black">
@@ -1407,12 +1492,6 @@
   <video id="popupVideo" controls autoplay muted style="max-width:680px;width:90%;border-radius:var(--radius-xl);margin-top:80px;"></video>
 </div>
 
-<!-- Mobile Warning -->
-<section class="mobile-warning">
-  <i class="fa fa-desktop" style="font-size:3rem;color:var(--clr-text-muted);display:block;margin-bottom:var(--space-5);"></i>
-  <h2>Desktop Required</h2>
-  <p style="margin-top:var(--space-3);">The admin dashboard is optimized for screens 1024px and wider. Please use a desktop or laptop computer.</p>
-</section>
 
 <!-- Footer -->
 <footer id="admin-footer" style="position:fixed;bottom:0;left:var(--sidebar-w);right:0;height:36px;background:var(--clr-surface-2);border-top:1px solid var(--clr-border);display:flex;align-items:center;padding:0 var(--space-5);z-index:300;transition:left .3s ease;">
@@ -1420,6 +1499,8 @@
 </footer>
 </div>
 
+<script src="scripts/admin-core.js"></script>
 <script src="scripts/admin.js" defer></script>
+<script src="scripts/admin-extra.js" defer></script>
 </body>
 </html>

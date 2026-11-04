@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Session — AdConnect</title>
+  <meta name="description" content="Book a consultation or working session for digital marketing, web, software, data and consulting services." />
+  <meta name="robots" content="index,follow" />
+  <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body data-site-nav>
+<div class="headerindex">
+  <header>
+    <nav class="container navbar">
+      <div class="container-nav flex">
+         <!--a href="/" class="navbar-logo" aria-label="AdConnect Home">
+          <img src="resources/logo.png" alt="AdConnect Logo" />
+        </a-->
+        <div class="logo-wrap">
+          <div class="logo-stack">
+            <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+            <span class="logo-tagline">Your Growth, Our Mission</span>
+          </div>
+        </div>
+        <button id="navbarTogler" class="navbar-toggler" type="button"><i class="fa fa-bars"></i></button>
+        <ul class="navbar-nav flex">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="dropdown">
+            <a href="our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+            </ul>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </nav>
+    <aside id="mySidePanel" class="sidepanel">
+      <div class="sidebar flex">
+        <a href="/"><img src="resources/logo.png" alt="AdConnect" /></a>
+        <button id="sidePanelCloseBtn" type="button" class="closebtn"><i class="fa fa-times"></i></button>
+      </div>
+      <div>
+        <ul>
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="aboutus.html" class="nav-link">About Us</a></li>
+          <li><a href="blog.html" class="nav-link">Blog</a></li>
+          <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li class="collapse-btn">
+            <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
+            <div class="collapse" id="services">
+              <ul>
+                <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
+              </ul>
+            </div>
+          </li>
+          <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
+        </ul>
+      </div>
+    </aside>
+  </header>
+</div>
+<main class="pg pg-narrow" id="bookPage">
+  <div class="pg-hero">
+    <span class="eyebrow"><i class="fa fa-calendar-check"></i> Book a session</span>
+    <h1>Talk to an expert, <span class="hl">at a time that suits you</span></h1>
+    <p>Pick a service, choose a slot and tell us what you need. Online sessions get a Google&nbsp;Meet link; we confirm by email.</p>
+  </div>
+
+  <div class="panel" id="bookPanel">
+    <div class="steps" id="steps">
+      <div class="st on" data-s="1"><b>1</b><span>Service</span></div>
+      <div class="st" data-s="2"><b>2</b><span>Date &amp; time</span></div>
+      <div class="st" data-s="3"><b>3</b><span>Your details</span></div>
+      <div class="st" data-s="4"><b>4</b><span>Confirm</span></div>
+    </div>
+
+    <!-- 1 -->
+    <section data-step="1">
+      <h2>What do you need help with?</h2>
+      <p class="sub">Choose a category. Each session type has its own length and specialist.</p>
+      <div class="pick" id="catPick"><div class="empty-note">Loading services…</div></div>
+      <div class="f-field" id="svcWrap" style="margin-top:18px;display:none">
+        <label for="svcSel">Specific service <span class="hint" style="display:inline">(optional)</span></label>
+        <select id="svcSel"><option value="">Not sure yet — general consultation</option></select>
+      </div>
+      <div class="msg err" id="m1"></div>
+      <div class="nav-row"><span></span><button class="btn btn-primary" id="to2">Continue <i class="fa fa-arrow-right"></i></button></div>
+    </section>
+
+    <!-- 2 -->
+    <section data-step="2" hidden>
+      <h2>Pick a date and time</h2>
+      <p class="sub" id="slotSub">Times are shown in East Africa Time (Nairobi).</p>
+      <div class="cal-wrap">
+        <div>
+          <div class="cal-head">
+            <button type="button" id="prevM" aria-label="Previous month"><i class="fa fa-chevron-left"></i></button>
+            <strong id="monthLbl"></strong>
+            <button type="button" id="nextM" aria-label="Next month"><i class="fa fa-chevron-right"></i></button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div>
+          <h3 style="font-size:1rem;margin-bottom:10px" id="slotTitle">Select a day</h3>
+          <div class="slots" id="slotGrid"></div>
+        </div>
+      </div>
+      <div class="msg err" id="m2"></div>
+      <div class="nav-row"><button class="btn btn-ghost" data-back="1"><i class="fa fa-arrow-left"></i> Back</button><button class="btn btn-primary" id="to3">Continue <i class="fa fa-arrow-right"></i></button></div>
+    </section>
+
+    <!-- 3 -->
+    <section data-step="3" hidden>
+      <h2>Your details</h2>
+      <p class="sub">We only use these to arrange your session.</p>
+      <form id="detailsForm" class="f-grid" novalidate>
+        <div class="f-field"><label for="bName">Full name <span class="req">*</span></label><input id="bName" autocomplete="name" required /></div>
+        <div class="f-field"><label for="bEmail">Email <span class="req">*</span></label><input id="bEmail" type="email" autocomplete="email" required /></div>
+        <div class="f-field"><label for="bPhone">Phone <span class="req">*</span></label><input id="bPhone" type="tel" autocomplete="tel" placeholder="0712 345 678" required /></div>
+        <div class="f-field"><label for="bCompany">Company / organisation</label><input id="bCompany" autocomplete="organization" /></div>
+        <div class="f-field full"><label>How would you like to meet?</label>
+          <div class="seg" id="modeSeg"></div><div class="hint" id="modeHint"></div></div>
+        <div class="f-field full"><label for="bTopic">What would you like to discuss?</label><textarea id="bTopic" placeholder="Tell us about your goals, project or questions…"></textarea></div>
+        <div class="f-field full"><label class="f-check"><input type="checkbox" id="bSub" checked /> <span>Send me occasional tips and updates by email (you can unsubscribe anytime).</span></label></div>
+        <input class="hp" tabindex="-1" autocomplete="off" id="bWebsite" aria-hidden="true" />
+      </form>
+      <div class="msg err" id="m3"></div>
+      <div class="nav-row"><button class="btn btn-ghost" data-back="2"><i class="fa fa-arrow-left"></i> Back</button><button class="btn btn-primary" id="to4">Review <i class="fa fa-arrow-right"></i></button></div>
+    </section>
+
+    <!-- 4 -->
+    <section data-step="4" hidden>
+      <h2>Review and confirm</h2>
+      <p class="sub" id="confirmNote"></p>
+      <div class="summary" id="sumBox"></div>
+      <div class="msg err" id="m4"></div>
+      <div class="nav-row"><button class="btn btn-ghost" data-back="3"><i class="fa fa-arrow-left"></i> Back</button><button class="btn btn-primary" id="submitBtn"><i class="fa fa-check"></i> Confirm booking</button></div>
+    </section>
+
+    <!-- done -->
+    <section data-step="done" hidden>
+      <div class="done-card">
+        <div class="tick"><i class="fa fa-check"></i></div>
+        <h2 id="doneTitle">Booking received</h2>
+        <p id="doneText"></p>
+        <div class="ref" id="doneRef"></div>
+        <div class="summary" id="doneSum" style="text-align:left;margin:10px 0 18px"></div>
+        <p style="font-size:.85rem">A confirmation was sent to your email. Keep the reference to view, reschedule or cancel your session.</p>
+        <div class="nav-row" style="justify-content:center">
+          <a class="btn btn-primary" id="doneTrack" href="booking-status.html">View booking</a>
+          <a class="btn btn-ghost" href="index.html">Back to home</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p style="text-align:center;margin-top:18px;font-size:.88rem">Prefer to talk first? Call <a data-site-phone href="tel:+254790064130">+254 790 064 130</a>
+    <span data-site-phone2-wrap> · <a data-site-phone2 href="tel:+254799292048">+254 799 292 048</a></span>.</p>
+</main>
+
+<footer class="footer-v2" role="contentinfo">
+  <!-- Animated accent line -->
+  <!--div class="footer-v2-accent" aria-hidden="true"></div-->
+ 
+  <!-- Main link grid -->
+  <div class="footer-v2-main">
+ 
+    <!-- Brand / About column -->
+    <div class="footer-v2-brand">
+      <a href="index.html" class="footer-v2-logo" aria-label="AdConnect Home">
+        <span class="footer-v2-logo-text">
+          <span class="ac-red">Ad</span><span class="ac-white">Connect</span>
+        </span>
+      </a>
+      <p class="footer-v2-tagline">
+        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+      </p>
+      <div class="footer-v2-socials" aria-label="Social media links">
+        <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/adconnect_digital/" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="X / Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="#" class="footer-v2-social-link" aria-label="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+      <a href="tel:+254790064130" class="footer-v2-contact-pill">
+        <i class="fa fa-phone"></i> +254 790 064 130
+      </a>
+    </div>
+ 
+    <!-- Company column -->
+    <div class="footer-v2-col col-company">
+      <div class="footer-v2-col-title">Company</div>
+      <ul class="footer-v2-links">
+        <li><a href="aboutus.html">About Us</a></li>
+        <li><a href="careers.html">Careers</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li>
+          <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+ 
+    <!-- Services column -->
+    <div class="footer-v2-col col-services">
+      <div class="footer-v2-col-title">Services</div>
+      <ul class="footer-v2-links">
+        <li><a href="our-services.html">Social Media Ads</a></li>
+        <li><a href="our-services.html">Ad Creative Design</a></li>
+        <li><a href="our-services.html">Analytics & Reporting</a></li>
+        <li><a href="our-services.html">Facebook Campaigns</a></li>
+        <li><a href="our-services.html">Web Development</a></li>
+        <li><a href="our-services.html">Android Apps</a></li>
+        <li><a href="our-services.html">Coaching Programs</a></li>
+      </ul>
+    </div>
+ 
+    <!-- Quick Links column -->
+    <div class="footer-v2-col col-quick">
+      <div class="footer-v2-col-title">Quick Links</div>
+      <ul class="footer-v2-links">
+        <li><a href="book.html">Book a Session</a></li>
+        <li><a href="proposal.html">Submit a Proposal</a></li>
+        <li><a href="booking-status.html">Track Booking / Proposal</a></li>
+        <li><a href="subscribe.html">Email Updates</a></li>
+        <li><a href="faqs.html">FAQs</a></li>
+        <li><a href="unsubscribe.html">Unsubscribe</a></li>
+      </ul>
+      <!-- Location pill -->
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      </div>
+    </div>
+ 
+    <!-- Newsletter column -->
+    <div class="footer-v2-col col-newsletter">
+      <div class="footer-v2-col-title">Newsletter</div>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <div class="footer-v2-newsletter-form">
+        <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
+        <button id="btnSubscribe" class="footer-v2-newsletter-btn">
+          Subscribe →
+        </button>
+      </div>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
+      <!-- Help text -->
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
+        </p>
+      </div>
+    </div>
+ 
+  </div><!-- /.footer-v2-main -->
+ 
+  <!-- Bottom bar -->
+  <div class="footer-v2-bottom">
+    <div>
+      <p class="footer-v2-copy">
+        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
+      </p>
+      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
+        Designed, Built and Managed by <span style="color:var(--clr-border);">AdConnect Development Team</span>
+      </p>
+    </div>
+    <nav class="footer-v2-legal" aria-label="Legal links">
+      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
+      <a href="unsubscribe.html">Unsubscribe</a>
+    </nav>
+  </div>
+ 
+</footer>
+<script src="scripts/site.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { cfg: null, cat: null, svc: '', date: '', time: '', end: '', mode: 'ONLINE', month: null, daysMap: {} };
+  var esc = SITE.esc;
+  var qs = new URLSearchParams(location.search);
+
+  function show(step) {
+    document.querySelectorAll('[data-step]').forEach(function (s) { s.hidden = s.getAttribute('data-step') !== String(step); });
+    document.querySelectorAll('#steps .st').forEach(function (e) {
+      var n = +e.getAttribute('data-s');
+      e.classList.toggle('on', n === +step); e.classList.toggle('done', step === 'done' || n < +step);
+    });
+    window.scrollTo({ top: $('bookPanel').offsetTop - 80, behavior: 'smooth' });
+  }
+  function err(id, msg) { var e = $(id); e.textContent = msg || ''; e.classList.toggle('show', !!msg); }
+  var ymd = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+
+  /* ── step 1 ── */
+  function renderCats() {
+    var pick = $('catPick');
+    if (!S.cfg.categories.length) { pick.innerHTML = '<div class="empty-note">Online booking is not available right now. Please call or email us.</div>'; return; }
+    pick.innerHTML = S.cfg.categories.map(function (c) {
+      return '<button type="button" class="pick-item" data-slug="' + esc(c.slug) + '"><i class="fa ' + esc(c.icon || 'fa-star') + '"></i><strong>' + esc(c.name) + '</strong><span>' + esc(c.tagline || '') + '</span><span style="margin-top:6px;color:var(--clr-primary)">' + c.session_minutes + ' min' + (c.host_name ? ' · ' + esc(c.host_name) : '') + '</span></button>';
+    }).join('');
+    pick.querySelectorAll('.pick-item').forEach(function (b) { b.addEventListener('click', function () { chooseCat(b.getAttribute('data-slug')); }); });
+  }
+  function chooseCat(slug) {
+    S.cat = S.cfg.categories.filter(function (c) { return c.slug === slug; })[0] || null;
+    document.querySelectorAll('.pick-item').forEach(function (b) { b.classList.toggle('sel', b.getAttribute('data-slug') === slug); });
+    var svcs = S.cfg.services.filter(function (s) { return s.category_slug === slug; });
+    $('svcWrap').style.display = svcs.length ? '' : 'none';
+    $('svcSel').innerHTML = '<option value="">Not sure yet — general consultation</option>' + svcs.map(function (s) { return '<option value="' + esc(s.slug) + '">' + esc(s.name) + '</option>'; }).join('');
+    if (S.svc) $('svcSel').value = S.svc;
+    S.date = ''; S.time = ''; err('m1');
+  }
+  $('to2').addEventListener('click', function () {
+    if (!S.cat) return err('m1', 'Please choose a service category.');
+    S.svc = $('svcSel').value; err('m1');
+    var t = new Date(); S.month = new Date(t.getFullYear(), t.getMonth(), 1);
+    $('slotSub').textContent = S.cat.name + ' · ' + S.cat.session_minutes + '-minute session' + (S.cat.host_name ? ' with ' + S.cat.host_name : '') + '. Times are East Africa Time (Nairobi).';
+    show(2); loadMonth();
+  });
+
+  /* ── step 2 ── */
+  function loadMonth() {
+    var m = S.month, key = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0');
+    $('monthLbl').textContent = m.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' });
+    $('calGrid').innerHTML = '<div class="empty-note" style="grid-column:1/-1">Loading…</div>';
+    SITE.api('booking/days?category=' + encodeURIComponent(S.cat.slug) + '&month=' + key).then(function (r) { S.daysMap = r.days || {}; drawCal(); })
+      .catch(function (e) { $('calGrid').innerHTML = '<div class="empty-note" style="grid-column:1/-1">' + esc(e.message) + '</div>'; });
+    var now = new Date();
+    $('prevM').disabled = m.getFullYear() === now.getFullYear() && m.getMonth() === now.getMonth();
+    var max = new Date(); max.setDate(max.getDate() + (S.cfg.maxDaysAhead || 60));
+    $('nextM').disabled = new Date(m.getFullYear(), m.getMonth() + 1, 1) > max;
+  }
+  function drawCal() {
+    var m = S.month, first = new Date(m.getFullYear(), m.getMonth(), 1), last = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+    var lead = (first.getDay() + 6) % 7, html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) { return '<div class="cal-dow">' + d + '</div>'; }).join('');
+    for (var i = 0; i < lead; i++) html += '<div></div>';
+    var today = ymd(new Date());
+    for (var d = 1; d <= last; d++) {
+      var key = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      var free = (S.daysMap[key] || 0) > 0;
+      html += '<button type="button" class="cal-day' + (free ? ' free' : '') + (key === S.date ? ' sel' : '') + (key === today ? ' today' : '') + '" data-d="' + key + '"' + (free ? '' : ' disabled') + ' aria-label="' + key + '">' + d + '</button>';
+    }
+    $('calGrid').innerHTML = html;
+    $('calGrid').querySelectorAll('.cal-day.free').forEach(function (b) { b.addEventListener('click', function () { pickDay(b.getAttribute('data-d')); }); });
+  }
+  $('prevM').addEventListener('click', function () { S.month = new Date(S.month.getFullYear(), S.month.getMonth() - 1, 1); loadMonth(); });
+  $('nextM').addEventListener('click', function () { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + 1, 1); loadMonth(); });
+  function pickDay(date) {
+    S.date = date; S.time = ''; drawCal(); err('m2');
+    $('slotTitle').textContent = SITE.fmtDate(date);
+    $('slotGrid').innerHTML = '<div class="empty-note" style="grid-column:1/-1">Loading times…</div>';
+    SITE.api('booking/availability?category=' + encodeURIComponent(S.cat.slug) + '&date=' + date).then(function (r) {
+      var slots = r.slots || [];
+      if (!slots.some(function (s) { return s.available; })) { $('slotGrid').innerHTML = '<div class="empty-note" style="grid-column:1/-1">No free times on this day. Please pick another date.</div>'; return; }
+      $('slotGrid').innerHTML = slots.map(function (s) { return '<button type="button" class="slot" data-t="' + s.time + '" data-e="' + (s.end || '') + '"' + (s.available ? '' : ' disabled') + '>' + SITE.fmtTime(s.time) + '</button>'; }).join('');
+      $('slotGrid').querySelectorAll('.slot:not(:disabled)').forEach(function (b) {
+        b.addEventListener('click', function () {
+          S.time = b.getAttribute('data-t'); S.end = b.getAttribute('data-e');
+          $('slotGrid').querySelectorAll('.slot').forEach(function (x) { x.classList.toggle('sel', x === b); });
+        });
+      });
+    }).catch(function (e) { $('slotGrid').innerHTML = '<div class="empty-note" style="grid-column:1/-1">' + esc(e.message) + '</div>'; });
+  }
+  $('to3').addEventListener('click', function () { if (!S.date || !S.time) return err('m2', 'Please select a date and a time.'); err('m2'); show(3); });
+
+  /* ── step 3 ── */
+  function renderModes() {
+    $('modeSeg').innerHTML = S.cfg.modes.map(function (m, i) {
+      return '<label><input type="radio" name="mode" value="' + esc(m.value) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(m.label) + '</span></label>';
+    }).join('');
+    function hint() {
+      var v = (document.querySelector('input[name=mode]:checked') || {}).value;
+      $('modeHint').textContent = v === 'IN_PERSON' ? (S.cfg.inPersonLocation ? 'Location: ' + S.cfg.inPersonLocation : '') : v === 'PHONE' ? 'We will call the number you provide.' : 'A Google Meet link will be emailed to you.';
+    }
+    $('modeSeg').addEventListener('change', hint); hint();
+  }
+  $('to4').addEventListener('click', function () {
+    var name = $('bName').value.trim(), email = $('bEmail').value.trim(), phone = $('bPhone').value.trim();
+    if (name.length < 2) return err('m3', 'Please enter your full name.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err('m3', 'Please enter a valid email address.');
+    if (!/^(?:\+254|254|0)[17]\d{8}$/.test(phone.replace(/[\s-]/g, ''))) return err('m3', 'Please enter a valid Kenyan phone number, e.g. 0712 345 678.');
+    err('m3'); S.mode = (document.querySelector('input[name=mode]:checked') || {}).value || 'ONLINE';
+    var svcName = S.svc ? (S.cfg.services.filter(function (s) { return s.slug === S.svc; })[0] || {}).name : '';
+    var modeLbl = (S.cfg.modes.filter(function (m) { return m.value === S.mode; })[0] || {}).label || S.mode;
+    $('sumBox').innerHTML = [['Service', S.cat.name + (svcName ? ' — ' + svcName : '')], ['Date', SITE.fmtDate(S.date)], ['Time', SITE.fmtTime(S.time) + (S.end ? ' – ' + SITE.fmtTime(S.end) : '')], ['Format', modeLbl], ['Name', name], ['Email', email], ['Phone', phone]]
+      .map(function (r) { return '<div><span class="k">' + r[0] + '</span><b>' + esc(r[1]) + '</b></div>'; }).join('');
+    $('confirmNote').textContent = S.cfg.autoConfirm ? 'Your session is confirmed instantly once you submit.' : 'We will confirm your request by email shortly after you submit.';
+    show(4);
+  });
+  document.querySelectorAll('[data-back]').forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-back')); }); });
+
+  /* ── submit ── */
+  $('submitBtn').addEventListener('click', function () {
+    var btn = $('submitBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Booking…'; err('m4');
+    SITE.api('bookings', { method: 'POST', body: {
+      category: S.cat.slug, service: S.svc, date: S.date, time: S.time, mode: S.mode,
+      name: $('bName').value.trim(), email: $('bEmail').value.trim(), phone: $('bPhone').value.trim(), company: $('bCompany').value.trim(),
+      topic: $('bTopic').value.trim(), subscribe: $('bSub').checked, website: $('bWebsite').value
+    } }).then(function (r) {
+      $('doneTitle').textContent = r.status === 'CONFIRMED' ? 'Your session is confirmed' : 'Booking request received';
+      $('doneText').textContent = r.status === 'CONFIRMED' ? 'See you then! Your details are below.' : 'We will review your request and confirm by email.';
+      $('doneRef').textContent = r.reference;
+      $('doneSum').innerHTML = [['Service', r.category], ['Date', SITE.fmtDate(r.date)], ['Time', SITE.fmtTime(r.time) + (r.end ? ' – ' + SITE.fmtTime(r.end) : '')], ['Status', r.status]]
+        .concat(r.meeting_link ? [['Meeting link', '<a href="' + esc(r.meeting_link) + '">Open Google Meet</a>']] : [])
+        .map(function (x) { return '<div><span class="k">' + x[0] + '</span><b>' + (x[0] === 'Meeting link' ? x[1] : esc(x[1])) + '</b></div>'; }).join('');
+      $('doneTrack').href = 'booking-status.html?ref=' + encodeURIComponent(r.reference) + '&email=' + encodeURIComponent($('bEmail').value.trim());
+      show('done');
+    }).catch(function (e) {
+      err('m4', e.message);
+      if (e.status === 409) { S.time = ''; show(2); pickDay(S.date); err('m2', e.message); }
+    }).finally(function () { btn.disabled = false; btn.innerHTML = '<i class="fa fa-check"></i> Confirm booking'; });
+  });
+
+  /* ── init ── */
+  SITE.api('booking/config').then(function (cfg) {
+    S.cfg = cfg; renderCats(); renderModes();
+    if (qs.get('category')) { S.svc = qs.get('service') || ''; chooseCat(qs.get('category')); }
+  }).catch(function (e) { $('catPick').innerHTML = '<div class="empty-note">' + esc(e.message) + '</div>'; });
+  SITE.info().then(function (i) { if (!i.phone2) { var w = document.querySelector('[data-site-phone2-wrap]'); if (w) w.style.display = 'none'; } });
+})();
+
+</script>
+</body>
+</html>

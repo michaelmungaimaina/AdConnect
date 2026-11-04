@@ -1,0 +1,13 @@
+---
+# cPanel Git deployment. Pushing to the repo and clicking "Deploy HEAD Commit" copies the app
+# into the Node.js application root. .env and uploads/ live only on the server and are never touched.
+# 1) Change DEPLOYPATH to your application root (the one set in cPanel → Setup Node.js App).
+# 2) After the first deploy, run "NPM Install" in Setup Node.js App, then Restart.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/eshhfecq/adconnect/
+    - /bin/mkdir -p $DEPLOYPATH $DEPLOYPATH/uploads/proposals $DEPLOYPATH/uploads/cvs $DEPLOYPATH/uploads/media
+    - /bin/cp -f server.js config.js package.json $DEPLOYPATH
+    - /bin/cp -R lib routes database public $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/tmp
+    - /bin/touch $DEPLOYPATH/tmp/restart.txt

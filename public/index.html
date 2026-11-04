@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- ── Primary SEO ── -->
-  <title>AdConnect — Real Estate Digital Marketing & Lead Generation Kenya</title>
-  <meta name="description" content="AdConnect helps real estate companies generate high-quality leads, reduce ad costs and maximize ROI through targeted social media advertising, web development and digital marketing strategies. Serving Kenya and globally." />
-  <meta name="keywords" content="real estate digital marketing Kenya, social media advertising real estate, lead generation real estate, Facebook ads Kenya, Google ads real estate, real estate marketing agency Nairobi, AdConnect Kenya" />
+  <title>AdConnect — Digital Marketing, Web & Software Development, Data & Consulting in Kenya</title>
+  <meta name="description" content="AdConnect offers digital marketing, web and software development, software design, database management, data analytics and consulting. Book a session or submit your project proposal." />
+  <meta name="keywords" content="digital marketing Kenya, web development Nairobi, software development, database management, data analytics, software design, IT consulting, AdConnect" />
   <meta name="author" content="AdConnect" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://www.adconnect.co.ke/" />
@@ -15,8 +15,8 @@
   <!-- ── Open Graph / Facebook ── -->
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://www.adconnect.co.ke/" />
-  <meta property="og:title"       content="AdConnect — Real Estate Digital Marketing Agency Kenya" />
-  <meta property="og:description" content="Generate more real estate leads, reduce ad spend, and grow your business with AdConnect's proven digital marketing strategies." />
+  <meta property="og:title"       content="AdConnect — Digital Marketing, Software & Data Services in Kenya" />
+  <meta property="og:description" content="Digital marketing, web and software development, databases, analytics and consulting — book a session or send us your project proposal." />
   <meta property="og:image"       content="https://www.adconnect.co.ke/resources/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -26,8 +26,8 @@
 
   <!-- ── Twitter / X Card ── -->
   <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="AdConnect — Real Estate Digital Marketing Kenya" />
-  <meta name="twitter:description" content="High-ROI social media advertising and lead generation for real estate businesses." />
+  <meta name="twitter:title"       content="AdConnect — Digital Marketing, Software & Data Services" />
+  <meta name="twitter:description" content="Marketing, web, software, data and consulting services for growing businesses." />
   <meta name="twitter:image"       content="https://www.adconnect.co.ke/resources/og-image.jpg" />
   <meta name="twitter:site"        content="@adconnect_ke" />
 
@@ -39,7 +39,7 @@
     "name": "AdConnect",
     "url": "https://www.adconnect.co.ke",
     "logo": "https://www.adconnect.co.ke/resources/logo.png",
-    "description": "AdConnect specializes in high-ROI digital marketing and social media advertising tailored for real estate businesses, plus web development, mobile applications, and UI/UX design.",
+    "description": "AdConnect provides digital marketing, web and software development, software design, database management, data analytics and consulting services.",
     "foundingDate": "2020",
     "areaServed": ["KE","ET","RW","UG","TZ"],
     "contactPoint": {
@@ -115,6 +115,8 @@
 
   <!-- ── Master Theme CSS ── -->
   <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
 
   <style>
   /* ════════════════════════════════════════
@@ -150,8 +152,8 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(246,87,48,.18) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(74,188,79,.08) 0%, transparent 70%),
+      radial-gradient(ellipse 70% 60% at 80% 20%, rgba(var(--clr-primary-rgb),.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(var(--clr-accent-rgb),.08) 0%, transparent 70%),
       url(resources/background-image.jpeg) center/cover no-repeat;
     filter: brightness(.35);
     z-index: 0;
@@ -166,7 +168,7 @@
     right: -100px;
     top: 50%;
     transform: translateY(-50%);
-    background: radial-gradient(circle, rgba(246,87,48,.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--clr-primary-rgb),.12) 0%, transparent 70%);
     border-radius: 50%;
     animation: orb-pulse 6s ease-in-out infinite;
     z-index: 0;
@@ -183,8 +185,8 @@
     align-items: center;
     gap: 8px;
     padding: 6px 16px;
-    background: rgba(246,87,48,.12);
-    border: 1px solid rgba(246,87,48,.35);
+    background: rgba(var(--clr-primary-rgb),.12);
+    border: 1px solid rgba(var(--clr-primary-rgb),.35);
     border-radius: 999px;
     font-family: var(--font-mono);
     font-size: .75rem;
@@ -274,8 +276,8 @@
     animation: pulse-glow 3s ease infinite 2s;
   }
   @keyframes pulse-glow {
-    0%,100% { box-shadow: 0 0 0 0 rgba(246,87,48,.4); }
-    50%      { box-shadow: 0 0 0 14px rgba(246,87,48,0); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(var(--clr-primary-rgb),.4); }
+    50%      { box-shadow: 0 0 0 14px rgba(var(--clr-primary-rgb),0); }
   }
   .btn-hero-primary:hover { background: var(--clr-primary-hover); transform: translateY(-2px); }
 
@@ -570,7 +572,7 @@
     position: absolute;
     top: -200px; left: -200px;
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(246,87,48,.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--clr-primary-rgb),.08) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
   }
@@ -591,7 +593,7 @@
     margin-top: 32px;
     padding: 18px 28px;
     background: transparent;
-    border: 2px dashed rgba(246,87,48,.4);
+    border: 2px dashed rgba(var(--clr-primary-rgb),.4);
     border-radius: var(--radius-lg);
     color: var(--clr-text-secondary);
     font-size: .9rem;
@@ -625,7 +627,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(246,87,48,.2), transparent);
+    background: linear-gradient(135deg, rgba(var(--clr-primary-rgb),.2), transparent);
     z-index: 1;
     transition: var(--transition-base);
   }
@@ -647,13 +649,13 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 1.6rem;
     color: #fff;
-    box-shadow: 0 0 0 12px rgba(246,87,48,.2), 0 0 0 24px rgba(246,87,48,.08);
+    box-shadow: 0 0 0 12px rgba(var(--clr-primary-rgb),.2), 0 0 0 24px rgba(var(--clr-primary-rgb),.08);
     transition: var(--transition-base);
     animation: play-pulse 2.5s ease infinite;
   }
   @keyframes play-pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(246,87,48,.5), 0 0 0 0 rgba(246,87,48,.2); }
-    50%      { box-shadow: 0 0 0 14px rgba(246,87,48,.2), 0 0 0 28px rgba(246,87,48,.06); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(var(--clr-primary-rgb),.5), 0 0 0 0 rgba(var(--clr-primary-rgb),.2); }
+    50%      { box-shadow: 0 0 0 14px rgba(var(--clr-primary-rgb),.2), 0 0 0 28px rgba(var(--clr-primary-rgb),.06); }
   }
   .video-thumb-wrapper:hover .big-play-btn { transform: scale(1.1); }
   .video-play-label { font-size: .8rem; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
@@ -684,7 +686,7 @@
     position: absolute;
     right: -100px; bottom: -100px;
     width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(74,188,79,.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--clr-accent-rgb),.06) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
   }
@@ -1013,7 +1015,7 @@
     top: 50%; left: 50%;
     transform: translate(-50%,-50%);
     width: 800px; height: 400px;
-    background: radial-gradient(ellipse, rgba(246,87,48,.1) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(var(--clr-primary-rgb),.1) 0%, transparent 70%);
     pointer-events: none;
   }
   .cta-section h2 { font-size: clamp(2rem,4vw,3rem); line-height: 1.1; margin-bottom: 20px; }
@@ -1077,7 +1079,7 @@
     max-width: 520px;
     text-align: center;
   }
-  .thanks-icon { width: 72px; height: 72px; background: rgba(74,188,79,.15); border: 2px solid var(--clr-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--clr-accent); margin: 0 auto 24px; }
+  .thanks-icon { width: 72px; height: 72px; background: rgba(var(--clr-accent-rgb),.15); border: 2px solid var(--clr-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--clr-accent); margin: 0 auto 24px; }
   .thanks-detail { background: var(--clr-surface-2); border-radius: var(--radius-lg); padding: 20px; margin: 24px 0; text-align: left; display: flex; flex-direction: column; gap: 12px; }
   .thanks-row { display: flex; align-items: center; gap: 12px; font-size: .875rem; }
   .thanks-row i { color: var(--clr-primary); width: 16px; text-align: center; }
@@ -1154,12 +1156,12 @@
   height: auto; /* allow vertical growth */
   display: flex;
   align-items: center;
-  background: #252320;
+  background: var(--clr-surface-1);
   border-radius: 5px;
   padding: 5px 15px;
   margin-bottom: 5px;
   margin-top: 5px;
-  border: 1px solid #3d3b39;
+  border: 1px solid var(--clr-border);
 }
 
 .logo-stack {
@@ -1175,12 +1177,12 @@
   margin-top: -7px;
 }
 
-.logo-text .ad { color: #f65730; }
+.logo-text .ad { color: var(--clr-primary); }
 .logo-text .connect { color: #ffffff; }
 
 .logo-tagline {
   font-size: 12px;              /* smaller */
-  color: #4abc4f;               /* green */
+  color: var(--clr-accent);               /* green */
   margin-top: -6px;
   white-space: nowrap;          /* keep in one line */
   width: 100%;
@@ -1224,13 +1226,14 @@
               Services <i class="fa fa-caret-down" aria-hidden="true"></i>
             </a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Social Media Advertising</a></li>
-              <li><a href="our-services.html?adverts-service=true" class="dropdown-item" role="menuitem">Analytics & Reporting</a></li>
-              <li><a href="our-services.html?development-service=true" class="dropdown-item" role="menuitem">Web Design & Development</a></li>
-              <li><a href="our-services.html?courses-service=true" class="dropdown-item" role="menuitem">Courses</a></li>
+              <li><a href="our-services.html" class="dropdown-item" role="menuitem">Social Media Advertising</a></li>
+              <li><a href="our-services.html" class="dropdown-item" role="menuitem">Analytics & Reporting</a></li>
+              <li><a href="our-services.html" class="dropdown-item" role="menuitem">Web Design & Development</a></li>
+              <li><a href="our-services.html" class="dropdown-item" role="menuitem">Courses</a></li>
             </ul>
           </li>
           <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
         </ul>
         <!--button id="searchBarBtn" class="btn btn-ghost btn-icon btn-sm" onclick="openSearch()" aria-label="Search" style="margin-left:var(--space-3);">
           <i class="fa fa-search"></i>
@@ -1259,14 +1262,15 @@
             </a>
             <div class="collapse" id="services">
               <ul>
-                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
-                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
-                <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
-                <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
               </ul>
             </div>
           </li>
           <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
         </ul>
       </div>
     </aside>
@@ -1287,18 +1291,17 @@
   <div class="hero-content">
     <div class="hero-eyebrow">
       <span class="dot"></span>
-      <span id="hero-eyebrow-text">Kenya's #1 Real Estate Marketing Agency</span>
+      <span id="hero-eyebrow-text">Digital Marketing · Software · Data · Consulting</span>
     </div>
 
     <h1 class="hero-h1" id="hero-headline">
-      Powering <span class="accent">Real Estate</span><br />
-      Businesses with<br />
-      <span class="accent-g">HI-ROI</span> Digital Marketing
+      Technology &amp; Marketing<br />
+      Solutions That <span class="accent">Grow</span><br />
+      <span class="accent-g">Your Business</span>
     </h1>
 
     <p class="hero-sub" id="hero-subheadline">
-      Boost your lead generation, reduce ad costs, and grow your real estate
-      business with tailored ad strategies across Facebook, Instagram, Google and beyond.
+      From ad campaigns and websites to custom software, databases and analytics — one team that helps you attract customers and run smarter.
     </p>
 
     <!-- Dynamic service pills -->
@@ -1350,23 +1353,23 @@
 <!-- ════════════════ PROOF TICKER ════════════════ -->
 <div class="proof-ticker" aria-hidden="true">
   <div class="ticker-track" id="tickerTrack">
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Real Estate Lead Generation <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Lead Generation <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Facebook Advertising <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Google Ads Management <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Web Design & Development <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Android App Development <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> UI/UX Design (Figma) <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Social Media Management <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Analytics & Reporting <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Software &amp; App Development <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Software &amp; UI/UX Design <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Database Management <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Data Analytics &amp; Reporting <span class="sep">·</span></span>
     <!-- Duplicate for seamless loop -->
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Real Estate Lead Generation <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Lead Generation <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Facebook Advertising <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Google Ads Management <span class="sep">·</span></span>
     <span class="ticker-item"><i class="fa fa-check-circle"></i> Web Design & Development <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Android App Development <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> UI/UX Design (Figma) <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Social Media Management <span class="sep">·</span></span>
-    <span class="ticker-item"><i class="fa fa-check-circle"></i> Analytics & Reporting <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Software &amp; App Development <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Software &amp; UI/UX Design <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Database Management <span class="sep">·</span></span>
+    <span class="ticker-item"><i class="fa fa-check-circle"></i> Data Analytics &amp; Reporting <span class="sep">·</span></span>
   </div>
 </div>
 
@@ -1413,51 +1416,13 @@
   <div class="container">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:8px;">
       <div>
-        <span class="section-label"><i class="fa fa-star"></i> Exclusive Services</span>
+        <span class="section-label"><i class="fa fa-star"></i> Our Services</span>
         <h2 class="section-title" id="services-title">Everything You Need<br />to Win Online</h2>
       </div>
       <a href="our-services.html" class="btn btn-ghost btn-sm">View All Services <i class="fa fa-arrow-right"></i></a>
     </div>
     <!-- Dynamic services grid populated from API -->
-    <div class="services-grid" id="servicesGrid">
-      <!-- JS will populate, fallback shown while loading -->
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-bullhorn"></i></div>
-        <h4>Social Media Advertising</h4>
-        <p>Targeted campaigns on Facebook, Instagram, TikTok & more — designed to attract qualified real estate buyers and sellers.</p>
-        <a href="our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-bar-chart"></i></div>
-        <h4>Analytics & Reporting</h4>
-        <p>In-depth analytics to track campaign performance, measure ROI, and make data-driven decisions with confidence.</p>
-        <a href="our-services.html?adverts-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-code"></i></div>
-        <h4>Web Design & Development</h4>
-        <p>High-converting real estate websites built with modern frameworks — fast, mobile-first and SEO-optimized.</p>
-        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-mobile"></i></div>
-        <h4>Android Development</h4>
-        <p>Native Android applications built with Kotlin & Java — intuitive, performant apps for your business needs.</p>
-        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-paint-brush"></i></div>
-        <h4>UI/UX Design</h4>
-        <p>Beautiful, user-centered Figma designs that convert visitors into leads — crafted for real estate audiences.</p>
-        <a href="our-services.html?development-service=true" class="arrow-link">Learn More <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="service-card">
-        <div class="svc-icon"><i class="fa fa-graduation-cap"></i></div>
-        <h4>Marketing Courses</h4>
-        <p>Learn proven strategies through our structured digital marketing programs — tailored for real estate professionals.</p>
-        <a href="our-services.html?courses-service=true" class="arrow-link">Coming Soon <i class="fa fa-lock"></i></a>
-      </div>
-    </div>
+    <div class="svc-grid" id="servicesGrid" data-category-grid style="margin-top:24px"><div class="empty-note" style="grid-column:1/-1">Loading services…</div></div>
   </div>
 </section>
 
@@ -1469,13 +1434,13 @@
       <div class="video-text">
         <span class="section-label"><i class="fa fa-play-circle"></i> Free Strategy Video</span>
         <h2 class="section-title" id="video-title" id="videoHeadline">
-          <span class="highlight">5 Proven Strategies</span> to Generate More Real Estate Leads
+          <span class="highlight">5 Proven Strategies</span> to Generate More Leads
         </h2>
         <p class="section-sub" style="margin-top:16px;" id="videoSubheadline">
           Discover how to reduce your ad spend and attract higher-quality property leads in this exclusive 5-minute video.
         </p>
         <p style="font-size:.875rem;line-height:1.8;margin-top:16px;color:var(--clr-text-muted);" id="videoDescription">
-          In this exclusive video, I share proven strategies and insights gained from five years of experience in digital marketing for real estate. Learn how to create effective social media ad campaigns that attract clients, generate leads, and boost your sales.
+          In this exclusive video, I share proven strategies and insights gained from five years of experience in digital marketing. Learn how to create effective social media ad campaigns that attract clients, generate leads, and boost your sales.
         </p>
 
         <div style="display:flex;flex-direction:column;gap:12px;margin-top:28px;">
@@ -1504,7 +1469,7 @@
 
       <!-- Right: Thumbnail -->
       <div class="video-thumb-wrapper" onclick="openLeadCaptureSection()" role="button" aria-label="Watch free strategy video" tabindex="0">
-        <img id="videoThumbnail" src="resources/background-image.jpeg" alt="Free Real Estate Marketing Strategy Video" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+        <img id="videoThumbnail" src="resources/background-image.jpeg" alt="Free Marketing Strategy Video" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
         <div class="video-play-overlay">
           <div class="big-play-btn"><i class="fa fa-play" style="margin-left:3px;"></i></div>
           <div class="video-play-label">Watch Free Strategy</div>
@@ -1529,7 +1494,7 @@
       </div>
       <div class="result-card">
         <div class="result-num" id="res2">50+</div>
-        <div class="result-label">Real Estate Clients Served</div>
+        <div class="result-label">Clients Served</div>
       </div>
       <div class="result-card">
         <div class="result-num" id="res3">60%</div>
@@ -1562,7 +1527,7 @@
         <!-- JS populated -->
         <div class="tcard">
           <div class="stars"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
-          <p class="quote">"AdConnect transformed our real estate business. Their Facebook campaigns cut our lead cost by 65% while tripling quality inquiries. Highly recommended for any real estate company in Kenya."</p>
+          <p class="quote">"AdConnect transformed our business. Their Facebook campaigns cut our lead cost by 65% while tripling quality inquiries. Highly recommended for any real estate company in Kenya."</p>
           <div class="author">
             <div class="author-photo" style="background-image:url('/resources/elixir.png')"></div>
             <div>
@@ -1597,7 +1562,7 @@
 <!-- ════════════════ CTA SECTION ════════════════ -->
 <section class="cta-section" aria-labelledby="cta-title">
   <div class="container" style="position:relative;z-index:1;">
-    <h2 id="cta-title">Ready to Transform Your<br /><span>Real Estate Business?</span></h2>
+    <h2 id="cta-title">Ready to Grow<br /><span>Your Business?</span></h2>
     <p>Book your free consultation today and let's craft a strategy that generates real leads, real results, and real growth.</p>
     <div class="cta-btns">
       <button onclick="openLeadCaptureSection()" class="btn-hero-primary">
@@ -1626,7 +1591,7 @@
         </span>
       </a>
       <p class="footer-v2-tagline">
-        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+        Digital marketing, web &amp; software development, data and consulting. We build campaigns, systems and brands that convert.
       </p>
       <div class="footer-v2-socials" aria-label="Social media links">
         <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
@@ -1669,13 +1634,13 @@
     <div class="footer-v2-col col-services">
       <div class="footer-v2-col-title">Services</div>
       <ul class="footer-v2-links">
-        <li><a href="our-services.html?adverts-service=true">Social Media Ads</a></li>
-        <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
-        <li><a href="our-services.html?adverts-service=true">Analytics & Reporting</a></li>
-        <li><a href="our-services.html?adverts-service=true">Facebook Campaigns</a></li>
-        <li><a href="our-services.html?development-service=true">Web Development</a></li>
-        <li><a href="our-services.html?development-service=true">Android Apps</a></li>
-        <li><a href="our-services.html?courses-service=true">Coaching Programs</a></li>
+        <li><a href="our-services.html">Social Media Ads</a></li>
+        <li><a href="our-services.html">Ad Creative Design</a></li>
+        <li><a href="our-services.html">Analytics & Reporting</a></li>
+        <li><a href="our-services.html">Facebook Campaigns</a></li>
+        <li><a href="our-services.html">Web Development</a></li>
+        <li><a href="our-services.html">Android Apps</a></li>
+        <li><a href="our-services.html">Coaching Programs</a></li>
       </ul>
     </div>
  
@@ -1683,42 +1648,36 @@
     <div class="footer-v2-col col-quick">
       <div class="footer-v2-col-title">Quick Links</div>
       <ul class="footer-v2-links">
-        <li>
-          <a href="javascript:void(0)" onclick="openFAQs()">FAQs</a>
-        </li>
-        <li>
-          <a href="?appointment-booking=true">Free Consultation</a>
-        </li>
-        <li>
-          <a href="?value-video-request=true">Watch Free Video</a>
-        </li>
-        <li>
-          <a href="our-services.html?development-service=true">UI/UX Design</a>
-        </li>
+        <li><a href="book.html">Book a Session</a></li>
+        <li><a href="proposal.html">Submit a Proposal</a></li>
+        <li><a href="booking-status.html">Track Booking / Proposal</a></li>
+        <li><a href="subscribe.html">Email Updates</a></li>
+        <li><a href="faqs.html">FAQs</a></li>
+        <li><a href="unsubscribe.html">Unsubscribe</a></li>
       </ul>
       <!-- Location pill -->
-      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
-        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
       </div>
     </div>
  
     <!-- Newsletter column -->
     <div class="footer-v2-col col-newsletter">
       <div class="footer-v2-col-title">Newsletter</div>
-      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Practical tips on marketing, web, software and data. No spam.</p>
       <div class="footer-v2-newsletter-form">
         <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
         <button id="btnSubscribe" class="footer-v2-newsletter-btn">
           Subscribe →
         </button>
       </div>
-      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
       <!-- Help text -->
-      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
-          <strong style="color:#f4f1ee;">Need Help?</strong><br />
-          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
         </p>
       </div>
     </div>
@@ -1732,13 +1691,13 @@
         © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
       </p>
       <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
-        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
+        Designed, Built and Managed by <span style="color:var(--clr-border);">AdConnect Development Team</span>
       </p>
     </div>
     <nav class="footer-v2-legal" aria-label="Legal links">
       <a href="javascript:void(0)" onclick="openPrivacyPolicy()">Privacy Policy</a>
       <a href="javascript:void(0)" onclick="openFAQs()">FAQs</a>
-      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
+      <a href="unsubscribe.html">Unsubscribe</a>
     </nav>
   </div>
  
@@ -1752,7 +1711,7 @@
   <div class="lead-box">
     <div class="modal-badge"><i class="fa fa-lock"></i> 100% Secure & Private</div>
     <h2 style="font-size:1.5rem;margin-bottom:8px;">Unlock Your Free Strategy</h2>
-    <p style="font-size:.875rem;margin-bottom:28px;">Enter your details to get instant access to our exclusive real estate marketing video.</p>
+    <p style="font-size:.875rem;margin-bottom:28px;">Enter your details to get instant access to our exclusive marketing video.</p>
     <div id="leadErrorMessage" style="display:none;background:rgba(231,76,60,.1);border:1px solid var(--clr-error);color:var(--clr-error);padding:10px 16px;border-radius:var(--radius-md);font-size:.82rem;margin-bottom:16px;"></div>
     <div id="leadLoader" class="loader" style="display:none;"></div>
     <div class="form-section">
@@ -1800,7 +1759,7 @@
     <div class="ty-header">
       <div>
         <h2 style="font-size:1.5rem;"><span style="color:var(--clr-accent);">🎉</span> Your Free Video is Ready!</h2>
-        <p style="font-size:.85rem;margin-top:4px;">Exclusive real estate marketing strategies inside.</p>
+        <p style="font-size:.85rem;margin-top:4px;">Exclusive marketing strategies inside.</p>
       </div>
       <img src="resources/logo.png" alt="AdConnect" style="height:36px;border-radius:var(--radius-sm);" />
     </div>
@@ -1866,7 +1825,7 @@
     <div id="stepOccupation" class="app-step" style="display:none;">
       <div class="step-question">What's your current occupation?</div>
       <div class="step-hint">And how long have you been in this role?</div>
-      <input id="occupationInput" type="text" class="app-input" placeholder="e.g. Real Estate Agent — 3 years" />
+      <input id="occupationInput" type="text" class="app-input" placeholder="e.g. Business Owner — 3 years" />
     </div>
     <div id="stepReason" class="app-step" style="display:none;">
       <div class="step-question">What's happening in your business right now?</div>
@@ -1888,7 +1847,7 @@
         <option value="KES 156,000 – 200,000">KES 156,000 – 200,000</option>
         <option value="More than KES 200,000">More than KES 200,000</option>
       </select>
-      <p style="margin-top:20px;padding:16px;background:rgba(74,188,79,.08);border:1px solid rgba(74,188,79,.25);border-radius:var(--radius-md);font-size:.82rem;color:var(--clr-accent);">
+      <p style="margin-top:20px;padding:16px;background:rgba(var(--clr-accent-rgb),.08);border:1px solid rgba(var(--clr-accent-rgb),.25);border-radius:var(--radius-md);font-size:.82rem;color:var(--clr-accent);">
         🎉 <strong>Almost done!</strong> Click below to send your application and schedule your free call.
       </p>
     </div>
@@ -1981,7 +1940,7 @@
       <div class="thanks-row"><i class="fa fa-video-camera"></i><span id="meetingType">Online Consultation</span></div>
       <div class="thanks-row"><i class="fa fa-calendar"></i><span id="meetingDate">—</span></div>
     </div>
-    <div style="background:rgba(246,87,48,.08);border:1px solid rgba(246,87,48,.2);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;">
+    <div style="background:rgba(var(--clr-primary-rgb),.08);border:1px solid rgba(var(--clr-primary-rgb),.2);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;">
       <p style="font-size:.82rem;font-weight:700;margin-bottom:6px;color:var(--clr-primary);">How to Prepare</p>
       <p style="font-size:.82rem;">Feel free to bring any questions or examples of your current marketing efforts. We'll review your challenges and share proven strategies.</p>
     </div>
@@ -2021,7 +1980,7 @@
           </button>
         </div>
       </form>
-      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(74,188,79,.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
+      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(var(--clr-accent-rgb),.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
         <i class="fa fa-check-circle"></i> Thank you! We'll get back to you within 24 hours.
       </div>
     </div>
@@ -2050,7 +2009,7 @@
 
       <h2>2. How We Use Your Data</h2>
       <ul>
-        <li>To connect real estate companies with potential local and international customers.</li>
+        <li>To help businesses grow through marketing, technology and data.</li>
         <li>To analyse website performance and improve user experience.</li>
         <li>To create targeted marketing campaigns through Facebook Pixel and similar tools.</li>
         <li>To send updates, promotional offers, and service communications.</li>
@@ -2101,8 +2060,8 @@
     z-index: 99999;
     width: calc(100% - 32px);
     max-width: 680px;
-    background: var(--clr-surface-1, #252320);
-    border: 1.5px solid var(--clr-border, #3d3b39);
+    background: var(--clr-surface-1, var(--clr-surface-1));
+    border: 1.5px solid var(--clr-border, var(--clr-border));
     border-radius: 16px;
     padding: 20px 24px;
     box-shadow: 0 8px 40px rgba(0,0,0,.55);
@@ -2112,21 +2071,21 @@
   .cc-inner { display: flex; align-items: flex-start; gap: 16px; }
   .cc-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
   .cc-text { flex: 1; }
-  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: #F4F1EE; margin: 0 0 6px; }
-  .cc-text p { font-size: .78rem; color: #B8B4B0; line-height: 1.6; margin: 0; }
-  .cc-text a { color: #4ABC4F; text-decoration: none; }
+  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: var(--clr-text-primary); margin: 0 0 6px; }
+  .cc-text p { font-size: .78rem; color: var(--clr-text-secondary); line-height: 1.6; margin: 0; }
+  .cc-text a { color: var(--clr-accent); text-decoration: none; }
   .cc-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
   .cc-btn {
     padding: 9px 20px; border-radius: 8px; font-size: .78rem; font-weight: 700;
     cursor: pointer; border: none; font-family: inherit; transition: all .2s ease;
     text-transform: uppercase; letter-spacing: .4px;
   }
-  .cc-btn-accept  { background: #F65730; color: #fff; }
-  .cc-btn-accept:hover  { background: #d94522; }
-  .cc-btn-reject  { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
-  .cc-btn-reject:hover  { border-color: #F65730; color: #F65730; }
-  .cc-btn-pref    { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
-  .cc-btn-pref:hover    { border-color: #B8B4B0; color: #B8B4B0; }
+  .cc-btn-accept  { background: var(--clr-primary); color: #fff; }
+  .cc-btn-accept:hover  { background: var(--clr-primary-hover); }
+  .cc-btn-reject  { background: transparent; color: var(--clr-text-muted); border: 1.5px solid var(--clr-border); }
+  .cc-btn-reject:hover  { border-color: var(--clr-primary); color: var(--clr-primary); }
+  .cc-btn-pref    { background: transparent; color: var(--clr-text-muted); border: 1.5px solid var(--clr-border); }
+  .cc-btn-pref:hover    { border-color: var(--clr-text-secondary); color: var(--clr-text-secondary); }
   /* Preferences modal */
   .cc-modal-overlay {
     position: fixed; inset: 0; z-index: 100000;
@@ -2134,19 +2093,19 @@
     display: flex; align-items: center; justify-content: center; padding: 20px;
   }
   .cc-modal {
-    background: #252320; border: 1.5px solid #3d3b39; border-radius: 16px;
+    background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: 16px;
     padding: 32px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
   }
-  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: #F4F1EE; margin: 0 0 8px; }
-  .cc-modal p  { font-size: .82rem; color: #7a7874; margin: 0 0 20px; line-height: 1.6; }
-  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #3d3b39; }
+  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--clr-text-primary); margin: 0 0 8px; }
+  .cc-modal p  { font-size: .82rem; color: var(--clr-text-muted); margin: 0 0 20px; line-height: 1.6; }
+  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--clr-border); }
   .cc-toggle-row:last-child { border-bottom: none; }
-  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: #F4F1EE; margin-bottom: 3px; }
-  .cc-toggle-desc  { font-size: .75rem; color: #7a7874; line-height: 1.5; }
+  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: var(--clr-text-primary); margin-bottom: 3px; }
+  .cc-toggle-desc  { font-size: .75rem; color: var(--clr-text-muted); line-height: 1.5; }
   .cc-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 3px; }
   .cc-switch input { opacity: 0; width: 0; height: 0; }
-  .cc-slider { position: absolute; inset: 0; background: #3d3b39; border-radius: 999px; cursor: pointer; transition: .3s; }
-  .cc-switch input:checked + .cc-slider { background: #F65730; }
+  .cc-slider { position: absolute; inset: 0; background: var(--clr-border); border-radius: 999px; cursor: pointer; transition: .3s; }
+  .cc-switch input:checked + .cc-slider { background: var(--clr-primary); }
   .cc-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
   .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
   .cc-switch input:disabled + .cc-slider { opacity: .6; cursor: not-allowed; }
@@ -2218,5 +2177,6 @@
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
 <script src="scripts/main.js" defer></script>
+<script src="scripts/site.js"></script>
 </body>
 </html>

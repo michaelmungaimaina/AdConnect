@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FAQs — AdConnect</title>
-  <meta name="description" content="Frequently asked questions about AdConnect's real estate digital marketing services." />
+  <meta name="description" content="Frequently asked questions about AdConnect's services." />
   <link rel="shortcut icon" href="resources/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
   <style>
   .faq-page { padding-top: var(--header-h); min-height: 100vh; background: var(--clr-bg); }
   .faq-container { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
@@ -42,7 +44,7 @@
   @media (max-width: 600px) { .faq-form { grid-template-columns: 1fr; } }
   </style>
 </head>
-<body>
+<body data-site-nav>
 
 <div class="headerindex">
   <header>
@@ -109,7 +111,7 @@
           </button>
         </div>
       </form>
-      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(74,188,79,.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
+      <div id="faqFormSuccess" style="display:none;margin-top:20px;padding:14px 20px;background:rgba(var(--clr-accent-rgb),.1);border:1px solid var(--clr-accent);border-radius:var(--radius-md);color:var(--clr-accent);font-size:.875rem;">
         <i class="fa fa-check-circle"></i> Thank you! We'll get back to you within 24 hours.
       </div>
     </div>
@@ -130,8 +132,7 @@
 </footer>
 
 <script>
-//const DOMAIN = 'https://adconnect.co.ke/api/';
-const DOMAIN = 'http://localhost:3000/api/';
+const DOMAIN = '/api/';
 document.getElementById('cy').textContent = new Date().getFullYear();
 
 const STATIC_FAQS = [
@@ -196,5 +197,6 @@ async function submitFAQ(e) {
 
 loadFAQs();
 </script>
+<script src="scripts/site.js"></script>
 </body>
 </html>

@@ -6,8 +6,7 @@
 
 
 /* ── Config ─────────────────────────────────── */
-//const DOMAIN = 'https://adconnect.co.ke/api/';
- const DOMAIN = 'http://localhost:3000/api/';
+ const DOMAIN = '/api/';
 
 /* ── State ───────────────────────────────────── */
 const AppState = {
@@ -507,7 +506,7 @@ function openThankYouPage()        { const el=document.getElementById('thankYouV
 function closeThankYouPage()       { setD('thankYouVideoSection','none'); pushUrl(''); }
 function openApplicationForm()     { const el=document.getElementById('applicationFormSection'); if(el){el.style.display='flex'; el.classList.add('open'); pushUrl('application-form=true');} initAppForm(); }
 function closeApplicationForm()    { const el=document.getElementById('applicationFormSection'); if(el){el.classList.remove('open'); setTimeout(()=>el.style.display='none',550);} pushUrl(''); }
-async function openAppointmentBooking() { setH('appointmentView','100%'); pushUrl('appointment-booking=true'); initAppointmentDate(); }
+function openAppointmentBooking() { window.location.href = 'book.html'; }
 function closeAppointmentView()    { setH('appointmentView','0%'); pushUrl(''); }
 function openAppointmentBookingThankYouPage() { setH('appointmentThanksView','100%'); pushUrl('thank-you-for-booking=true'); }
 function closeAppointmentThanksView() { setH('appointmentThanksView','0%'); pushUrl(''); }
@@ -566,8 +565,7 @@ async function submitLeads(e) {
     });
 
     if (leadRes.ok) {
-      // Send welcome email (fire-and-forget)
-      fetch(`${DOMAIN}send-welcome-email`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ clientName:name, clientEmail:email }) }).catch(()=>{});
+      // The welcome e-mail is queued by the server when the lead is saved
 
       // Pre-fill application form
       const nameParts = name.split(' ');
@@ -887,18 +885,35 @@ async function submitFAQsForm() {
 document.getElementById('btnSubscribe').addEventListener('click', subscribeNewsletter);
 /* ── Newsletter ──────────────────────────────── */
 async function subscribeNewsletter() {
-  const email = getValue('footerNewsletterEmail');
-  if (!email || !RE.email.test(email)) { toast('Please enter a valid email.', 'error'); return; }
+  const email = getValue('footerNewsletterEmail')?.trim();
 
-  fetch(`${DOMAIN}newsletter-subscribe`, { 
-    method:'POST', 
-    headers:{'Content-Type':'application/json'}, 
-    body:JSON.stringify({ 
-      email 
-    }), 
-  }).catch(() => { /* ignore errors */ });
-  toast('Subscribed! Thanks for joining our newsletter.', 'success');
-  setValue('newsletterEmail','');
+  if (!email || !RE.email.test(email)) {
+    toast('Please enter a valid email.', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${DOMAIN}newsletter-subscribe`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Subscription failed. Please try again.');
+    }
+
+    toast(data.message || 'Subscribed! Thanks for joining our newsletter.', 'success');
+    setValue('footerNewsletterEmail', '');
+
+  } catch (error) {
+    console.error('Newsletter subscription error:', error);
+    toast(error.message || 'Unable to subscribe. Please try again later.', 'error');
+  }
 }
 
 /* ── Date Formatting ─────────────────────────── */
@@ -929,7 +944,7 @@ function showErr(msg, container) {
 function showSuccess(msg, container) {
   if (!container) return;
   const origBg = container.style.background;
-  container.style.background = 'rgba(74,188,79,.1)';
+  container.style.background = 'rgba(var(--clr-accent-rgb),.1)';
   container.style.borderColor = 'var(--clr-accent)';
   container.style.color       = 'var(--clr-accent)';
   container.innerHTML = `<i class="fa fa-check-circle"></i> ${msg}`;

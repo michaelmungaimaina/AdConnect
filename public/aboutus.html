@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us — AdConnect | Meet Our Digital Marketing Team</title>
   <meta name="description" content="Meet the AdConnect team — digital marketing specialists with 4+ years of expertise in social media advertising, lead generation, and web development for real estate businesses." />
-  <meta name="keywords" content="AdConnect team, digital marketing Kenya, real estate marketing experts, Misgina Fitwi, AdConnect about us" />
+  <meta name="keywords" content="AdConnect team, digital marketing Kenya, software, data and marketing experts, Misgina Fitwi, AdConnect about us" />
   <meta property="og:title" content="About AdConnect — Our Expert Marketing Team" />
-  <meta property="og:description" content="Meet the team behind AdConnect's award-winning real estate marketing campaigns." />
+  <meta property="og:description" content="Meet the team behind AdConnect's marketing, software and data work." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.adconnect.co.ke/aboutus.html" />
   <link rel="canonical" href="https://www.adconnect.co.ke/aboutus.html" />
@@ -17,6 +17,8 @@
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TCWSW8TT');</script>
 
   <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="/api/theme.css" />
+  <link rel="stylesheet" href="css/site.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" crossorigin="anonymous" />
 
   <style>
@@ -24,7 +26,7 @@
     .about-hero {
       padding: calc(var(--header-h) + var(--space-12)) var(--space-5) var(--space-10);
       background-image:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(246,87,48,.15) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--clr-primary-rgb),.15) 0%, transparent 70%),
         linear-gradient(170deg, rgba(26,25,23,1) 55%, rgba(48,46,44,.85) 100%),
         url(resources/background-image.jpeg);
       background-position: center;
@@ -209,7 +211,7 @@
     .about-cta {
       padding: var(--space-16) var(--space-5);
       text-align: center;
-      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(246,87,48,.12) 0%, transparent 70%);
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(var(--clr-primary-rgb),.12) 0%, transparent 70%);
     }
     .about-cta h2 { font-size: clamp(1.6rem,4vw,2.4rem); margin-bottom: var(--space-4); }
     .about-cta p  { max-width: 480px; margin: 0 auto var(--space-8); }
@@ -255,13 +257,14 @@
           <li class="dropdown">
             <a href="our-services.html" class="nav-link dropdown-toggle">Services <i class="fa fa-caret-down"></i></a>
             <ul class="dropdown-menu">
-              <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
-              <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Analytics & Reporting</a></li>
-              <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
-              <li><a href="our-services.html?courses-service=true" class="dropdown-item">Courses</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Analytics & Reporting</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
+              <li><a href="our-services.html" class="dropdown-item">Courses</a></li>
             </ul>
           </li>
           <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
         </ul>
       </div>
     </nav>
@@ -281,12 +284,13 @@
             <a href="javascript:void(0);" class="nav-link dropdown-trigger">Services <i class="fa fa-caret-down"></i></a>
             <div class="collapse" id="services">
               <ul>
-                <li><a href="our-services.html?adverts-service=true" class="dropdown-item">Social Media Advertising</a></li>
-                <li><a href="our-services.html?development-service=true" class="dropdown-item">Web Design & Development</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Social Media Advertising</a></li>
+                <li><a href="our-services.html" class="dropdown-item">Web Design & Development</a></li>
               </ul>
             </div>
           </li>
           <li><a href="careers.html" class="nav-link">Careers</a></li>
+          <li><a href="book.html" class="nav-link nav-cta">Book a Session</a></li>
         </ul>
       </div>
     </aside>
@@ -297,7 +301,7 @@
 <section class="about-hero">
   <div class="eyebrow"><i class="fa fa-users"></i> Our Team</div>
   <h1>The People Behind<br><span>AdConnect</span></h1>
-  <p>A dedicated team of digital marketing experts, developers, and strategists passionate about growing real estate businesses through data-driven campaigns.</p>
+  <p>A dedicated team of digital marketing experts, developers, and strategists passionate about growing businesses through data-driven campaigns.</p>
 </section>
 
 <!-- ── VALUES ── -->
@@ -415,7 +419,7 @@
 <section class="about-cta">
   <div class="container">
     <h2>Ready to Work With Us?</h2>
-    <p>Book a free consultation and let's craft a digital marketing strategy that moves your real estate business forward.</p>
+    <p>Book a free consultation and let's craft a digital marketing strategy that moves your business forward.</p>
     <div class="cta-buttons">
       <a href="index.html?lead-capture-form=true" class="btn btn-primary btn-lg">
         <i class="fa fa-calendar"></i> Book Free Consultation
@@ -443,7 +447,7 @@
         </span>
       </a>
       <p class="footer-v2-tagline">
-        Kenya's real estate digital marketing specialists. We build campaigns, systems, and brands that convert.
+        Digital marketing, web &amp; software development, data and consulting. We build campaigns, systems and brands that convert.
       </p>
       <div class="footer-v2-socials" aria-label="Social media links">
         <a href="https://www.facebook.com/profile.php?id=61567259036362" class="footer-v2-social-link" target="_blank" rel="noopener" aria-label="Facebook">
@@ -486,13 +490,13 @@
     <div class="footer-v2-col col-services">
       <div class="footer-v2-col-title">Services</div>
       <ul class="footer-v2-links">
-        <li><a href="our-services.html?adverts-service=true">Social Media Ads</a></li>
-        <li><a href="our-services.html?adverts-service=true">Ad Creative Design</a></li>
-        <li><a href="our-services.html?adverts-service=true">Analytics & Reporting</a></li>
-        <li><a href="our-services.html?adverts-service=true">Facebook Campaigns</a></li>
-        <li><a href="our-services.html?development-service=true">Web Development</a></li>
-        <li><a href="our-services.html?development-service=true">Android Apps</a></li>
-        <li><a href="our-services.html?courses-service=true">Coaching Programs</a></li>
+        <li><a href="our-services.html">Social Media Ads</a></li>
+        <li><a href="our-services.html">Ad Creative Design</a></li>
+        <li><a href="our-services.html">Analytics & Reporting</a></li>
+        <li><a href="our-services.html">Facebook Campaigns</a></li>
+        <li><a href="our-services.html">Web Development</a></li>
+        <li><a href="our-services.html">Android Apps</a></li>
+        <li><a href="our-services.html">Coaching Programs</a></li>
       </ul>
     </div>
  
@@ -500,64 +504,42 @@
     <div class="footer-v2-col col-quick">
       <div class="footer-v2-col-title">Quick Links</div>
       <ul class="footer-v2-links">
-        <li>
-          <a href="javascript:void(0)" >FAQs</a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" onclick="footerModal('appointment-booking')">Free Consultation</a>
-        </li>
-        <li>
-          <a href="?value-video-request=true">Watch Free Video</a>
-        </li>
-        <li>
-          <a href="our-services.html?development-service=true">UI/UX Design</a>
-        </li>
+        <li><a href="book.html">Book a Session</a></li>
+        <li><a href="proposal.html">Submit a Proposal</a></li>
+        <li><a href="booking-status.html">Track Booking / Proposal</a></li>
+        <li><a href="subscribe.html">Email Updates</a></li>
+        <li><a href="faqs.html">FAQs</a></li>
+        <li><a href="unsubscribe.html">Unsubscribe</a></li>
       </ul>
       <!-- Location pill -->
-      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
-        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
       </div>
     </div>
  
     <!-- Newsletter column -->
     <div class="footer-v2-col col-newsletter">
       <div class="footer-v2-col-title">Newsletter</div>
-      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Practical tips on marketing, web, software and data. No spam.</p>
       <div class="footer-v2-newsletter-form">
         <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
         <button id="btnSubscribe" class="footer-v2-newsletter-btn">
           Subscribe →
         </button>
       </div>
-      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
       <!-- Help text -->
-      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
-          <strong style="color:#f4f1ee;">Need Help?</strong><br />
-          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
         </p>
       </div>
     </div>
  
   </div><!-- /.footer-v2-main -->
- 
-  <!-- Bottom bar -->
-  <div class="footer-v2-bottom">
-    <div>
-      <p class="footer-v2-copy">
-        © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
-      </p>
-      <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
-        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
-      </p>
-    </div>
-    <nav class="footer-v2-legal" aria-label="Legal links">
-      <a href="javascript:void(0)" onclick="footerModal('privacy-policy')">Privacy Policy</a>
-      <a href="javascript:void(0)" onclick="footerModal('faqs')">FAQs</a>
-      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
-    </nav>
-  </div>
+
  
 </footer>
  
@@ -575,35 +557,35 @@
           <a href="?value-video-request=true">Watch Free Video</a>
         </li>
         <li>
-          <a href="our-services.html?development-service=true">UI/UX Design</a>
+          <a href="our-services.html">UI/UX Design</a>
         </li>
         <li>
           <a href="javascript:void(0)" onclick="openPrivacyPolicyPage()">Terms of Use</a>
         </li>
       </ul>
       <!-- Location pill -->
-      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <i class="fa fa-map-marker" style="color:#F65730;font-size:.8rem;"></i>
-        <span style="color:#7a7874;font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <i class="fa fa-map-marker" style="color:var(--clr-primary);font-size:.8rem;"></i>
+        <span style="color:var(--clr-text-muted);font-size:.78rem;" id="footerLocation">Nairobi, Kenya</span>
       </div>
     </div>
  
     <!-- Newsletter column -->
     <div class="footer-v2-col col-newsletter">
       <div class="footer-v2-col-title">Newsletter</div>
-      <p style="color:#7a7874;font-size:.8rem;line-height:1.6;margin-bottom:14px;">Get weekly marketing tips for real estate businesses. No spam.</p>
+      <p style="color:var(--clr-text-muted);font-size:.8rem;line-height:1.6;margin-bottom:14px;">Practical tips on marketing, web, software and data. No spam.</p>
       <div class="footer-v2-newsletter-form">
         <input id="footerNewsletterEmail" type="email" class="footer-v2-newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter" />
         <button class="footer-v2-newsletter-btn" onclick="subscribeNewsletter()">
           Subscribe →
         </button>
       </div>
-      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:#4ABC4F;display:none;">You're subscribed! ✓</p>
+      <p id="footerNewsletterMsg" style="font-size:.72rem;margin-top:6px;color:var(--clr-accent);display:none;">You're subscribed! ✓</p>
       <!-- Help text -->
-      <div style="margin-top:20px;padding:12px;background:#1a1917;border:1px solid #2d2b29;border-radius:8px;">
-        <p style="color:#7a7874;font-size:.75rem;line-height:1.6;">
-          <strong style="color:#f4f1ee;">Need Help?</strong><br />
-          <a href="mailto:info@adconnect.co.ke" style="color:#F65730;text-decoration:none;">info@adconnect.co.ke</a>
+      <div style="margin-top:20px;padding:12px;background:var(--clr-bg);border:1px solid #2d2b29;border-radius:8px;">
+        <p style="color:var(--clr-text-muted);font-size:.75rem;line-height:1.6;">
+          <strong style="color:var(--clr-text-primary);">Need Help?</strong><br />
+          <a href="mailto:info@adconnect.co.ke" style="color:var(--clr-primary);text-decoration:none;">info@adconnect.co.ke</a>
         </p>
       </div>
     </div>
@@ -617,13 +599,13 @@
         © <span id="current-year"></span> <a href="index.html">AdConnect</a>. All rights reserved.
       </p>
       <p class="footer-v2-built" style="margin-top:4px;color:#2d2b29;font-size:.7rem;">
-        Designed, Built and Managed by <span style="color:#3d3b39;">AdConnect Development Team</span>
+        Designed, Built and Managed by <span style="color:var(--clr-border);">AdConnect Development Team</span>
       </p>
     </div>
     <nav class="footer-v2-legal" aria-label="Legal links">
       <a href="javascript:void(0)" onclick="openPrivacyPolicyPage()">Privacy Policy</a>
       <a href="javascript:void(0)" onclick="openFAQsPage()">FAQs</a>
-      <a href="https://adconnect.co.ke/unsubscribe">Unsubscribe</a>
+      <a href="unsubscribe.html">Unsubscribe</a>
     </nav>
   </div>
  
@@ -640,8 +622,8 @@
     z-index: 99999;
     width: calc(100% - 32px);
     max-width: 680px;
-    background: var(--clr-surface-1, #252320);
-    border: 1.5px solid var(--clr-border, #3d3b39);
+    background: var(--clr-surface-1, var(--clr-surface-1));
+    border: 1.5px solid var(--clr-border, var(--clr-border));
     border-radius: 16px;
     padding: 20px 24px;
     box-shadow: 0 8px 40px rgba(0,0,0,.55);
@@ -651,21 +633,21 @@
   .cc-inner { display: flex; align-items: flex-start; gap: 16px; }
   .cc-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
   .cc-text { flex: 1; }
-  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: #F4F1EE; margin: 0 0 6px; }
-  .cc-text p { font-size: .78rem; color: #B8B4B0; line-height: 1.6; margin: 0; }
-  .cc-text a { color: #4ABC4F; text-decoration: none; }
+  .cc-text h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: var(--clr-text-primary); margin: 0 0 6px; }
+  .cc-text p { font-size: .78rem; color: var(--clr-text-secondary); line-height: 1.6; margin: 0; }
+  .cc-text a { color: var(--clr-accent); text-decoration: none; }
   .cc-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
   .cc-btn {
     padding: 9px 20px; border-radius: 8px; font-size: .78rem; font-weight: 700;
     cursor: pointer; border: none; font-family: inherit; transition: all .2s ease;
     text-transform: uppercase; letter-spacing: .4px;
   }
-  .cc-btn-accept  { background: #F65730; color: #fff; }
-  .cc-btn-accept:hover  { background: #d94522; }
-  .cc-btn-reject  { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
-  .cc-btn-reject:hover  { border-color: #F65730; color: #F65730; }
-  .cc-btn-pref    { background: transparent; color: #7a7874; border: 1.5px solid #3d3b39; }
-  .cc-btn-pref:hover    { border-color: #B8B4B0; color: #B8B4B0; }
+  .cc-btn-accept  { background: var(--clr-primary); color: #fff; }
+  .cc-btn-accept:hover  { background: var(--clr-primary-hover); }
+  .cc-btn-reject  { background: transparent; color: var(--clr-text-muted); border: 1.5px solid var(--clr-border); }
+  .cc-btn-reject:hover  { border-color: var(--clr-primary); color: var(--clr-primary); }
+  .cc-btn-pref    { background: transparent; color: var(--clr-text-muted); border: 1.5px solid var(--clr-border); }
+  .cc-btn-pref:hover    { border-color: var(--clr-text-secondary); color: var(--clr-text-secondary); }
   /* Preferences modal */
   .cc-modal-overlay {
     position: fixed; inset: 0; z-index: 100000;
@@ -673,19 +655,19 @@
     display: flex; align-items: center; justify-content: center; padding: 20px;
   }
   .cc-modal {
-    background: #252320; border: 1.5px solid #3d3b39; border-radius: 16px;
+    background: var(--clr-surface-1); border: 1.5px solid var(--clr-border); border-radius: 16px;
     padding: 32px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto;
   }
-  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: #F4F1EE; margin: 0 0 8px; }
-  .cc-modal p  { font-size: .82rem; color: #7a7874; margin: 0 0 20px; line-height: 1.6; }
-  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #3d3b39; }
+  .cc-modal h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--clr-text-primary); margin: 0 0 8px; }
+  .cc-modal p  { font-size: .82rem; color: var(--clr-text-muted); margin: 0 0 20px; line-height: 1.6; }
+  .cc-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--clr-border); }
   .cc-toggle-row:last-child { border-bottom: none; }
-  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: #F4F1EE; margin-bottom: 3px; }
-  .cc-toggle-desc  { font-size: .75rem; color: #7a7874; line-height: 1.5; }
+  .cc-toggle-label { font-size: .85rem; font-weight: 700; color: var(--clr-text-primary); margin-bottom: 3px; }
+  .cc-toggle-desc  { font-size: .75rem; color: var(--clr-text-muted); line-height: 1.5; }
   .cc-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 3px; }
   .cc-switch input { opacity: 0; width: 0; height: 0; }
-  .cc-slider { position: absolute; inset: 0; background: #3d3b39; border-radius: 999px; cursor: pointer; transition: .3s; }
-  .cc-switch input:checked + .cc-slider { background: #F65730; }
+  .cc-slider { position: absolute; inset: 0; background: var(--clr-border); border-radius: 999px; cursor: pointer; transition: .3s; }
+  .cc-switch input:checked + .cc-slider { background: var(--clr-primary); }
   .cc-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
   .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
   .cc-switch input:disabled + .cc-slider { opacity: .6; cursor: not-allowed; }
@@ -704,7 +686,7 @@
       <h4>We use cookies</h4>
       <p>
         We use cookies and similar technologies to improve your browsing experience, analyse traffic, and personalise content.
-        Read our <a href="/pages/privacy.html">Privacy Policy</a> to learn more.
+        Read our <a href="privacy.html">Privacy Policy</a> to learn more.
       </p>
       <div class="cc-actions">
         <button class="cc-btn cc-btn-accept" onclick="acceptCookies()">Accept All</button>
@@ -755,8 +737,7 @@
   </div>
 </div>
 <script>
-//const DOMAIN = 'https://adconnect.co.ke/api/';
-const DOMAIN = 'http://localhost:3000/api/';
+const DOMAIN = '/api/';
 let allMembers = [];
 
 // Department icon map
@@ -1045,9 +1026,9 @@ function getStaticTeam() {
       department: 'Marketing',
       role: 'Digital Marketing Specialist',
       photo: '/resources/misgina.png',
-      introduction: "Hello! I'm Misgina Fitwi, a digital marketing specialist dedicated to helping real estate companies thrive in the digital landscape. I studied Digital Marketing at Oslo Kristiania University, where I honed my skills in social media advertising, data analysis, and consumer behaviour.",
+      introduction: "Hello! I'm Misgina Fitwi, a digital marketing specialist dedicated to helping businesses thrive in the digital landscape. I studied Digital Marketing at Oslo Kristiania University, where I honed my skills in social media advertising, data analysis, and consumer behaviour.",
       experience: "With over four years of hands-on experience, I have developed and executed successful social media ad campaigns that significantly increased visibility and sales for clients. My approach is data-driven, ensuring that every campaign is optimised for maximum performance and ROI.",
-      mission: "At AdConnect, our mission is to empower real estate businesses by leveraging the full potential of digital marketing. We believe in building long-term relationships, providing clients with the tools and insights they need to succeed in a competitive market.",
+      mission: "At AdConnect, our mission is to empower businesses by leveraging the full potential of digital marketing. We believe in building long-term relationships, providing clients with the tools and insights they need to succeed in a competitive market.",
       status: 'ACTIVE',
     },
     {
@@ -1075,5 +1056,6 @@ function closeNav() { document.getElementById('mySidePanel').style.left = '-320p
   to   { opacity: 1; transform: translateY(0); }
 }
 </style>
+<script src="scripts/site.js"></script>
 </body>
 </html>

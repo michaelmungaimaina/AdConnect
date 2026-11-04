@@ -1,5 +1,7 @@
-node_modules
-credentials.txt
-credentials.json
-token.json
+node_modules/
 .env
+uploads/*
+!uploads/.gitkeep
+!uploads/cvs/.gitkeep
+!uploads/proposals/.gitkeep
+*.log
