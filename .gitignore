@@ -5,3 +5,4 @@ uploads/*
 !uploads/cvs/.gitkeep
 !uploads/proposals/.gitkeep
 *.log
+token.json
