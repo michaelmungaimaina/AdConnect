@@ -2,10 +2,10 @@
   "name": "adconnect",
   "version": "2.0.0",
   "description": "AdConnect website and admin: services, bookings, project proposals, email subscriptions and campaigns.",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon node server.js",
+    "start": "node app.js",
+    "dev": "nodemon node app.js",
     "sample-data": "node database/build-sample-data.js"
   },
   "engines": {
